@@ -9,7 +9,7 @@ export default async function Home() {
           <div className="max-w-xl rounded-2xl border bg-white/70 p-6 shadow-sm">
             <h2 className={`${italianno.className} text-gray-800 md:text-5xl md:leading-normal`}>Every healing practice has a story.</h2>
             <p className="mb-4 text-sm text-gray-500">
-              We’d love to know yours, and who you hold space for.
+              We&apos;d love to know yours, and who you hold space for.
             </p>
             <PractitionerForm />
           </div>

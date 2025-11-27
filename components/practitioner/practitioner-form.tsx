@@ -34,7 +34,7 @@ export default function PractitionerForm() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log('Practitioner form:', form);
-    alert('Submitted! (Currently saved on frontend only. We’ll connect to backend/database later)');
+    alert('Submitted! (Currently saved on frontend only. We&apos;ll connect to backend/database later)');
   };
 
   return (
@@ -117,7 +117,7 @@ export default function PractitionerForm() {
 
         <textarea
             className="w-full rounded-md border px-3 py-2 text-sm min-h-[80px]"
-            placeholder="Feel free to include one or more ways, each on a new line if you'd like."
+            placeholder="Feel free to include one or more ways, each on a new line if you&apos;d like."
             value={form.contact}
             onChange={handleChange('contact')}
         />
@@ -127,7 +127,7 @@ export default function PractitionerForm() {
         <label className="block text-sm font-medium">Tell us a little about your practice</label>
         <textarea
           className="w-full rounded-md border px-3 py-2 text-sm min-h-[100px]"
-          placeholder="Share anything you'd like - your background, care values, or current offerings."
+          placeholder="Share anything you&apos;d like - your background, care values, or current offerings."
           value={form.bio}
           onChange={handleChange('bio')}
         />
