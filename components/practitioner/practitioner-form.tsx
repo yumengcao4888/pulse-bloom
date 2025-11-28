@@ -50,7 +50,7 @@ export default function PractitionerForm() {
       const data = await res.json();
       console.log("Saved practitioner:", data);
 
-      alert("Saved to backend API successfully!");
+      alert("Saved to backend SQLite database successfully!");
       setForm(initialForm);
     } catch (err) {
       console.error(err);
