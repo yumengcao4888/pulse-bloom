@@ -31,10 +31,31 @@ export default function PractitionerForm() {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('Practitioner form:', form);
-    alert("Submitted! (Currently saved on frontend only. We'll connect to backend/database later)");
+
+    try {
+      const res = await fetch("/api/practitioner", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to save");
+      }
+
+      const data = await res.json();
+      console.log("Saved practitioner:", data);
+
+      alert("Saved to backend API successfully!");
+      setForm(initialForm);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save. Please try again.");
+    }
   };
 
   return (
@@ -72,6 +93,7 @@ export default function PractitionerForm() {
           placeholder="e.g. yoga, community acupuncture, peer support"
           value={form.modality}
           onChange={handleChange('modality')}
+          required
         />
       </div>
 
@@ -83,6 +105,7 @@ export default function PractitionerForm() {
           placeholder="e.g. queer & trans folks, BIPOC parents, immigrants"
           value={form.focus}
           onChange={handleChange('focus')}
+          required
         />
       </div>
 
@@ -130,6 +153,7 @@ export default function PractitionerForm() {
           placeholder="Share anything you'd like - your background, care values, or current offerings."
           value={form.bio}
           onChange={handleChange('bio')}
+          required
         />
       </div>
 
