@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     console.log("Received practitioner data:", body);
 
-    const { name, modality, focus, bio } = body;
+    const { name, pronoun, modality, focus, city, contact, bio } = body;
     const missing: string[] = [];
     if (!name) missing.push("name");
     if (!modality) missing.push("modality");
@@ -20,6 +21,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const practitioner = await prisma.practitioner.create({
+      data: { name, modality, focus, bio, pronoun, city, contact },
+    });
 
     return NextResponse.json(
       { success: true, practitioner: body },
