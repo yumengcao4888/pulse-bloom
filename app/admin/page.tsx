@@ -32,7 +32,7 @@ export default async function PractitionerListPage() {
             <tr key={p.id}>
               <td className="border px-4 py-2">{p.id}</td>
               <td className="border px-4 py-2">{p.name}</td>
-              <td className="border px-4 py-2">{p.pronoun}</td>
+              <td className="border px-4 py-2">{p.pronouns}</td>
               <td className="border px-4 py-2">{p.modality}</td>
               <td className="border px-4 py-2">{p.focus}</td>
               <td className="border px-4 py-2">{p.city}</td>

@@ -27,7 +27,7 @@ model Practitioner {
   focus     String
   bio       String
 
-  pronoun   String?
+  pronouns  String?
   city      String?
   contact   String?
   

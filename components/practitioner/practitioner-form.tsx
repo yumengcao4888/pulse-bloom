@@ -4,7 +4,7 @@ import { useState, FormEvent } from 'react';
 
 type PractitionerForm = {
   name: string;
-  pronoun: string;
+  pronouns: string;
   modality: string;
   focus: string;
   city: string;
@@ -14,7 +14,7 @@ type PractitionerForm = {
 
 const initialForm: PractitionerForm = {
   name: '',
-  pronoun: '',
+  pronouns: '',
   modality: '',
   focus: '',
   city: '',
@@ -80,8 +80,8 @@ export default function PractitionerForm() {
           type="text"
           className="w-full rounded-md border px-3 py-2 text-sm"
           placeholder="e.g. she/her, they/them, he/him, xe/xem, or however you identify"
-          value={form.pronoun}
-          onChange={handleChange('pronoun')}
+          value={form.pronouns}
+          onChange={handleChange('pronouns')}
         />
       </div>
 

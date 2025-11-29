@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log("Received practitioner data:", body);
 
-    const { name, pronoun, modality, focus, city, contact, bio } = body;
+    const { name, pronouns, modality, focus, city, contact, bio } = body;
     const missing: string[] = [];
     if (!name) missing.push("name");
     if (!modality) missing.push("modality");
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const practitioner = await prisma.practitioner.create({
-      data: { name, modality, focus, bio, pronoun, city, contact },
+      data: { name, modality, focus, bio, pronouns, city, contact },
     });
 
     return NextResponse.json(
