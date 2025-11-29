@@ -26,9 +26,9 @@ model Practitioner {
   modality  String
   focus     String
   bio       String
+  slug      String   @unique
 
   pronouns  String?
   city      String?
   contact   String?
-  
 }

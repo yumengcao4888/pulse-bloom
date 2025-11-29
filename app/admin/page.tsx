@@ -15,6 +15,7 @@ export default async function PractitionerListPage() {
         <thead className="bg-gray-100">
           <tr>
             <th className="border px-4 py-2">ID</th>
+            <th className="border px-4 py-2">Slug</th>
             <th className="border px-4 py-2">Name</th>
             <th className="border px-4 py-2">Pronouns</th>
             <th className="border px-4 py-2">Modality</th>
@@ -31,6 +32,7 @@ export default async function PractitionerListPage() {
           {practitioners.map((p) => (
             <tr key={p.id}>
               <td className="border px-4 py-2">{p.id}</td>
+              <td className="border px-4 py-2">{p.slug}</td>
               <td className="border px-4 py-2">{p.name}</td>
               <td className="border px-4 py-2">{p.pronouns}</td>
               <td className="border px-4 py-2">{p.modality}</td>
