@@ -19,16 +19,32 @@ datasource db {
 
 model Practitioner {
   id        Int      @id @default(autoincrement())
+  name        String
+  pronouns    String?
+  modality    String
+  focus       String
+  city        String?
+  contact     String?
+  bio         String
+
+  slug        String @unique
+  reflections Reflection[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
 
-  name      String
-  modality  String
-  focus     String
-  bio       String
-  slug      String   @unique
+model Reflection {
+  id Int @id @default(autoincrement())
 
-  pronouns  String?
-  city      String?
-  contact   String?
+  grounded  Boolean?
+  supported Boolean?
+  connected Boolean?
+
+  feeling   String?
+
+  practitioner   Practitioner @relation(fields: [practitionerId], references: [id])
+  practitionerId Int
+
+  createdAt DateTime @default(now())
 }

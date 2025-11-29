@@ -1,7 +1,7 @@
 import PractitionerForm from "@/components/practitioner/practitioner-form";
 import { italianno } from '@/app/fonts';
 
-export default async function Home() {
+export default async function PractitionerPage() {
   return (
     <>
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
