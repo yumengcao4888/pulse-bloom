@@ -55,7 +55,7 @@ export default async function ReflectionPage({ params }: { params: { slug: strin
           <input type="hidden" name="slug" value={slug} />
 
           <label className="block">
-            <span className="text-gray-700">A few words, if you&aposd like (optional)</span>
+            <span className="text-gray-700">A few words, if you&apos;d like (optional)</span>
             <textarea
               name="content"
               className="w-full border p-3 rounded mt-1"
