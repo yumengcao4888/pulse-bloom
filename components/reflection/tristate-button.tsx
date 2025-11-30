@@ -14,10 +14,7 @@ export function TriStateButton({ name, label, onChange }: TriStateButtonProps) {
   const [state, setState] = useState<TriState>(null);
 
   function nextState() {
-    let next: TriState = null;
-    if (state === null) next = "yes";
-    else if (state === "yes") next = "no";
-    else next = null;
+    const next: TriState = state === "yes" ? "no" : "yes";
 
     setState(next);
     onChange(next);
