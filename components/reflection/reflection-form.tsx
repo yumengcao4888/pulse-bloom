@@ -1,39 +1,57 @@
+"use client";
+
+import { useState } from "react";
+import { FormEvent } from "react";
+import { TriStateButton } from "@/components/reflection/tristate-button";
+
 type Props = {
   slug: string;
 };
 
+type TriState = null | "yes" | "no";
+
 export default function ReflectionForm({ slug }: Props) {
+  const [grounded, setGrounded] = useState<TriState>(null);
+  const [supported, setSupported] = useState<TriState>(null);
+  const [connected, setConnected] = useState<TriState>(null);
+  const [feeling, setFeeling] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!grounded || !supported || !connected) {
+      setError("Please choose a response for each feeling.");
+      return;
+    }
+
+    setError("");
+    await fetch("/api/reflection", {
+      method: "POST",
+      body: JSON.stringify({
+        slug,
+        grounded,
+        supported,
+        connected,
+        feeling
+      }),
+    });
+  }
+
   return (
-    <form action="/api/reflection" method="POST" className="space-y-4">
+    <form action="/api/reflection" onSubmit={handleSubmit} method="POST" className="space-y-4">
       <input type="hidden" name="slug" value={slug} />
 
       <div className="space-y-2">
-        <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 cursor-pointer">
-          <input
-            type="checkbox"
-            name="grounded"
-            className="h-4 w-4"
-          />
-          <span>I feel grounded 🌱</span>
-        </label>
+        <TriStateButton name="grounded" label="I feel grounded 🌱" onChange={setGrounded} />
+        <TriStateButton name="supported" label="I feel supported 💛" onChange={setSupported} />
+        <TriStateButton name="connected" label="I feel connected 🤝" onChange={setConnected} />
 
-        <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 cursor-pointer">
-          <input
-            type="checkbox"
-            name="supported"
-            className="h-4 w-4"
-          />
-          <span>I feel supported 💛</span>
-        </label>
-
-        <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 cursor-pointer">
-          <input
-            type="checkbox"
-            name="connected"
-            className="h-4 w-4"
-          />
-          <span>I feel connected 🤝</span>
-        </label>
+        {error && (
+          <p className="text-red-500 text-sm">
+            {error}
+          </p>
+        )}
       </div>
 
       <label className="block">
@@ -42,6 +60,8 @@ export default function ReflectionForm({ slug }: Props) {
           name="feeling"
           className="w-full border p-3 rounded mt-1"
           placeholder="e.g. a word, a feeling, or a quiet thought…"
+          onChange={(e) => setFeeling(e.target.value)}
+          value={feeling}
           rows={3}
         />
       </label>

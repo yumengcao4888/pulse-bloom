@@ -3,17 +3,11 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    const body = await req.json();
+    const { slug, grounded, supported, connected, feeling } = body;
 
-    const slug = formData.get('slug') as string | null;
-    const feeling = formData.get('feeling') as string | null;
-
-    const grounded  = formData.get('grounded') === 'on';
-    const supported = formData.get('supported') === 'on';
-    const connected = formData.get('connected') === 'on';
-
-    if (!slug) {
-      return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
+    if (!slug || typeof slug !== "string") {
+      return NextResponse.json({ error: "Missing slug" }, { status: 400 });
     }
 
     const practitioner = await prisma.practitioner.findUnique({
@@ -24,12 +18,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Practitioner not found' }, { status: 404 });
     }
 
+    const groundedBool = grounded === "yes";
+    const supportedBool = supported === "yes";
+    const connectedBool = connected === "yes";
+
     const reflection = await prisma.reflection.create({
       data: {
-        grounded,
-        supported,
-        connected,
-        feeling: feeling && feeling.trim() !== '' ? feeling : null,
+        grounded: groundedBool,
+        supported: supportedBool,
+        connected: connectedBool,
+        feeling: feeling && feeling.trim() !== "" ? feeling : null,
         practitionerId: practitioner.id,
       },
     });
