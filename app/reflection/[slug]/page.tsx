@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import ReflectionForm from "@/components/reflection/reflection-form";
-import { QRCodeSVG } from "qrcode.react";
 import { sriracha } from '@/app/fonts';
 
 export default async function ReflectionPage({
@@ -18,24 +17,18 @@ export default async function ReflectionPage({
     where: { slug },
   });
 
-  const url = "http://localhost:3000/reflection/" + slug;
-
   if (!practitioner) {
     return <div className="relative z-10 p-8 text-red-500 text-lg">Practitioner not found.</div>;
   }
 
   return (
     <div className="relative z-10 rounded-2xl border bg-white/70 p-6 shadow-sm">
-      <div className="mb-3 flex justify-center">
-        <QRCodeSVG value={url} size={120} />
-      </div>
-
       {submitted && (
         <p className="mb-0 rounded-lg bg-emerald-50 text-emerald-800 px-4 py-2 text-sm">
           Thank you for taking a moment to reflect. 🌿
         </p>
       )}
-      
+
       <div className="max-w-xl mx-auto p-8">
         <h1 className={`${sriracha.className} text-2xl font-bold mb-0`}>
           After your time with {practitioner.name}...
