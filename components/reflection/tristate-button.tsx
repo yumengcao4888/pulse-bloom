@@ -24,14 +24,14 @@ export function TriStateButton({ name, label, onChange }: TriStateButtonProps) {
   }
 
   const base =
-    "w-full px-4 py-3 rounded-lg border cursor-pointer transition";
+    "w-full px-4 py-3 rounded-lg cursor-pointer transition inline-flex items-center justify-center gap-1";
 
   const color =
     state === "yes"
-      ? "bg-green-100 border-green-400"
+      ? "bg-green-100 border-green-400 hover:bg-green-100/60 hover:backdrop-blur-sm hover:shadow-md"
       : state === "no"
-      ? "bg-red-100 border-red-400"
-      : "bg-gray-100 border-gray-300 opacity-80";
+      ? "bg-red-100 border-red-400 hover:bg-red-100/60 hover:backdrop-blur-sm hover:shadow-md"
+      : "bg-gray-100 border-gray-300 opacity-80 hover:bg-gray-100/60 hover:backdrop-blur-sm hover:shadow-md";
 
   return (
     <button type="button" className={`${base} ${color} inline-flex items-center justify-center`} onClick={nextState}>
