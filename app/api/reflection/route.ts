@@ -15,7 +15,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!practitioner) {
-      return NextResponse.json({ error: 'Practitioner not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Practitioner not found' },
+        { status: 404 }
+      );
     }
 
     const groundedBool = grounded === "yes";
@@ -32,9 +35,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const redirectUrl = new URL(`/reflection/${slug}?submitted=1`, req.url);
-    return NextResponse.redirect(redirectUrl);
-
+    return NextResponse.json(
+      { success: true, id: reflection.id },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("Error in /api/reflection:", err);
     return NextResponse.json(

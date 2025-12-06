@@ -2,16 +2,18 @@ import { prisma } from "@/lib/prisma";
 import ReflectionForm from "@/components/reflection/reflection-form";
 import { sriracha } from '@/app/fonts';
 
-export default async function ReflectionPage({
-    params,
-    searchParams,
-  }: {
-    params: { slug: string };
-    searchParams?: { submitted?: string };
-  }) {
+type PageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ submitted?: string }>;
+};
 
-  const { slug } = params;
-  const submitted = searchParams?.submitted === '1';
+export default async function ReflectionPage(props: PageProps) {
+
+  const { slug } = await props.params;
+  const rawSearchParams =
+    props.searchParams ? await props.searchParams : ({} as { submitted?: string });
+
+  const submitted = rawSearchParams.submitted === "1";
 
   const practitioner = await prisma.practitioner.findUnique({
     where: { slug },

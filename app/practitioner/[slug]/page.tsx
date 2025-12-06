@@ -2,8 +2,13 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { prisma } from "@/lib/prisma";
 
-export default async function PractitionerPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+type PageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export default async function PractitionerPage(props: PageProps) {
+  
+  const { slug } = await props.params;
 
   const practitioner = await prisma.practitioner.findUnique({
     where: { slug },
