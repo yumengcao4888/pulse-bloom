@@ -13,7 +13,7 @@ type TriStateButtonProps = {
 export function TriStateButton({ name, label, value, onChange }: TriStateButtonProps) {
   const handleClick = () => {
     const next: TriState =
-      value === null ? "yes" : value === "yes" ? "no" : null;
+      value === null ? "yes" : value === "yes" ? "no" : "yes";
     onChange(next);
   };
 
