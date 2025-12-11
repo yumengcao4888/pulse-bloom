@@ -38,5 +38,5 @@ next-env.d.ts
 
 # misc
 .vscode
-
 /generated/prisma
+AGENTS.md
