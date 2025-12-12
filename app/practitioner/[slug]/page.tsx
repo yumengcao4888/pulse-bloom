@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
+import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
 
 type PageProps = {
@@ -27,6 +28,25 @@ export default async function PractitionerPage(props: PageProps) {
   const formatBool = (value: boolean | null | undefined) =>
     value == null ? "N/A" : value ? "Yes" : "No";
   const formatDate = (date: Date) => new Date(date).toLocaleString();
+  const hfEnabled = Boolean(process.env.HF_TOKEN);
+
+  const reflectionsWithAnalysis = await Promise.all(
+    practitioner.reflections.map(async (reflection) => ({
+      ...reflection,
+      sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
+    })),
+  );
+
+  const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
+    (acc, reflection) => {
+      const label = reflection.sentiment?.label ?? "Unclassified";
+      acc[label] = (acc[label] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+
+  const summaryEntries = Object.entries(sentimentCounts);
 
   return (
     <>
@@ -59,7 +79,7 @@ export default async function PractitionerPage(props: PageProps) {
               <b>Reflection Link:</b> <Link href={reflectionLink} className="text-blue-600 underline">{reflectionLink}</Link>
             </p>
             <p className="text-gray-700">
-              <b>Reflections Count:</b> {practitioner.reflections.length}
+              <b>Reflections Count:</b> {reflectionsWithAnalysis.length}
             </p>
           </div>
         </div>
@@ -67,11 +87,29 @@ export default async function PractitionerPage(props: PageProps) {
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
         <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
           <h2 className="text-2xl font-semibold mb-4">Reflections</h2>
-          {practitioner.reflections.length === 0 ? (
+          <p className="mb-3 text-sm text-gray-500">
+            {hfEnabled
+              ? "Sentiment analysis powered by the CardiffNLP Hugging Face model."
+              : "Set HF_TOKEN to enable sentiment analysis for reflections."}
+          </p>
+          {summaryEntries.length > 0 && (
+            <div className="mb-4 grid gap-3 sm:grid-cols-3">
+              {summaryEntries.map(([label, count]) => (
+                <div
+                  key={label}
+                  className="rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-center text-sm shadow-sm"
+                >
+                  <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
+                  <p className="text-lg font-semibold text-gray-800">{count}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {reflectionsWithAnalysis.length === 0 ? (
             <p className="text-gray-600">No reflections yet.</p>
           ) : (
             <div className="space-y-4">
-              {practitioner.reflections.map((reflection) => (
+              {reflectionsWithAnalysis.map((reflection) => (
                 <div key={reflection.id} className="rounded-xl border border-gray-200 p-4">
                   <div className="mb-2 flex flex-wrap gap-4 text-sm text-gray-700">
                     <span>
@@ -86,6 +124,14 @@ export default async function PractitionerPage(props: PageProps) {
                   </div>
                   <p className="text-base text-gray-800 mb-2">
                     <b>Feeling:</b> {reflection.feeling ?? "N/A"}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Sentiment:{" "}
+                    {reflection.sentiment
+                      ? `${reflection.sentiment.label} (${(
+                          reflection.sentiment.score * 100
+                        ).toFixed(0)}% confidence)`
+                      : "Unavailable"}
                   </p>
                   <p className="text-sm text-gray-500">
                     Created: {formatDate(reflection.createdAt)}
