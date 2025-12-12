@@ -119,3 +119,51 @@ export function computeScores(reflections: Reflection[]) {
     monthly: aggregate(monthlyReflections),
   };
 }
+
+export type TrendPoint = {
+  date: string;
+  grounded: number | null;
+  supported: number | null;
+  connected: number | null;
+};
+
+function averagePercentage(values: boolean[]) {
+  if (values.length === 0) return null;
+  return Math.round((values.filter(Boolean).length / values.length) * 100);
+}
+
+export function computeDailyTrends(reflections: Reflection[]): TrendPoint[] {
+  const byDay: Record<
+    string,
+    {
+      grounded: boolean[];
+      supported: boolean[];
+      connected: boolean[];
+    }
+  > = {};
+
+  reflections.forEach((reflection) => {
+    const day = new Date(reflection.createdAt).toISOString().slice(0, 10);
+
+    const bucket =
+      byDay[day] ??
+      (byDay[day] = {
+        grounded: [],
+        supported: [],
+        connected: [],
+      });
+
+    if (reflection.grounded !== null) bucket.grounded.push(reflection.grounded);
+    if (reflection.supported !== null) bucket.supported.push(reflection.supported);
+    if (reflection.connected !== null) bucket.connected.push(reflection.connected);
+  });
+
+  return Object.entries(byDay)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, stats]) => ({
+      date,
+      grounded: averagePercentage(stats.grounded),
+      supported: averagePercentage(stats.supported),
+      connected: averagePercentage(stats.connected),
+    }));
+}

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
-import { computeScores, type ScoreSummary } from "@/lib/utils";
+import { TrendChart } from "@/components/practitioner/TrendChart";
+import { computeScores, computeDailyTrends, type ScoreSummary } from "@/lib/utils";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -70,6 +71,7 @@ export default async function PractitionerPage(props: PageProps) {
   );
 
   const scores = computeScores(reflectionsWithAnalysis);
+  const dailyTrends = computeDailyTrends(reflectionsWithAnalysis);
 
   const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
@@ -164,6 +166,16 @@ export default async function PractitionerPage(props: PageProps) {
               <ScoreCard key={card.id} title={card.title} subtitle={card.subtitle} score={card.score} />
             ))}
           </div>
+
+          {dailyTrends.length > 0 ? (
+            <div className="mt-6">
+              <TrendChart data={dailyTrends} />
+            </div>
+          ) : (
+            <p className="mt-6 text-sm text-gray-500">
+              Add a reflection to seed the trend chart.
+            </p>
+          )}
 
           {reflectionsWithAnalysis.length === 0 ? (
             <p className="text-gray-600">No reflections yet.</p>
