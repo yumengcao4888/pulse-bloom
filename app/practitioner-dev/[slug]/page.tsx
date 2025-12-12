@@ -2,13 +2,48 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
+import { computeScores, type ScoreSummary } from "@/lib/utils";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+const formatBool = (value: boolean | null | undefined) =>
+  value == null ? "N/A" : value ? "Yes" : "No";
+
+const formatDate = (date: string | Date) => new Date(date).toLocaleString();
+
+const formatPercent = (value: number | null | undefined) => (value == null ? "—" : `${value}%`);
+
+type ScoreCardProps = {
+  title: string;
+  subtitle: string;
+  score: ScoreSummary;
+};
+
+function ScoreCard({ title, subtitle, score }: ScoreCardProps) {
+  const metrics = [
+    ["Community Grounding", formatPercent(score.grounded)],
+    ["Support & Care", formatPercent(score.supported)],
+    ["Connection Index", formatPercent(score.connected)],
+  ] as const;
+
+  return (
+    <div className="rounded-xl border bg-white/70 p-4 text-center shadow-sm">
+      <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">{subtitle}</p>
+      <p className="text-sm font-semibold text-gray-700 mb-3">{title}</p>
+      <div className="space-y-1 text-sm">
+        {metrics.map(([label, value]) => (
+          <p key={label}>
+            {label}: <b>{value}</b>
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default async function PractitionerPage(props: PageProps) {
-  
   const { slug } = await props.params;
 
   const practitioner = await prisma.practitioner.findUnique({
@@ -25,9 +60,6 @@ export default async function PractitionerPage(props: PageProps) {
   }
 
   const reflectionLink = `http://localhost:3000/reflection/${slug}`;
-  const formatBool = (value: boolean | null | undefined) =>
-    value == null ? "N/A" : value ? "Yes" : "No";
-  const formatDate = (date: Date) => new Date(date).toLocaleString();
   const hfEnabled = Boolean(process.env.HF_TOKEN);
 
   const reflectionsWithAnalysis = await Promise.all(
@@ -36,6 +68,8 @@ export default async function PractitionerPage(props: PageProps) {
       sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
     })),
   );
+
+  const scores = computeScores(reflectionsWithAnalysis);
 
   const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
@@ -47,6 +81,21 @@ export default async function PractitionerPage(props: PageProps) {
   );
 
   const summaryEntries = Object.entries(sentimentCounts);
+
+  const scoreCards = [
+    {
+      id: "monthly",
+      title: "Last 30 Days",
+      subtitle: `n = ${scores.monthly.n}`,
+      score: scores.monthly,
+    },
+    {
+      id: "all-time",
+      title: "All-time",
+      subtitle: `n = ${scores.allTime.n}`,
+      score: scores.allTime,
+    },
+  ];
 
   return (
     <>
@@ -76,7 +125,10 @@ export default async function PractitionerPage(props: PageProps) {
               <b>Bio:</b> {practitioner.bio}
             </p>
             <p className="text-gray-700">
-              <b>Reflection Link:</b> <Link href={reflectionLink} className="text-blue-600 underline">{reflectionLink}</Link>
+              <b>Reflection Link:</b>{" "}
+              <Link href={reflectionLink} className="text-blue-600 underline">
+                {reflectionLink}
+              </Link>
             </p>
             <p className="text-gray-700">
               <b>Reflections Count:</b> {reflectionsWithAnalysis.length}
@@ -84,16 +136,17 @@ export default async function PractitionerPage(props: PageProps) {
           </div>
         </div>
       </div>
-      <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
-        <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold mb-4">Reflections</h2>
-          <p className="mb-3 text-sm text-gray-500">
+
+      <div className="relative z-10 w-full max-w-xl px-5 xl:px-0 space-y-6">
+        <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
+          <h2 className="text-2xl font-semibold">Reflections</h2>
+          <p className="text-sm text-gray-500">
             {hfEnabled
               ? "Sentiment analysis powered by the CardiffNLP Hugging Face model."
               : "Set HF_TOKEN to enable sentiment analysis for reflections."}
           </p>
           {summaryEntries.length > 0 && (
-            <div className="mb-4 grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-3">
               {summaryEntries.map(([label, count]) => (
                 <div
                   key={label}
@@ -105,6 +158,13 @@ export default async function PractitionerPage(props: PageProps) {
               ))}
             </div>
           )}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {scoreCards.map((card) => (
+              <ScoreCard key={card.id} title={card.title} subtitle={card.subtitle} score={card.score} />
+            ))}
+          </div>
+
           {reflectionsWithAnalysis.length === 0 ? (
             <p className="text-gray-600">No reflections yet.</p>
           ) : (
@@ -141,6 +201,7 @@ export default async function PractitionerPage(props: PageProps) {
             </div>
           )}
         </div>
+
       </div>
     </>
   );

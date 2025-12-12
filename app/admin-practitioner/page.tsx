@@ -5,6 +5,13 @@ export const dynamic = "force-dynamic"
 export default async function PractitionerListPage() {
   const practitioners = await prisma.practitioner.findMany({
     orderBy: { createdAt: "asc" },
+    include: {
+      _count: {
+        select: {
+          reflections: true,
+        },
+      },
+    },
   });
 
   return (
@@ -22,6 +29,7 @@ export default async function PractitionerListPage() {
             <th className="border px-4 py-2">Focus</th>
             <th className="border px-4 py-2">City</th>
             <th className="border px-4 py-2">Contact</th>
+            <th className="border px-4 py-2">Reflections</th>
             <th className="border px-4 py-2">Bio</th>
             <th className="border px-4 py-2">Created At</th>
             {/* <th className="border px-4 py-2">Updated At</th> */}
@@ -39,6 +47,7 @@ export default async function PractitionerListPage() {
               <td className="border px-4 py-2">{p.focus}</td>
               <td className="border px-4 py-2">{p.city}</td>
               <td className="border px-4 py-2">{p.contact}</td>
+              <td className="border px-4 py-2 text-center">{p._count?.reflections ?? 0}</td>
               <td className="border px-4 py-2">{p.bio}</td>
               <td className="border px-4 py-2">
                 {new Date(p.createdAt).toLocaleString()}

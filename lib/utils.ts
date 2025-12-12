@@ -67,3 +67,55 @@ export const truncate = (str: string, length: number) => {
   if (!str || str.length <= length) return str;
   return `${str.slice(0, length)}...`;
 };
+
+export type Reflection = {
+  grounded: boolean | null;
+  supported: boolean | null;
+  connected: boolean | null;
+  createdAt: string | Date;
+};
+
+export type ScoreSummary = {
+  grounded: number | null;
+  supported: number | null;
+  connected: number | null;
+  n: number;
+};
+
+export function avg100(values: (boolean | null | undefined)[]): number | null {
+  const valid = values.filter((v) => v === true || v === false) as boolean[];
+  if (valid.length === 0) return null;
+
+  const mean = valid.reduce((sum, value) => sum + (value ? 1 : 0), 0) / valid.length;
+  return Math.round(mean * 100);
+}
+
+const MONTHLY_WINDOW_DAYS = 30;
+
+function aggregate(reflections: Reflection[]): ScoreSummary {
+  return {
+    grounded: avg100(reflections.map((r) => r.grounded)),
+    supported: avg100(reflections.map((r) => r.supported)),
+    connected: avg100(reflections.map((r) => r.connected)),
+    n: reflections.length,
+  };
+}
+
+function isAfterThreshold(reflection: Reflection, threshold: Date) {
+  return new Date(reflection.createdAt) >= threshold;
+}
+
+export function computeScores(reflections: Reflection[]) {
+  const referenceDate = new Date();
+  const monthlyThreshold = new Date(referenceDate);
+  monthlyThreshold.setDate(referenceDate.getDate() - MONTHLY_WINDOW_DAYS);
+
+  const monthlyReflections = reflections.filter((reflection) =>
+    isAfterThreshold(reflection, monthlyThreshold),
+  );
+
+  return {
+    allTime: aggregate(reflections),
+    monthly: aggregate(monthlyReflections),
+  };
+}
