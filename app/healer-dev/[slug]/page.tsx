@@ -3,7 +3,10 @@ import { QRCodeSVG } from "qrcode.react";
 import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
 import { TrendChart } from "@/components/healer/TrendChart";
-import { computeScores, computeDailyTrends, type ScoreSummary } from "@/lib/utils";
+import {
+  computeScores,
+  computeWeeklyTrends,
+} from "@/lib/utils";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -49,7 +52,7 @@ export default async function HealerDevPage(props: PageProps) {
   );
 
   const scores = computeScores(reflectionsWithAnalysis);
-  const dailyTrends = computeDailyTrends(reflectionsWithAnalysis);
+  const weeklyTrends = computeWeeklyTrends(reflectionsWithAnalysis);
 
   const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
@@ -163,9 +166,9 @@ export default async function HealerDevPage(props: PageProps) {
             ))}
           </div>
 
-          {dailyTrends.length > 0 ? (
+          {weeklyTrends.length > 0 ? (
             <div className="mt-6">
-              <TrendChart data={dailyTrends} />
+              <TrendChart data={weeklyTrends} />
             </div>
           ) : (
             <p className="mt-6 text-sm text-gray-500">

@@ -105,14 +105,21 @@ function isAfterThreshold(reflection: Reflection, threshold: Date) {
   return new Date(reflection.createdAt) >= threshold;
 }
 
-export function computeScores(reflections: Reflection[]) {
+function getMonthlyThreshold() {
   const referenceDate = new Date();
   const monthlyThreshold = new Date(referenceDate);
   monthlyThreshold.setDate(referenceDate.getDate() - MONTHLY_WINDOW_DAYS);
+  return monthlyThreshold;
+}
 
-  const monthlyReflections = reflections.filter((reflection) =>
-    isAfterThreshold(reflection, monthlyThreshold),
+export function getMonthlyReflections(reflections: Reflection[]) {
+  return reflections.filter((reflection) =>
+    isAfterThreshold(reflection, getMonthlyThreshold()),
   );
+}
+
+export function computeScores(reflections: Reflection[]) {
+  const monthlyReflections = getMonthlyReflections(reflections);
 
   return {
     allTime: aggregate(reflections),
@@ -159,6 +166,52 @@ export function computeDailyTrends(reflections: Reflection[]): TrendPoint[] {
   });
 
   return Object.entries(byDay)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, stats]) => ({
+      date,
+      grounded: averagePercentage(stats.grounded),
+      supported: averagePercentage(stats.supported),
+      connected: averagePercentage(stats.connected),
+    }));
+}
+
+function getWeekStartKey(dateInput: string | Date) {
+  const date = new Date(dateInput);
+  const day = date.getDay();
+  const offset = (day + 6) % 7;
+  const startOfWeek = new Date(date);
+  startOfWeek.setDate(startOfWeek.getDate() - offset);
+  startOfWeek.setHours(0, 0, 0, 0);
+  return startOfWeek.toISOString().slice(0, 10);
+}
+
+export function computeWeeklyTrends(reflections: Reflection[]): TrendPoint[] {
+  const byWeek: Record<
+    string,
+    {
+      grounded: boolean[];
+      supported: boolean[];
+      connected: boolean[];
+    }
+  > = {};
+
+  reflections.forEach((reflection) => {
+    const week = getWeekStartKey(reflection.createdAt);
+
+    const bucket =
+      byWeek[week] ??
+      (byWeek[week] = {
+        grounded: [],
+        supported: [],
+        connected: [],
+      });
+
+    if (reflection.grounded !== null) bucket.grounded.push(reflection.grounded);
+    if (reflection.supported !== null) bucket.supported.push(reflection.supported);
+    if (reflection.connected !== null) bucket.connected.push(reflection.connected);
+  });
+
+  return Object.entries(byWeek)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, stats]) => ({
       date,

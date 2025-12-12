@@ -16,7 +16,7 @@ export function TrendChart({ data }: { data: TrendPoint[] }) {
   return (
     <div className="rounded-2xl border bg-white/70 p-5 shadow-sm">
       <h3 className="mb-3 text-lg font-semibold text-gray-800">
-        All-time Daily Trends
+        All-time Weekly Trends
       </h3>
 
       <div className="h-64">
