@@ -12,7 +12,7 @@ datasource db {
   provider = "postgresql"
 }
 
-model Practitioner {
+model Healer {
   id        Int      @id @default(autoincrement())
   name        String
   pronouns    String?
@@ -38,8 +38,8 @@ model Reflection {
 
   feeling   String?
 
-  practitioner   Practitioner @relation(fields: [practitionerId], references: [id])
-  practitionerId Int
+  healer   Healer @relation(fields: [healerId], references: [id])
+  healerId Int
 
   createdAt DateTime @default(now())
 }

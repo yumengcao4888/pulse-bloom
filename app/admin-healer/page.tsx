@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic"
 
-export default async function PractitionerListPage() {
-  const practitioners = await prisma.practitioner.findMany({
+export default async function HealerListPage() {
+  const healers = await prisma.healer.findMany({
     orderBy: { createdAt: "asc" },
     include: {
       _count: {
@@ -16,7 +16,7 @@ export default async function PractitionerListPage() {
 
   return (
     <div className="z-10 p-8">
-      <h1 className="text-2xl font-bold mb-4">All Practitioners</h1>
+      <h1 className="text-2xl font-bold mb-4">All Healers</h1>
 
       <table className="min-w-full border border-gray-300 text-sm">
         <thead className="bg-gray-100">
@@ -37,7 +37,7 @@ export default async function PractitionerListPage() {
         </thead>
 
         <tbody>
-          {practitioners.map((p) => (
+          {healers.map((p) => (
             <tr key={p.id}>
               <td className="border px-4 py-2">{p.id}</td>
               <td className="border px-4 py-2">{p.slug}</td>

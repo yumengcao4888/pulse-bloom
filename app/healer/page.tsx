@@ -1,7 +1,7 @@
-import PractitionerForm from "@/components/practitioner/practitioner-form";
+import HealerForm from "@/components/healer/healer-form";
 import { italianno } from '@/app/fonts';
 
-export default async function PractitionerPage() {
+export default async function HealerPage() {
   return (
     <>
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
@@ -11,7 +11,7 @@ export default async function PractitionerPage() {
             <p className="mb-4 text-sm text-gray-500">
               We&apos;d love to know yours, and who you hold space for.
             </p>
-            <PractitionerForm />
+            <HealerForm />
           </div>
         </div>
       </div>

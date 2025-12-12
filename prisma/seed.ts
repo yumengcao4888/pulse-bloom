@@ -30,8 +30,8 @@ const feelingSeeds = [
 ];
 
 const pronounOptions = ['she/her', 'they/them'];
-const practitionerCount = 2;
-const reflectionsPerPractitioner = 10;
+const healerCount = 2;
+const reflectionsPerHealer = 10;
 
 const buildFeeling = () => {
   const intro = faker.helpers.arrayElement(feelingSeeds);
@@ -40,12 +40,12 @@ const buildFeeling = () => {
 };
 
 async function main() {
-  for (let i = 0; i < practitionerCount; i += 1) {
+  for (let i = 0; i < healerCount; i += 1) {
     const fullName = faker.person.fullName();
     const [firstName] = fullName.split(' ');
     const slug = `${faker.helpers.slugify(fullName).toLowerCase()}-${faker.string.uuid().slice(0, 8)}`;
 
-    await prisma.practitioner.create({
+    await prisma.healer.create({
       data: {
         name: fullName,
         pronouns: faker.helpers.arrayElement(pronounOptions),
@@ -56,7 +56,7 @@ async function main() {
         bio: faker.lorem.paragraphs({ min: 1, max: 2 }),
         slug,
         reflections: {
-          create: Array.from({ length: reflectionsPerPractitioner }).map(() => ({
+          create: Array.from({ length: reflectionsPerHealer }).map(() => ({
             grounded: faker.datatype.boolean(),
             supported: faker.datatype.boolean(),
             connected: faker.datatype.boolean(),
@@ -67,7 +67,7 @@ async function main() {
     });
   }
 
-  console.log(`Created ${practitionerCount} practitioners with ${reflectionsPerPractitioner} reflections each.`);
+  console.log(`Created ${healerCount} healers with ${reflectionsPerHealer} reflections each.`);
 }
 
 main()

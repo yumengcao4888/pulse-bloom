@@ -15,12 +15,12 @@ export default async function ReflectionPage(props: PageProps) {
 
   const submitted = rawSearchParams.submitted === "1";
 
-  const practitioner = await prisma.practitioner.findUnique({
+  const healer = await prisma.healer.findUnique({
     where: { slug },
   });
 
-  if (!practitioner) {
-    return <div className="relative z-10 p-8 text-red-500 text-lg">Practitioner not found.</div>;
+  if (!healer) {
+    return <div className="relative z-10 p-8 text-red-500 text-lg">Healer not found.</div>;
   }
 
   return (
@@ -33,7 +33,7 @@ export default async function ReflectionPage(props: PageProps) {
 
       <div className="max-w-xl mx-auto p-8">
         <h1 className={`${sriracha.className} text-2xl font-bold mb-0`}>
-          After your time with {practitioner.name}...
+          After your time with {healer.name}...
         </h1>
         <p className="text-gray-600 mb-5">
           Take a moment to notice how you feel.

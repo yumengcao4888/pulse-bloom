@@ -7,11 +7,11 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export default async function PractitionerPage(props: PageProps) {
+export default async function HealerPage(props: PageProps) {
   
   const { slug } = await props.params;
 
-  const practitioner = await prisma.practitioner.findUnique({
+  const healer = await prisma.healer.findUnique({
     where: { slug },
     include: {
       reflections: {
@@ -20,8 +20,8 @@ export default async function PractitionerPage(props: PageProps) {
     },
   });
 
-  if (!practitioner) {
-    return <div className="relative z-10 p-6 text-red-500">Practitioner not found.</div>;
+  if (!healer) {
+    return <div className="relative z-10 p-6 text-red-500">Healer not found.</div>;
   }
 
   const reflectionLink = `http://localhost:3000/reflection/${slug}`;
@@ -31,7 +31,7 @@ export default async function PractitionerPage(props: PageProps) {
   const hfEnabled = Boolean(process.env.HF_TOKEN);
 
   const reflectionsWithAnalysis = await Promise.all(
-    practitioner.reflections.map(async (reflection) => ({
+    healer.reflections.map(async (reflection) => ({
       ...reflection,
       sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
     })),
@@ -56,24 +56,24 @@ export default async function PractitionerPage(props: PageProps) {
             <div className="mb-3 flex justify-center">
               <QRCodeSVG value={reflectionLink} size={120} />
             </div>
-            <h1 className="text-3xl font-semibold mb-5">{practitioner.name}</h1>
+            <h1 className="text-3xl font-semibold mb-5">{healer.name}</h1>
             <p className="text-gray-700">
-              <b>Pronouns:</b> {practitioner.pronouns}
+              <b>Pronouns:</b> {healer.pronouns}
             </p>
             <p className="text-gray-700">
-              <b>Modality:</b> {practitioner.modality}
+              <b>Modality:</b> {healer.modality}
             </p>
             <p className="text-gray-700">
-              <b>Focus:</b> {practitioner.focus}
+              <b>Focus:</b> {healer.focus}
             </p>
             <p className="text-gray-700">
-              <b>City:</b> {practitioner.city}
+              <b>City:</b> {healer.city}
             </p>
             <p className="text-gray-700">
-              <b>Contact:</b> {practitioner.contact}
+              <b>Contact:</b> {healer.contact}
             </p>
             <p className="text-gray-700">
-              <b>Bio:</b> {practitioner.bio}
+              <b>Bio:</b> {healer.bio}
             </p>
             <p className="text-gray-700">
               <b>Reflection Link:</b> <Link href={reflectionLink} className="text-blue-600 underline">{reflectionLink}</Link>

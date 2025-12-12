@@ -10,13 +10,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing slug" }, { status: 400 });
     }
 
-    const practitioner = await prisma.practitioner.findUnique({
+    const healer = await prisma.healer.findUnique({
       where: { slug },
     });
 
-    if (!practitioner) {
+    if (!healer) {
       return NextResponse.json(
-        { error: 'Practitioner not found' },
+        { error: 'Healer not found' },
         { status: 404 }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         supported: supportedBool,
         connected: connectedBool,
         feeling: feeling && feeling.trim() !== "" ? feeling : null,
-        practitionerId: practitioner.id,
+        healerId: healer.id,
       },
     });
 

@@ -19,7 +19,7 @@ export default async function ReflectionListPage() {
             <th className="border px-4 py-2">Supported</th>
             <th className="border px-4 py-2">Connected</th>
             <th className="border px-4 py-2">Feeling</th>
-            <th className="border px-4 py-2">PractitionerId</th>
+            <th className="border px-4 py-2">HealerId</th>
             <th className="border px-4 py-2">Created At</th>
           </tr>
         </thead>
@@ -32,7 +32,7 @@ export default async function ReflectionListPage() {
               <td className="border px-4 py-2">{r.supported ? "true" : "false"}</td>
               <td className="border px-4 py-2">{r.connected ? "true" : "false"}</td>
               <td className="border px-4 py-2">{r.feeling}</td>
-              <td className="border px-4 py-2">{r.practitionerId}</td>
+              <td className="border px-4 py-2">{r.healerId}</td>
               <td className="border px-4 py-2">
                 {new Date(r.createdAt).toLocaleString()}
               </td>

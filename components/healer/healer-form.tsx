@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 
-type PractitionerForm = {
+type HealerForm = {
   name: string;
   pronouns: string;
   modality: string;
@@ -12,7 +12,7 @@ type PractitionerForm = {
   bio: string;
 };
 
-const initialForm: PractitionerForm = {
+const initialForm: HealerForm = {
   name: '',
   pronouns: '',
   modality: '',
@@ -22,11 +22,11 @@ const initialForm: PractitionerForm = {
   bio: '',
 };
 
-export default function PractitionerForm() {
-  const [form, setForm] = useState<PractitionerForm>(initialForm);
+export default function HealerForm() {
+  const [form, setForm] = useState<HealerForm>(initialForm);
 
   const handleChange =
-    (field: keyof PractitionerForm) =>
+    (field: keyof HealerForm) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
@@ -35,7 +35,7 @@ export default function PractitionerForm() {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/practitioner", {
+      const res = await fetch("/api/healer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export default function PractitionerForm() {
       }
 
       const data = await res.json();
-      console.log("Saved practitioner:", data);
+      console.log("Saved healer:", data);
 
       alert("Saved to backend SQLite database successfully!");
       setForm(initialForm);
