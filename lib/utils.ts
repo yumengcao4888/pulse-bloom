@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import ms from "ms";
+import type { SentimentPrediction } from "@/lib/huggingface";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -73,6 +74,7 @@ export type Reflection = {
   supported: boolean | null;
   connected: boolean | null;
   createdAt: string | Date;
+  sentiment?: SentimentPrediction | null;
 };
 
 export type ScoreSummary = {
@@ -137,6 +139,12 @@ export type TrendPoint = {
 function averagePercentage(values: boolean[]) {
   if (values.length === 0) return null;
   return Math.round((values.filter(Boolean).length / values.length) * 100);
+}
+
+function averageNumber(values: number[]) {
+  if (values.length === 0) return null;
+  const sum = values.reduce((total, value) => total + value, 0);
+  return sum / values.length;
 }
 
 export function computeDailyTrends(reflections: Reflection[]): TrendPoint[] {
@@ -219,4 +227,23 @@ export function computeWeeklyTrends(reflections: Reflection[]): TrendPoint[] {
       supported: averagePercentage(stats.supported),
       connected: averagePercentage(stats.connected),
     }));
+}
+
+export function computeWeeklySentiment(reflections: Reflection[]): Record<string, number | null> {
+  const buckets: Record<string, number[]> = {};
+
+  reflections.forEach((reflection) => {
+    const score = reflection.sentiment?.score;
+    if (score == null) return;
+    const week = getWeekStartKey(reflection.createdAt);
+    const bucket = buckets[week] ?? (buckets[week] = []);
+    bucket.push(score);
+  });
+
+  return Object.fromEntries(
+    Object.entries(buckets).map(([week, values]) => {
+      const average = averageNumber(values);
+      return [week, average == null ? null : Math.round(average * 100)];
+    }),
+  );
 }

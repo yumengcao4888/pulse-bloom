@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { TrendChart } from "@/components/healer/TrendChart";
 import {
   computeScores,
+  computeWeeklySentiment,
   computeWeeklyTrends,
 } from "@/lib/utils";
 
@@ -18,6 +19,39 @@ const formatBool = (value: boolean | null | undefined) =>
 const formatDate = (date: string | Date) => new Date(date).toLocaleString();
 
 const formatPercent = (value: number | null | undefined) => (value == null ? "—" : `${value}%`);
+
+type HeatmapCategoryKey = "grounded" | "supported" | "connected" | "sentiment";
+
+const heatmapCategories: { key: HeatmapCategoryKey; label: string }[] = [
+  { key: "grounded", label: "Grounded" },
+  { key: "supported", label: "Supported" },
+  { key: "connected", label: "Connected" },
+  { key: "sentiment", label: "Sentiment" },
+];
+
+const formatWeekLabel = (week: string) => {
+  const date = new Date(week);
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+};
+
+const getHeatStyle = (value: number | null | undefined) => {
+  if (value == null) {
+    return {
+      backgroundColor: "#f8fafc",
+      color: "#475569",
+    };
+  }
+
+  const normalized = Math.max(0, Math.min(1, value / 100));
+  const hue = 220 - normalized * 160;
+  const lightness = 65 - normalized * 35;
+  const textColor = lightness < 50 ? "#ffffff" : "#0f172a";
+
+  return {
+    backgroundColor: `hsl(${hue}, 75%, ${lightness}%)`,
+    color: textColor,
+  };
+};
 
 type MetricComparison = {
   label: string;
@@ -53,6 +87,7 @@ export default async function HealerDevPage(props: PageProps) {
 
   const scores = computeScores(reflectionsWithAnalysis);
   const weeklyTrends = computeWeeklyTrends(reflectionsWithAnalysis);
+  const weeklySentiment = computeWeeklySentiment(reflectionsWithAnalysis);
 
   const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
@@ -64,6 +99,22 @@ export default async function HealerDevPage(props: PageProps) {
   );
 
   const summaryEntries = Object.entries(sentimentCounts);
+
+  const weeklyTrendMap = Object.fromEntries(
+    weeklyTrends.map((trend) => [trend.date, trend]),
+  ) as Record<string, typeof weeklyTrends[number]>;
+  const heatmapWeeks = weeklyTrends.map((trend) => trend.date);
+  const heatmapRows = heatmapCategories.map((category) => ({
+    label: category.label,
+    values: heatmapWeeks.map((week) => {
+      if (category.key === "sentiment") {
+        return weeklySentiment[week] ?? null;
+      }
+
+      return weeklyTrendMap[week]?.[category.key] ?? null;
+    }),
+  }));
+  const hasHeatmapData = heatmapWeeks.length > 0;
 
   const metricComparisons: MetricComparison[] = [
     {
@@ -173,6 +224,58 @@ export default async function HealerDevPage(props: PageProps) {
           ) : (
             <p className="mt-6 text-sm text-gray-500">
               Add a reflection to seed the trend chart.
+            </p>
+          )}
+
+          {hasHeatmapData ? (
+            <div className="mt-6 rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-sm">
+              <h3 className="mb-3 text-lg font-semibold text-gray-800">Emotional Heat Map</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-fixed text-sm">
+                  <thead>
+                    <tr>
+                      <th className="border-b px-3 py-2 text-left text-xs uppercase tracking-wide text-gray-500">
+                        Metric / Week
+                      </th>
+                      {heatmapWeeks.map((week) => (
+                        <th
+                          key={week}
+                          className="border-b px-3 py-2 text-center text-xs uppercase tracking-wide text-gray-500"
+                        >
+                          {formatWeekLabel(week)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {heatmapRows.map((row) => (
+                      <tr key={row.label}>
+                        <td className="border-b px-3 py-2 font-medium text-gray-700">{row.label}</td>
+                        {row.values.map((value, index) => (
+                          <td
+                            key={`${row.label}-${heatmapWeeks[index]}`}
+                            className="border-b px-2 py-1"
+                          >
+                            <div
+                              className="flex h-12 items-center justify-center rounded text-xs font-semibold uppercase tracking-wide"
+                              style={getHeatStyle(value)}
+                            >
+                              {value == null ? "—" : `${value}%`}
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-2 text-xs text-gray-500">
+                Weekly averages for each metric; comment sentiment reflects the optional reflection text.
+              </p>
+            </div>
+          ) : (
+            <p className="mt-6 text-sm text-gray-500">
+              Add reflections to populate the emotional heat map.
             </p>
           )}
 
