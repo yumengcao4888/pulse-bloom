@@ -16,33 +16,11 @@ const formatDate = (date: string | Date) => new Date(date).toLocaleString();
 
 const formatPercent = (value: number | null | undefined) => (value == null ? "—" : `${value}%`);
 
-type ScoreCardProps = {
-  title: string;
-  subtitle: string;
-  score: ScoreSummary;
+type MetricComparison = {
+  label: string;
+  monthly: string;
+  allTime: string;
 };
-
-function ScoreCard({ title, subtitle, score }: ScoreCardProps) {
-  const metrics = [
-    ["Community Grounding", formatPercent(score.grounded)],
-    ["Support & Care", formatPercent(score.supported)],
-    ["Connection Index", formatPercent(score.connected)],
-  ] as const;
-
-  return (
-    <div className="rounded-xl border bg-white/70 p-4 text-center shadow-sm">
-      <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">{subtitle}</p>
-      <p className="text-sm font-semibold text-gray-700 mb-3">{title}</p>
-      <div className="space-y-1 text-sm">
-        {metrics.map(([label, value]) => (
-          <p key={label}>
-            {label}: <b>{value}</b>
-          </p>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default async function HealerDevPage(props: PageProps) {
   const { slug } = await props.params;
@@ -84,18 +62,21 @@ export default async function HealerDevPage(props: PageProps) {
 
   const summaryEntries = Object.entries(sentimentCounts);
 
-  const scoreCards = [
+  const metricComparisons: MetricComparison[] = [
     {
-      id: "monthly",
-      title: "Last 30 Days",
-      subtitle: `n = ${scores.monthly.n}`,
-      score: scores.monthly,
+      label: "Community Grounding Score",
+      monthly: formatPercent(scores.monthly.grounded),
+      allTime: formatPercent(scores.allTime.grounded),
     },
     {
-      id: "all-time",
-      title: "All-time",
-      subtitle: `n = ${scores.allTime.n}`,
-      score: scores.allTime,
+      label: "Support & Care Score",
+      monthly: formatPercent(scores.monthly.supported),
+      allTime: formatPercent(scores.allTime.supported),
+    },
+    {
+      label: "Connection Index",
+      monthly: formatPercent(scores.monthly.connected),
+      allTime: formatPercent(scores.allTime.connected),
     },
   ];
 
@@ -161,9 +142,24 @@ export default async function HealerDevPage(props: PageProps) {
             </div>
           )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {scoreCards.map((card) => (
-              <ScoreCard key={card.id} title={card.title} subtitle={card.subtitle} score={card.score} />
+          <div className="grid gap-4 md:grid-cols-3">
+            {metricComparisons.map((metric) => (
+              <div
+                key={metric.label}
+                className="rounded-xl border border-gray-200 bg-white/70 p-4 shadow-sm"
+              >
+                <p className="text-sm font-semibold text-gray-700 mb-3">{metric.label}</p>
+                <div className="grid gap-3 text-sm sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">Monthly</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-800">{metric.monthly}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">All-time</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-800">{metric.allTime}</p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
 
