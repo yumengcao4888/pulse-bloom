@@ -2,7 +2,7 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
-import { TrendChart } from "@/components/healer/TrendChart";
+import { TrendChart } from "@/components/healer/trend-chart";
 import {
   computeScores,
   computeWeeklySentiment,
