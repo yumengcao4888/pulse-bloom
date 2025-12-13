@@ -283,7 +283,9 @@ export default async function HealerDevPage(props: PageProps) {
             </p>
           )}
 
-          <MyWordcloud />
+          <div className="w-full max-w-md mx-auto rounded-2xl border bg-white/70 p-5 shadow-sm">
+            <MyWordcloud />
+          </div>
 
           {reflectionsWithAnalysis.length === 0 ? (
             <p className="text-gray-600">No reflections yet.</p>

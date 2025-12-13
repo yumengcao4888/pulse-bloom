@@ -9,10 +9,10 @@ import ReactWordcloud, {
 type WordcloudSize = [number, number];
 
 const formatTooltip = ({ text, value }: Word) =>
-  `${text} (${value}) [${value > 50 ? "good" : "bad"}]`;
+  `${text} (${value}) [${value > 250 ? "good" : "bad"}]`;
 
 const callbacks: CallbacksProp = {
-  getWordColor: ({ value }) => (value > 50 ? "blue" : "red"),
+  getWordColor: ({ value }) => (value > 7 ? "#2563eb" : "#64748b"),
   getWordTooltip: formatTooltip,
   onWordClick: word => console.log("Word clicked:", word),
   onWordMouseOver: word => console.log("Word hovered:", word),
@@ -20,17 +20,23 @@ const callbacks: CallbacksProp = {
 
 const options: OptionsProp = {
   rotations: 2,
-  rotationAngles: [-30, 30],
+  rotationAngles: [0, 0],
+  fontSizes: [20, 48]
 };
 
-const size: WordcloudSize = [600, 400];
+const size: WordcloudSize = [400, 300];
 const minSize: WordcloudSize = [200, 200];
 const words = [
-  { text: "told", value: 64 },
+  { text: "told", value: 65 },
   { text: "mistake", value: 11 },
   { text: "thought", value: 16 },
   { text: "bad", value: 17 },
 ] satisfies Word[];
+
+const scaledWords = words.map(w => ({
+  ...w,
+  value: Math.sqrt(w.value),
+}));
 
 function MyWordcloud() {
   return (
@@ -39,7 +45,7 @@ function MyWordcloud() {
       minSize={minSize}
       options={options}
       size={size}
-      words={words}
+      words={scaledWords}
     />
   );
 }
