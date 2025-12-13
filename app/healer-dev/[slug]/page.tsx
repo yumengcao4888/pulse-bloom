@@ -2,12 +2,16 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
-import { TrendChart } from "@/components/healer/trend-chart";
 import {
   computeScores,
   computeWeeklySentiment,
   computeWeeklyTrends,
 } from "@/lib/utils";
+import { TrendChart } from "@/components/healer/trend-chart";
+import MyWordcloud from "@/components/healer/simple-wordcloud";
+
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/animations/scale.css';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -278,6 +282,8 @@ export default async function HealerDevPage(props: PageProps) {
               Add reflections to populate the emotional heat map.
             </p>
           )}
+
+          <MyWordcloud />
 
           {reflectionsWithAnalysis.length === 0 ? (
             <p className="text-gray-600">No reflections yet.</p>
