@@ -9,6 +9,7 @@ import {
 } from "@/lib/utils";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
+import type { Word } from "react-wordcloud";
 
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -136,6 +137,17 @@ export default async function HealerDevPage(props: PageProps) {
       monthly: formatPercent(scores.monthly.connected),
       allTime: formatPercent(scores.allTime.connected),
     },
+  ];
+
+  const metricToWord = (text: string, value: number | null): Word => ({
+    text,
+    value: (value ?? 0),
+  });
+
+  const wordcloudWords: Word[] = [
+    metricToWord("grounded", scores.allTime.grounded),
+    metricToWord("supported", scores.allTime.supported),
+    metricToWord("connected", scores.allTime.connected),
   ];
 
   return (
@@ -284,7 +296,7 @@ export default async function HealerDevPage(props: PageProps) {
           )}
 
           <div className="w-full max-w-md mx-auto rounded-2xl border bg-white/70 p-5 shadow-sm">
-            <MyWordcloud />
+            <MyWordcloud words={wordcloudWords} />
           </div>
 
           {reflectionsWithAnalysis.length === 0 ? (

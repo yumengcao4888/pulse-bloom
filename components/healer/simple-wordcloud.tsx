@@ -31,7 +31,7 @@ const pickColor = (value: number) => {
 
 const callbacks: CallbacksProp = {
   getWordColor: ({ value }) => pickColor(value),
-  getWordTooltip: ({ text }) => text,
+  getWordTooltip: ({ text, value }) => `${text} (${value.toFixed(0)})`,
   onWordClick: word => console.log("Word clicked:", word),
   onWordMouseOver: word => console.log("Word hovered:", word),
 };
@@ -44,28 +44,29 @@ const options: OptionsProp = {
 
 const size: WordcloudSize = [400, 300];
 const minSize: WordcloudSize = [200, 200];
-const baseWords = [
-  { text: "told", value: 65 },
-  { text: "mistake", value: 11 },
-  { text: "thought", value: 16 },
-  { text: "bad", value: 17 },
-] satisfies Word[];
 
-const scaledWords: Word[] = baseWords.map(word => ({
-  ...word,
-  value: Math.sqrt(word.value),
-}));
-
-const wordcloudProps = {
-  callbacks,
-  minSize,
-  options,
-  size,
-  words: scaledWords,
+type MyWordcloudProps = {
+  words: Word[];
 };
 
-function MyWordcloud() {
-  return <ReactWordcloud {...wordcloudProps} />;
+function scaleWords(words: Word[]): Word[] {
+  if (!words.length) return words;
+  return words.map(word => ({
+    ...word,
+    value: Math.sqrt(word.value),
+  }));
+}
+
+function MyWordcloud({ words }: MyWordcloudProps) {
+  return (
+    <ReactWordcloud
+      callbacks={callbacks}
+      minSize={minSize}
+      options={options}
+      size={size}
+      words={scaleWords(words)}
+    />
+  );
 }
 
 export default MyWordcloud;
