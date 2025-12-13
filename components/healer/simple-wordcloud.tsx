@@ -9,32 +9,29 @@ import ReactWordcloud, {
 type WordcloudSize = [number, number];
 
 const COLOR_PALETTE = [
-  "#94a3b8", // 0–1  quiet        slate-400
-  "#818cf8", // 1–2  gentle       indigo-400
-  "#60a5fa", // 2–3  open         blue-400
-  "#38bdf8", // 3–4  clarity      sky-400
-  "#4ade80", // 4–5  grounded     green-400
-  "#a3e635", // 5–6  alive        lime-400
-  "#facc15", // 6–7  warm         yellow-400
-  "#fb923c", // 7–8  expressive  orange-400
-  "#f472b6", // 8–9  care         pink-400
-  "#ec4899", // 9–10 deep care   pink-500
-];
+  "#94a3b8", // quiet
+  "#818cf8", // gentle
+  "#60a5fa", // open
+  "#38bdf8", // clarity
+  "#4ade80", // grounded
+  "#a3e635", // alive
+  "#facc15", // warm
+  "#fb923c", // expressive
+  "#f472b6", // care
+  "#ec4899", // deep care
+] as const;
 
-function getColor(value: number) {
-  const index = Math.min(
-    COLOR_PALETTE.length - 1,
-    Math.max(0, Math.floor(value))
-  );
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+const pickColor = (value: number) => {
+  const index = clamp(Math.floor(value), 0, COLOR_PALETTE.length - 1);
   return COLOR_PALETTE[index];
-}
-
-const formatTooltip = ({ text, value }: Word) =>
-  `${text} (${value}) [${value > 250 ? "good" : "bad"}]`;
+};
 
 const callbacks: CallbacksProp = {
-  getWordColor: ({ value }) => (getColor(value)),
-  getWordTooltip: formatTooltip,
+  getWordColor: ({ value }) => pickColor(value),
+  getWordTooltip: ({ text }) => text,
   onWordClick: word => console.log("Word clicked:", word),
   onWordMouseOver: word => console.log("Word hovered:", word),
 };
@@ -42,33 +39,33 @@ const callbacks: CallbacksProp = {
 const options: OptionsProp = {
   rotations: 2,
   rotationAngles: [0, 0],
-  fontSizes: [20, 48]
+  fontSizes: [20, 48],
 };
 
 const size: WordcloudSize = [400, 300];
 const minSize: WordcloudSize = [200, 200];
-const words = [
+const baseWords = [
   { text: "told", value: 65 },
   { text: "mistake", value: 11 },
   { text: "thought", value: 16 },
   { text: "bad", value: 17 },
 ] satisfies Word[];
 
-const scaledWords = words.map(w => ({
-  ...w,
-  value: Math.sqrt(w.value),
+const scaledWords: Word[] = baseWords.map(word => ({
+  ...word,
+  value: Math.sqrt(word.value),
 }));
 
+const wordcloudProps = {
+  callbacks,
+  minSize,
+  options,
+  size,
+  words: scaledWords,
+};
+
 function MyWordcloud() {
-  return (
-    <ReactWordcloud
-      callbacks={callbacks}
-      minSize={minSize}
-      options={options}
-      size={size}
-      words={scaledWords}
-    />
-  );
+  return <ReactWordcloud {...wordcloudProps} />;
 }
 
 export default MyWordcloud;
