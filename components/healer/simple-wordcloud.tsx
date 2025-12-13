@@ -20,7 +20,7 @@ const callbacks: CallbacksProp = {
 
 const options: OptionsProp = {
   rotations: 2,
-  rotationAngles: [0],
+  rotationAngles: [-30, 30],
 };
 
 const size: WordcloudSize = [600, 400];
