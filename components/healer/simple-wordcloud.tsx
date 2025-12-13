@@ -8,11 +8,32 @@ import ReactWordcloud, {
 
 type WordcloudSize = [number, number];
 
+const COLOR_PALETTE = [
+  "#94a3b8", // 0–1  quiet        slate-400
+  "#818cf8", // 1–2  gentle       indigo-400
+  "#60a5fa", // 2–3  open         blue-400
+  "#38bdf8", // 3–4  clarity      sky-400
+  "#4ade80", // 4–5  grounded     green-400
+  "#a3e635", // 5–6  alive        lime-400
+  "#facc15", // 6–7  warm         yellow-400
+  "#fb923c", // 7–8  expressive  orange-400
+  "#f472b6", // 8–9  care         pink-400
+  "#ec4899", // 9–10 deep care   pink-500
+];
+
+function getColor(value: number) {
+  const index = Math.min(
+    COLOR_PALETTE.length - 1,
+    Math.max(0, Math.floor(value))
+  );
+  return COLOR_PALETTE[index];
+}
+
 const formatTooltip = ({ text, value }: Word) =>
   `${text} (${value}) [${value > 250 ? "good" : "bad"}]`;
 
 const callbacks: CallbacksProp = {
-  getWordColor: ({ value }) => (value > 7 ? "#2563eb" : "#64748b"),
+  getWordColor: ({ value }) => (getColor(value)),
   getWordTooltip: formatTooltip,
   onWordClick: word => console.log("Word clicked:", word),
   onWordMouseOver: word => console.log("Word hovered:", word),
