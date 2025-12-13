@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import ReactWordcloud, {
   type CallbacksProp,
   type OptionsProp,
@@ -7,6 +8,9 @@ import ReactWordcloud, {
 } from "react-wordcloud";
 
 type WordcloudSize = [number, number];
+
+const DEFAULT_SIZE: WordcloudSize = [400, 300];
+const MIN_SIZE: WordcloudSize = [200, 200];
 
 const COLOR_PALETTE = [
   "#94a3b8", // quiet
@@ -29,23 +33,20 @@ const pickColor = (value: number) => {
   return COLOR_PALETTE[index];
 };
 
-const callbacks: CallbacksProp = {
+const wordcloudCallbacks: CallbacksProp = {
   getWordColor: ({ value }) => pickColor(value),
   getWordTooltip: ({ text, value }) => `${text} (${value.toFixed(0)})`,
   onWordClick: word => console.log("Word clicked:", word),
   onWordMouseOver: word => console.log("Word hovered:", word),
 };
 
-const options: OptionsProp = {
+const wordcloudOptions: OptionsProp = {
   rotations: 2,
   rotationAngles: [0, 0],
-  fontSizes: [20, 48],
+  fontSizes: [30, 48],
 };
 
-const size: WordcloudSize = [400, 300];
-const minSize: WordcloudSize = [200, 200];
-
-type MyWordcloudProps = {
+type CommunityWordcloudProps = {
   words: Word[];
 };
 
@@ -57,16 +58,18 @@ function scaleWords(words: Word[]): Word[] {
   }));
 }
 
-function MyWordcloud({ words }: MyWordcloudProps) {
+function CommunityWordcloud({ words }: CommunityWordcloudProps) {
+  const scaledWords = useMemo(() => scaleWords(words), [words]);
+
   return (
     <ReactWordcloud
-      callbacks={callbacks}
-      minSize={minSize}
-      options={options}
-      size={size}
-      words={scaleWords(words)}
+      callbacks={wordcloudCallbacks}
+      minSize={MIN_SIZE}
+      options={wordcloudOptions}
+      size={DEFAULT_SIZE}
+      words={scaledWords}
     />
   );
 }
 
-export default MyWordcloud;
+export default CommunityWordcloud;
