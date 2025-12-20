@@ -26,6 +26,13 @@ const formatDate = (date: string | Date) => new Date(date).toLocaleString();
 
 const formatPercent = (value: number | null | undefined) => (value == null ? "—" : `${value}%`);
 
+const formatDelta = (current: number | null | undefined, baseline: number | null | undefined) => {
+  if (current == null || baseline == null) return "N/A";
+  const delta = current - baseline;
+  const sign = delta >= 0 ? "+" : "";
+  return `${sign}${delta.toFixed(0)}%`;
+};
+
 type HeatmapCategoryKey = "grounded" | "supported" | "connected" | "sentiment";
 
 const heatmapCategories: { key: HeatmapCategoryKey; label: string }[] = [
@@ -65,7 +72,7 @@ type MetricComparison = {
   allTime: string;
 };
 
-export default async function HealerDevPage(props: PageProps) {
+export default async function HealerPage(props: PageProps) {
   const { slug } = await props.params;
 
   const healer = await prisma.healer.findUnique({
@@ -154,7 +161,7 @@ export default async function HealerDevPage(props: PageProps) {
   return (
     <>
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
-        <div className="my-10 mx-auto max-w-xl flex flex-col items-center">
+        <div className="my-10 mx-auto max-w-xl flex flex-col items-center space-y-6">
           <Image
           src="/default-healer.jpg"
           alt="Healer profile photo"
@@ -162,12 +169,15 @@ export default async function HealerDevPage(props: PageProps) {
           height={200}
           className="rounded-full object-cover"
         />
-        <h1 className="text-3xl font-semibold mb-5">{healer.name}{healer.pronouns && (
-          <span className="text-xl font-normal ml-2 text-gray-600">
-            ({healer.pronouns})
-          </span>
-        )}</h1>
-          <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
+        <h1 className="mb-5 flex items-baseline gap-2 text-3xl font-semibold">
+          <span>{healer.name}</span>
+          {healer.pronouns && (
+            <span className="text-xl font-normal text-gray-600">
+              ({healer.pronouns})
+            </span>
+          )}
+        </h1>
+          <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm">
             <p className="text-gray-700">
               <b>My approach:</b> {healer.modality}
             </p>
@@ -184,8 +194,30 @@ export default async function HealerDevPage(props: PageProps) {
               <b>About me:</b> {healer.bio}
             </p>
           </div>
+          <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
+            <h2 className="text-2xl font-semibold">This Month's Healing Highlights</h2>
+            <div className="space-y-2 text-gray-700">
+              <p>
+                🌱 This month, the community felt grounded <b>{formatPercent(scores.monthly.grounded)}</b>% of the time.
+              </p>
+              <p>
+                💛 This month, the community felt supported <b>{formatPercent(scores.monthly.supported)}</b>% of the time.
+              </p>
+              <p>
+                🤝 This month, the community felt connected <b>{formatPercent(scores.monthly.connected)}</b>% of the time.
+              </p>
+              <p>
+                🗣️ Top words from my space: <b>peace</b>, <b>trust</b>, <b>familia</b>
+              </p>
+            </div>
+            {/* <div className="pt-2">
+              <GradientGraph />
+            </div> */}
+          </div>
         </div>
       </div>
+
+      
 
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0 space-y-6">
         <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
