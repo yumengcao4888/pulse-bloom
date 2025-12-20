@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
@@ -153,38 +154,34 @@ export default async function HealerDevPage(props: PageProps) {
   return (
     <>
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
-        <div className="my-10 mx-auto max-w-xl">
+        <div className="my-10 mx-auto max-w-xl flex flex-col items-center">
+          <Image
+          src="/default-healer.jpg"
+          alt="Healer profile photo"
+          width={200}
+          height={200}
+          className="rounded-full object-cover"
+        />
+        <h1 className="text-3xl font-semibold mb-5">{healer.name}{healer.pronouns && (
+          <span className="text-xl font-normal ml-2 text-gray-600">
+            ({healer.pronouns})
+          </span>
+        )}</h1>
           <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
-            <div className="mb-3 flex justify-center">
-              <QRCodeSVG value={reflectionLink} size={120} />
-            </div>
-            <h1 className="text-3xl font-semibold mb-5">{healer.name}</h1>
             <p className="text-gray-700">
-              <b>Pronouns:</b> {healer.pronouns}
+              <b>My approach:</b> {healer.modality}
             </p>
             <p className="text-gray-700">
-              <b>Modality:</b> {healer.modality}
+              <b>I work with:</b> {healer.focus}
             </p>
             <p className="text-gray-700">
-              <b>Focus:</b> {healer.focus}
-            </p>
-            <p className="text-gray-700">
-              <b>City:</b> {healer.city}
+              <b>Location:</b> {healer.city}
             </p>
             <p className="text-gray-700">
               <b>Contact:</b> {healer.contact}
             </p>
             <p className="text-gray-700">
-              <b>Bio:</b> {healer.bio}
-            </p>
-            <p className="text-gray-700">
-              <b>Reflection Link:</b>{" "}
-              <Link href={reflectionLink} className="text-blue-600 underline">
-                {reflectionLink}
-              </Link>
-            </p>
-            <p className="text-gray-700">
-              <b>Reflections Count:</b> {reflectionsWithAnalysis.length}
+              <b>About me:</b> {healer.bio}
             </p>
           </div>
         </div>
