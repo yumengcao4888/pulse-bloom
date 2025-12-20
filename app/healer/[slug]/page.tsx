@@ -5,6 +5,7 @@ import { classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
 import {
   computeScores,
+  getMonthlyReflections,
   computeWeeklySentiment,
   computeWeeklyTrends,
 } from "@/lib/utils";
@@ -101,6 +102,15 @@ export default async function HealerPage(props: PageProps) {
   const scores = computeScores(reflectionsWithAnalysis);
   const weeklyTrends = computeWeeklyTrends(reflectionsWithAnalysis);
   const weeklySentiment = computeWeeklySentiment(reflectionsWithAnalysis);
+  const monthlySentiment = (() => {
+    const recent = getMonthlyReflections(reflectionsWithAnalysis);
+    const sentimentScores = recent
+      .map((reflection) => reflection.sentiment?.score)
+      .filter((score): score is number => score != null);
+    if (sentimentScores.length === 0) return null;
+    const avg = sentimentScores.reduce((total, value) => total + value, 0) / sentimentScores.length;
+    return Math.round(avg * 100);
+  })();
 
   const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
@@ -195,20 +205,18 @@ export default async function HealerPage(props: PageProps) {
             </p>
           </div>
           <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
-            <h2 className="text-2xl font-semibold">This Month's Healing Highlights</h2>
+            <h2 className="text-2xl font-semibold">What we felt this month</h2>
             <div className="space-y-2 text-gray-700">
-              <p>
-                🌱 This month, the community felt grounded <b>{formatPercent(scores.monthly.grounded)}</b>% of the time.
-              </p>
-              <p>
-                💛 This month, the community felt supported <b>{formatPercent(scores.monthly.supported)}</b>% of the time.
-              </p>
-              <p>
-                🤝 This month, the community felt connected <b>{formatPercent(scores.monthly.connected)}</b>% of the time.
-              </p>
-              <p>
-                🗣️ Top words from my space: <b>peace</b>, <b>trust</b>, <b>familia</b>
-              </p>
+              <p><b>🌱 Feeling grounded</b></p>
+              <p><b>{formatPercent(scores.monthly.grounded)}</b> of the time, our community felt rooted and present.</p>
+              <p><b>💛 Feeling supported</b></p>
+              <p><b>{formatPercent(scores.monthly.supported)}</b> of all reflections spoke of being held with care.</p>
+              <p><b>🤝 Feeling connected</b></p>
+              <p><b>{formatPercent(scores.monthly.connected)}</b> of reflections expressed warmth and togetherness.</p>
+              <p><b>🌤️ Overall mood</b></p>
+              <p>Our community’s emotional tone this month: <b>{monthlySentiment} / 100</b>.</p>
+              <p><b>🗣️ Top words</b></p>
+              <p>The voices in this space often whispered: <b><i>peace</i></b>, <b><i>trust</i></b>, <b><i>familia</i></b>.</p>
             </div>
             {/* <div className="pt-2">
               <GradientGraph />
