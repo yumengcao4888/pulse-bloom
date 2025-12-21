@@ -1,5 +1,7 @@
-const HF_URL =
+const HF_SENTIMENT_URL =
   "https://router.huggingface.co/hf-inference/models/cardiffnlp/twitter-roberta-base-sentiment-latest";
+const HF_EMOTION_URL =
+  "https://router.huggingface.co/hf-inference/models/SamLowe/roberta-base-go_emotions";
 
 export type SentimentPrediction = {
   label: string;
@@ -13,6 +15,11 @@ export type SentimentScores = {
   positive: number;
 };
 
+export type EmotionPrediction = {
+  label: string;
+  score: number;
+};
+
 export async function classifyFeeling(
   feeling: string | null | undefined,
 ): Promise<SentimentPrediction | null> {
@@ -23,7 +30,7 @@ export async function classifyFeeling(
   }
 
   try {
-    const response = await fetch(HF_URL, {
+    const response = await fetch(HF_SENTIMENT_URL, {
       method: "POST",
       body: JSON.stringify({ inputs: feeling }),
       headers: {
@@ -45,6 +52,39 @@ export async function classifyFeeling(
     return prediction;
   } catch (err) {
     console.error("Failed to classify feeling", err);
+    return null;
+  }
+}
+
+export async function classifyEmotion(
+  feeling: string | null | undefined,
+): Promise<EmotionPrediction | null> {
+  if (!feeling || feeling.trim() === "") return null;
+  if (!process.env.HF_TOKEN) {
+    console.warn("Missing HF_TOKEN, skipping emotion classification");
+    return null;
+  }
+
+  try {
+    const response = await fetch(HF_EMOTION_URL, {
+      method: "POST",
+      body: JSON.stringify({ inputs: feeling }),
+      headers: {
+        Authorization: `Bearer ${process.env.HF_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.error("HF emotion request failed", await response.text());
+      return null;
+    }
+
+    const data = await response.json();
+    return normalizeEmotionPrediction(data);
+  } catch (err) {
+    console.error("Failed to classify emotion", err);
     return null;
   }
 }
@@ -79,6 +119,54 @@ function friendlyLabel(raw: string): string {
     return "Positive";
   }
   return "Unclassified";
+}
+
+function normalizeEmotionPrediction(data: unknown): EmotionPrediction | null {
+  const predictions = extractPredictionList(data);
+  if (!predictions || predictions.length === 0) return null;
+
+  let best = predictions[0];
+  for (const entry of predictions) {
+    if (entry.score > best.score) best = entry;
+  }
+
+  return best;
+}
+
+function extractPredictionList(data: unknown): EmotionPrediction[] | null {
+  if (Array.isArray(data)) {
+    const direct = predictionsFromArray(data);
+    if (direct) return direct;
+    for (const entry of data) {
+      const result = extractPredictionList(entry);
+      if (result) return result;
+    }
+    return null;
+  }
+
+  if (data && typeof data === "object" && "label" in data && "score" in data) {
+    return predictionsFromArray([data]);
+  }
+
+  if (data && typeof data === "object" && "error" in data) {
+    console.error("HF classification error payload:", data);
+  }
+
+  return null;
+}
+
+function predictionsFromArray(entries: unknown[]): EmotionPrediction[] | null {
+  const predictions: EmotionPrediction[] = [];
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    if (!("label" in entry) || !("score" in entry)) continue;
+    predictions.push({
+      label: String((entry as any).label),
+      score: Number((entry as any).score ?? 0),
+    });
+  }
+
+  return predictions.length > 0 ? predictions : null;
 }
 
 function extractScores(data: unknown): SentimentScores | null {

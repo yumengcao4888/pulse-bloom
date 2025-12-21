@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
-import { classifyFeeling } from "@/lib/huggingface";
+import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
 import {
   computeScores,
@@ -96,6 +96,7 @@ export default async function HealerPage(props: PageProps) {
     healer.reflections.map(async (reflection) => ({
       ...reflection,
       sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
+      emotion: hfEnabled ? await classifyEmotion(reflection.feeling) : null,
     })),
   );
 
@@ -363,6 +364,9 @@ export default async function HealerPage(props: PageProps) {
                           reflection.sentiment.score * 100
                         ).toFixed(0)})`
                       : "Unavailable"}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Emotion: {reflection.emotion?.label ?? "Unavailable"}
                   </p>
                   <p className="text-sm text-gray-500">
                     Created: {formatDate(reflection.createdAt)}
