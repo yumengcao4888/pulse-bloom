@@ -8,6 +8,7 @@ import { LayoutDashboard } from "lucide-react";
 import LanguageSwitcher from "@/components/layout/language-switcher";
 import { useLocale } from "@/components/shared/locale-provider";
 import { yellowtail } from "@/app/fonts";
+import icon from "@/app/icon.png";
 
 export default function NavBar() {
   const scrolled = useScroll(50);
@@ -25,12 +26,12 @@ export default function NavBar() {
         <div className="mx-5 flex h-16 w-full max-w-screen-xl items-center justify-between">
           <Link href="/" className="flex items-center font-display text-2xl">
             <Image
-              src="/logo.png"
+              src={icon}
               alt="Pulse Bloom"
               width="30"
               height="30"
               className="mr-2 rounded-sm"
-            ></Image>
+            />
             <p className={yellowtail.className}>PulseBloom</p>
           </Link>
           <div className="flex items-center gap-4">

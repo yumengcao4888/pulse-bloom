@@ -5,9 +5,6 @@ export default async function HealerPage() {
     <div className="relative z-10 w-full px-5 pb-20 pt-12 md:pt-16 xl:px-0">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-12">
         <section className="rounded-3xl border bg-white/80 p-6 shadow-sm backdrop-blur md:p-10">
-          <p className={`${italianno.className} text-2xl text-gray-700 md:text-3xl`}>
-            PulseBloom
-          </p>
           <h1 className="mt-3 text-3xl font-semibold leading-tight text-gray-900 md:text-5xl md:leading-tight">
             For healers who hold space, not scores.
           </h1>
