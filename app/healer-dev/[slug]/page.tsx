@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
-import { classifyFeeling } from "@/lib/huggingface";
+import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
 import {
   computeScores,
   computeWeeklySentiment,
   computeWeeklyTrends,
+  capitalize,
 } from "@/lib/utils";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
@@ -87,6 +88,7 @@ export default async function HealerDevPage(props: PageProps) {
     healer.reflections.map(async (reflection) => ({
       ...reflection,
       sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
+      emotion: hfEnabled ? await classifyEmotion(reflection.feeling) : null,
     })),
   );
 
@@ -104,6 +106,35 @@ export default async function HealerDevPage(props: PageProps) {
   );
 
   const summaryEntries = Object.entries(sentimentCounts);
+
+  const metricToWord = (text: string, value: number | null): Word => ({
+    text,
+    value: value ?? 0,
+  });
+
+  const emotionCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
+    (acc, reflection) => {
+      const label = reflection.emotion?.label;
+      if (!label) return acc;
+      acc[label] = (acc[label] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+  const totalEmotionCount = Object.values(emotionCounts).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
+  const emotionWords: Word[] = Object.entries(emotionCounts).map(([label, count]) => {
+    const percentage = totalEmotionCount === 0 ? 0 : (count / totalEmotionCount) * 100;
+    return metricToWord(label, Math.round(percentage));
+  });
+  const wordcloudWords: Word[] = [
+    metricToWord("grounded", scores.allTime.grounded),
+    metricToWord("supported", scores.allTime.supported),
+    metricToWord("connected", scores.allTime.connected),
+    ...emotionWords,
+  ];
 
   const weeklyTrendMap = Object.fromEntries(
     weeklyTrends.map((trend) => [trend.date, trend]),
@@ -137,17 +168,6 @@ export default async function HealerDevPage(props: PageProps) {
       monthly: formatPercent(scores.monthly.connected),
       allTime: formatPercent(scores.allTime.connected),
     },
-  ];
-
-  const metricToWord = (text: string, value: number | null): Word => ({
-    text,
-    value: (value ?? 0),
-  });
-
-  const wordcloudWords: Word[] = [
-    metricToWord("grounded", scores.allTime.grounded),
-    metricToWord("supported", scores.allTime.supported),
-    metricToWord("connected", scores.allTime.connected),
   ];
 
   return (
@@ -322,10 +342,13 @@ export default async function HealerDevPage(props: PageProps) {
                   <p className="text-sm text-gray-500">
                     Sentiment:{" "}
                     {reflection.sentiment
-                      ? `${reflection.sentiment.label} (${(
+                      ? `${reflection.sentiment.label} (Score: ${(
                           reflection.sentiment.score * 100
-                        ).toFixed(0)}% confidence)`
+                        ).toFixed(0)})`
                       : "Unavailable"}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Emotion: {reflection.emotion?.label ? capitalize(reflection.emotion.label) : "Unavailable"}
                   </p>
                   <p className="text-sm text-gray-500">
                     Created: {formatDate(reflection.createdAt)}
