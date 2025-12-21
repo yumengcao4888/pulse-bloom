@@ -164,11 +164,6 @@ export default async function HealerPage(props: PageProps) {
     value: (value ?? 0),
   });
 
-  const wordcloudWords: Word[] = [
-    metricToWord("grounded", scores.allTime.grounded),
-    metricToWord("supported", scores.allTime.supported),
-    metricToWord("connected", scores.allTime.connected),
-  ];
   const emotionCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
       const label = reflection.emotion?.label;
@@ -186,8 +181,19 @@ export default async function HealerPage(props: PageProps) {
     const percentage = totalEmotionCount === 0 ? 0 : (count / totalEmotionCount) * 100;
     return metricToWord(label, Math.round(percentage));
   });
-  wordcloudWords.push(...emotionWords);
-  const topWords = [...wordcloudWords]
+  const wordcloudWords: Word[] = [
+    metricToWord("grounded", scores.allTime.grounded),
+    metricToWord("supported", scores.allTime.supported),
+    metricToWord("connected", scores.allTime.connected),
+    ...emotionWords,
+  ];
+  const topWords = [
+    metricToWord("grounded", scores.allTime.grounded),
+    metricToWord("supported", scores.allTime.supported),
+    metricToWord("connected", scores.allTime.connected),
+    ...emotionWords,
+  ]
+    .filter((word) => word.value > 0)
     .sort((a, b) => b.value - a.value)
     .slice(0, 3)
     .map((word) => word.text);
@@ -255,14 +261,9 @@ export default async function HealerPage(props: PageProps) {
                 .
               </p>
             </div>
-            {/* <div className="pt-2">
-              <GradientGraph />
-            </div> */}
           </div>
         </div>
       </div>
-
-      
 
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0 space-y-6">
         <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
