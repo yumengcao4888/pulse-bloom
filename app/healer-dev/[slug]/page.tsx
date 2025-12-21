@@ -8,6 +8,8 @@ import {
   computeWeeklyTrends,
   capitalize,
 } from "@/lib/utils";
+import { getLocale } from "@/lib/i18n-server";
+import { getTranslations } from "@/lib/i18n";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
 import type { Word } from "react-wordcloud";
@@ -19,26 +21,14 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-const formatBool = (value: boolean | null | undefined) =>
-  value == null ? "N/A" : value ? "Yes" : "No";
-
-const formatDate = (date: string | Date) => new Date(date).toLocaleString();
-
-const formatPercent = (value: number | null | undefined) => (value == null ? "—" : `${value}%`);
-
 type HeatmapCategoryKey = "grounded" | "supported" | "connected" | "sentiment";
 
-const heatmapCategories: { key: HeatmapCategoryKey; label: string }[] = [
-  { key: "grounded", label: "Grounded" },
-  { key: "supported", label: "Supported" },
-  { key: "connected", label: "Connected" },
-  { key: "sentiment", label: "Sentiment" },
+const heatmapCategories: HeatmapCategoryKey[] = [
+  "grounded",
+  "supported",
+  "connected",
+  "sentiment",
 ];
-
-const formatWeekLabel = (week: string) => {
-  const date = new Date(week);
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-};
 
 const getHeatStyle = (value: number | null | undefined) => {
   if (value == null) {
@@ -67,6 +57,17 @@ type MetricComparison = {
 
 export default async function HealerDevPage(props: PageProps) {
   const { slug } = await props.params;
+  const locale = await getLocale();
+  const t = getTranslations(locale);
+  const formatDate = (date: string | Date) => new Date(date).toLocaleString(locale);
+  const formatBool = (value: boolean | null | undefined) =>
+    value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
+  const formatPercent = (value: number | null | undefined) =>
+    value == null ? t("common.none") : `${value}%`;
+  const formatWeekLabel = (week: string) => {
+    const date = new Date(week);
+    return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
+  };
 
   const healer = await prisma.healer.findUnique({
     where: { slug },
@@ -78,7 +79,7 @@ export default async function HealerDevPage(props: PageProps) {
   });
 
   if (!healer) {
-    return <div className="relative z-10 p-6 text-red-500">Healer not found.</div>;
+    return <div className="relative z-10 p-6 text-red-500">{t("healer.notFound")}</div>;
   }
 
   const reflectionLink = `http://localhost:3000/reflection/${slug}`;
@@ -98,7 +99,7 @@ export default async function HealerDevPage(props: PageProps) {
 
   const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
-      const label = reflection.sentiment?.label ?? "Unclassified";
+      const label = reflection.sentiment?.label ?? t("common.unclassified");
       acc[label] = (acc[label] ?? 0) + 1;
       return acc;
     },
@@ -141,30 +142,37 @@ export default async function HealerDevPage(props: PageProps) {
   ) as Record<string, typeof weeklyTrends[number]>;
   const heatmapWeeks = weeklyTrends.map((trend) => trend.date);
   const heatmapRows = heatmapCategories.map((category) => ({
-    label: category.label,
+    label:
+      category === "sentiment"
+        ? t("reflection.sentiment")
+        : category === "grounded"
+        ? t("reflection.grounded")
+        : category === "supported"
+        ? t("reflection.supported")
+        : t("reflection.connected"),
     values: heatmapWeeks.map((week) => {
-      if (category.key === "sentiment") {
+      if (category === "sentiment") {
         return weeklySentiment[week] ?? null;
       }
 
-      return weeklyTrendMap[week]?.[category.key] ?? null;
+      return weeklyTrendMap[week]?.[category] ?? null;
     }),
   }));
   const hasHeatmapData = heatmapWeeks.length > 0;
 
   const metricComparisons: MetricComparison[] = [
     {
-      label: "Community Grounding Score",
+      label: t("healer.metric.grounded"),
       monthly: formatPercent(scores.monthly.grounded),
       allTime: formatPercent(scores.allTime.grounded),
     },
     {
-      label: "Support & Care Score",
+      label: t("healer.metric.supported"),
       monthly: formatPercent(scores.monthly.supported),
       allTime: formatPercent(scores.allTime.supported),
     },
     {
-      label: "Connection Index",
+      label: t("healer.metric.connected"),
       monthly: formatPercent(scores.monthly.connected),
       allTime: formatPercent(scores.allTime.connected),
     },
@@ -180,31 +188,31 @@ export default async function HealerDevPage(props: PageProps) {
             </div>
             <h1 className="text-3xl font-semibold mb-5">{healer.name}</h1>
             <p className="text-gray-700">
-              <b>Pronouns:</b> {healer.pronouns}
+              <b>{t("healer.dev.pronouns")}:</b> {healer.pronouns}
             </p>
             <p className="text-gray-700">
-              <b>Modality:</b> {healer.modality}
+              <b>{t("healer.dev.modality")}:</b> {healer.modality}
             </p>
             <p className="text-gray-700">
-              <b>Focus:</b> {healer.focus}
+              <b>{t("healer.dev.focus")}:</b> {healer.focus}
             </p>
             <p className="text-gray-700">
-              <b>City:</b> {healer.city}
+              <b>{t("healer.dev.city")}:</b> {healer.city}
             </p>
             <p className="text-gray-700">
-              <b>Contact:</b> {healer.contact}
+              <b>{t("healer.dev.contact")}:</b> {healer.contact}
             </p>
             <p className="text-gray-700">
-              <b>Bio:</b> {healer.bio}
+              <b>{t("healer.dev.bio")}:</b> {healer.bio}
             </p>
             <p className="text-gray-700">
-              <b>Reflection Link:</b>{" "}
+              <b>{t("healer.dev.reflectionLink")}:</b>{" "}
               <Link href={reflectionLink} className="text-blue-600 underline">
                 {reflectionLink}
               </Link>
             </p>
             <p className="text-gray-700">
-              <b>Reflections Count:</b> {reflectionsWithAnalysis.length}
+              <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsWithAnalysis.length}
             </p>
           </div>
         </div>
@@ -212,11 +220,11 @@ export default async function HealerDevPage(props: PageProps) {
 
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0 space-y-6">
         <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
-          <h2 className="text-2xl font-semibold">Reflections</h2>
+          <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
           <p className="text-sm text-gray-500">
             {hfEnabled
-              ? "Sentiment analysis powered by the CardiffNLP Hugging Face model."
-              : "Set HF_TOKEN to enable sentiment analysis for reflections."}
+              ? t("reflection.hf.enabled")
+              : t("reflection.hf.disabled")}
           </p>
           {summaryEntries.length > 0 && (
             <div className="grid gap-3 sm:grid-cols-3">
@@ -241,11 +249,11 @@ export default async function HealerDevPage(props: PageProps) {
                 <p className="text-sm font-semibold text-gray-700 mb-3">{metric.label}</p>
                 <div className="grid gap-3 text-sm sm:grid-cols-2">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">Monthly</p>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">{t("healer.metric.monthly")}</p>
                     <p className="mt-1 text-lg font-semibold text-gray-800">{metric.monthly}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">All-time</p>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">{t("healer.metric.allTime")}</p>
                     <p className="mt-1 text-lg font-semibold text-gray-800">{metric.allTime}</p>
                   </div>
                 </div>
@@ -259,19 +267,19 @@ export default async function HealerDevPage(props: PageProps) {
             </div>
           ) : (
             <p className="mt-6 text-sm text-gray-500">
-              Add a reflection to seed the trend chart.
+              {t("reflection.addPrompt")}
             </p>
           )}
 
           {hasHeatmapData ? (
             <div className="mt-6 rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-sm">
-              <h3 className="mb-3 text-lg font-semibold text-gray-800">Emotional Heat Map</h3>
+              <h3 className="mb-3 text-lg font-semibold text-gray-800">{t("healer.heatmap.title")}</h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full table-fixed text-sm">
                   <thead>
                     <tr>
                       <th className="border-b px-3 py-2 text-left text-xs uppercase tracking-wide text-gray-500">
-                        Metric / Week
+                        {t("healer.heatmap.metricWeek")}
                       </th>
                       {heatmapWeeks.map((week) => (
                         <th
@@ -296,7 +304,7 @@ export default async function HealerDevPage(props: PageProps) {
                               className="flex h-12 items-center justify-center rounded text-xs font-semibold uppercase tracking-wide"
                               style={getHeatStyle(value)}
                             >
-                              {value == null ? "—" : `${value}%`}
+                              {value == null ? t("common.none") : `${value}%`}
                             </div>
                           </td>
                         ))}
@@ -306,12 +314,12 @@ export default async function HealerDevPage(props: PageProps) {
                 </table>
               </div>
               <p className="mt-2 text-xs text-gray-500">
-                Weekly averages for each metric; comment sentiment reflects the optional reflection text.
+                {t("healer.heatmap.caption")}
               </p>
             </div>
           ) : (
             <p className="mt-6 text-sm text-gray-500">
-              Add reflections to populate the emotional heat map.
+              {t("reflection.addHeatmap")}
             </p>
           )}
 
@@ -320,38 +328,41 @@ export default async function HealerDevPage(props: PageProps) {
           </div>
 
           {reflectionsWithAnalysis.length === 0 ? (
-            <p className="text-gray-600">No reflections yet.</p>
+            <p className="text-gray-600">{t("reflection.none")}</p>
           ) : (
             <div className="space-y-4">
               {reflectionsWithAnalysis.map((reflection) => (
                 <div key={reflection.id} className="rounded-xl border border-gray-200 p-4">
                   <div className="mb-2 flex flex-wrap gap-4 text-sm text-gray-700">
                     <span>
-                      <b>Grounded:</b> {formatBool(reflection.grounded)}
+                      <b>{t("reflection.grounded")}:</b> {formatBool(reflection.grounded)}
                     </span>
                     <span>
-                      <b>Supported:</b> {formatBool(reflection.supported)}
+                      <b>{t("reflection.supported")}:</b> {formatBool(reflection.supported)}
                     </span>
                     <span>
-                      <b>Connected:</b> {formatBool(reflection.connected)}
+                      <b>{t("reflection.connected")}:</b> {formatBool(reflection.connected)}
                     </span>
                   </div>
                   <p className="text-base text-gray-800 mb-2">
-                    <b>Feeling:</b> {reflection.feeling ?? "N/A"}
+                    <b>{t("reflection.feeling")}:</b> {reflection.feeling ?? t("common.na")}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Sentiment:{" "}
+                    {t("reflection.sentiment")}:{" "}
                     {reflection.sentiment
                       ? `${reflection.sentiment.label} (Score: ${(
                           reflection.sentiment.score * 100
                         ).toFixed(0)})`
-                      : "Unavailable"}
+                      : t("common.unavailable")}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Emotion: {reflection.emotion?.label ? capitalize(reflection.emotion.label) : "Unavailable"}
+                    {t("reflection.emotion")}:{" "}
+                    {reflection.emotion?.label
+                      ? capitalize(reflection.emotion.label)
+                      : t("common.unavailable")}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Created: {formatDate(reflection.createdAt)}
+                    {t("reflection.created")}: {formatDate(reflection.createdAt)}
                   </p>
                 </div>
               ))}

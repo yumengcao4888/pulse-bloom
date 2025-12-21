@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { useLocale } from "@/components/shared/locale-provider";
 
 type HealerForm = {
   name: string;
@@ -24,6 +25,7 @@ const initialForm: HealerForm = {
 
 export default function HealerForm() {
   const [form, setForm] = useState<HealerForm>(initialForm);
+  const { t } = useLocale();
 
   const handleChange =
     (field: keyof HealerForm) =>
@@ -44,28 +46,28 @@ export default function HealerForm() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to save");
+        throw new Error(t("form.healer.save.fail"));
       }
 
       const data = await res.json();
       console.log("Saved healer:", data);
 
-      alert("Saved to backend SQLite database successfully!");
+      alert(t("form.healer.save.success"));
       setForm(initialForm);
     } catch (err) {
       console.error(err);
-      alert("Failed to save. Please try again.");
+      alert(t("form.healer.save.error"));
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1">
-        <label className="block text-sm font-medium">What name should we use?</label>
+        <label className="block text-sm font-medium">{t("form.healer.name.label")}</label>
         <input
           type="text"
           className="w-full rounded-md border px-3 py-2 text-sm"
-          placeholder="e.g. Alex, Luna, Dr. Rivera"
+          placeholder={t("form.healer.name.placeholder")}
           value={form.name}
           onChange={handleChange('name')}
           required
@@ -74,23 +76,24 @@ export default function HealerForm() {
 
       <div className="space-y-1">
         <label className="block text-sm font-medium">
-          Pronouns you&apos;d like us to use <span className="text-gray-500 text-sm">(optional)</span>
+          {t("form.healer.pronouns.label")}{" "}
+          <span className="text-gray-500 text-sm">{t("form.optional")}</span>
         </label>
         <input
           type="text"
           className="w-full rounded-md border px-3 py-2 text-sm"
-          placeholder="e.g. she/her, they/them, he/him, xe/xem, or however you identify"
+          placeholder={t("form.healer.pronouns.placeholder")}
           value={form.pronouns}
           onChange={handleChange('pronouns')}
         />
       </div>
 
       <div className="space-y-1">
-        <label className="block text-sm font-medium">Primary care approach / modality</label>
+        <label className="block text-sm font-medium">{t("form.healer.modality.label")}</label>
         <input
           type="text"
           className="w-full rounded-md border px-3 py-2 text-sm"
-          placeholder="e.g. yoga, community acupuncture, peer support"
+          placeholder={t("form.healer.modality.placeholder")}
           value={form.modality}
           onChange={handleChange('modality')}
           required
@@ -98,11 +101,11 @@ export default function HealerForm() {
       </div>
 
       <div className="space-y-1">
-        <label className="block text-sm font-medium">Who do you center in your work?</label>
+        <label className="block text-sm font-medium">{t("form.healer.focus.label")}</label>
         <input
           type="text"
           className="w-full rounded-md border px-3 py-2 text-sm"
-          placeholder="e.g. queer & trans folks, BIPOC parents, immigrants"
+          placeholder={t("form.healer.focus.placeholder")}
           value={form.focus}
           onChange={handleChange('focus')}
           required
@@ -110,11 +113,13 @@ export default function HealerForm() {
       </div>
 
       <div className="space-y-1">
-        <label className="block text-sm font-medium">Where are you based? (optional)</label>
+        <label className="block text-sm font-medium">
+          {t("form.healer.city.label")} {t("form.optional")}
+        </label>
         <input
           type="text"
           className="w-full rounded-md border px-3 py-2 text-sm"
-          placeholder="e.g. online / based in Chicago, IL"
+          placeholder={t("form.healer.city.placeholder")}
           value={form.city}
           onChange={handleChange('city')}
         />
@@ -122,11 +127,18 @@ export default function HealerForm() {
 
       <div className="space-y-1">
         <label className="block text-sm font-medium">
-            How can people reach you? <span className="text-gray-500 text-sm">(optional)</span>
+          {t("form.healer.contact.label")}{" "}
+          <span className="text-gray-500 text-sm">{t("form.optional")}</span>
         </label>
 
         <div className="flex flex-wrap gap-2 text-sm">
-            {['Email', 'Phone', 'Website', 'IG / Social', 'Other'].map((type) => (
+            {[
+              t("form.healer.contact.type.email"),
+              t("form.healer.contact.type.phone"),
+              t("form.healer.contact.type.website"),
+              t("form.healer.contact.type.social"),
+              t("form.healer.contact.type.other"),
+            ].map((type) => (
             <button
                 type="button"
                 key={type}
@@ -140,17 +152,17 @@ export default function HealerForm() {
 
         <textarea
             className="w-full rounded-md border px-3 py-2 text-sm min-h-[80px]"
-            placeholder="Feel free to include one or more ways, each on a new line if you'd like."
+            placeholder={t("form.healer.contact.placeholder")}
             value={form.contact}
             onChange={handleChange('contact')}
         />
       </div>
 
       <div className="space-y-1">
-        <label className="block text-sm font-medium">Tell us a little about your practice</label>
+        <label className="block text-sm font-medium">{t("form.healer.bio.label")}</label>
         <textarea
           className="w-full rounded-md border px-3 py-2 text-sm min-h-[100px]"
-          placeholder="Share anything you'd like - your background, care values, or current offerings."
+          placeholder={t("form.healer.bio.placeholder")}
           value={form.bio}
           onChange={handleChange('bio')}
           required
@@ -163,13 +175,13 @@ export default function HealerForm() {
           className="rounded-md border px-4 py-2 text-sm"
           onClick={() => setForm(initialForm)}
         >
-          Reset
+          {t("form.reset")}
         </button>
         <button
           type="submit"
           className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
         >
-          Save
+          {t("form.save")}
         </button>
       </div>
     </form>

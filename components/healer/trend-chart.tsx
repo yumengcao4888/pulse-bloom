@@ -11,12 +11,15 @@ import {
 } from "recharts";
 
 import { type TrendPoint } from "@/lib/utils";
+import { useLocale } from "@/components/shared/locale-provider";
 
 export function TrendChart({ data }: { data: TrendPoint[] }) {
+  const { t } = useLocale();
+
   return (
     <div className="rounded-2xl border bg-white/70 p-5 shadow-sm">
       <h3 className="mb-3 text-lg font-semibold text-gray-800">
-        All-time Weekly Trends
+        {t("healer.trend.title")}
       </h3>
 
       <div className="h-64">
@@ -33,7 +36,7 @@ export function TrendChart({ data }: { data: TrendPoint[] }) {
               stroke="#F4C430"
               strokeWidth={2}
               dot={false}
-              name="Grounded"
+              name={t("reflection.grounded")}
             />
             <Line
               type="monotone"
@@ -41,7 +44,7 @@ export function TrendChart({ data }: { data: TrendPoint[] }) {
               stroke="#BAA1DD"
               strokeWidth={2}
               dot={false}
-              name="Supported"
+              name={t("reflection.supported")}
             />
             <Line
               type="monotone"
@@ -49,7 +52,7 @@ export function TrendChart({ data }: { data: TrendPoint[] }) {
               stroke="#4FC3F7"
               strokeWidth={2}
               dot={false}
-              name="Connected"
+              name={t("reflection.connected")}
             />
           </LineChart>
         </ResponsiveContainer>

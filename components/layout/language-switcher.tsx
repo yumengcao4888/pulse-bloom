@@ -1,0 +1,38 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { LOCALE_COOKIE, locales, type Locale } from "@/lib/i18n";
+import { useLocale } from "@/components/shared/locale-provider";
+
+export default function LanguageSwitcher() {
+  const router = useRouter();
+  const { locale, t } = useLocale();
+
+  const setLocale = (nextLocale: Locale) => {
+    document.cookie = `${LOCALE_COOKIE}=${nextLocale}; path=/; max-age=31536000`;
+    router.refresh();
+  };
+
+  return (
+    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
+      <span className="text-gray-500">{t("nav.language")}</span>
+      <div className="flex overflow-hidden rounded-full border border-gray-200 bg-white/70">
+        {locales.map((item) => (
+          <button
+            key={item}
+            type="button"
+            onClick={() => setLocale(item)}
+            className={`px-2.5 py-1 transition ${
+              item === locale
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+            aria-pressed={item === locale}
+          >
+            {t(`nav.locale.${item}` as const)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -1,3 +1,5 @@
+"use client";
+
 import Modal from "@/components/shared/modal";
 import {
   useState,
@@ -7,6 +9,7 @@ import {
   useMemo,
 } from "react";
 import Image from "next/image";
+import { useLocale } from "@/components/shared/locale-provider";
 
 const DemoModal = ({
   showDemoModal,
@@ -15,6 +18,7 @@ const DemoModal = ({
   showDemoModal: boolean;
   setShowDemoModal: Dispatch<SetStateAction<boolean>>;
 }) => {
+  const { t } = useLocale();
   return (
     <Modal showModal={showDemoModal} setShowModal={setShowDemoModal}>
       <div className="w-full overflow-hidden md:max-w-md md:rounded-2xl md:border md:border-gray-100 md:shadow-xl">
@@ -22,16 +26,15 @@ const DemoModal = ({
           <a href="https://precedent.dev">
             <Image
               src="/logo.png"
-              alt="Precedent Logo"
+              alt={t("template.demoModal.alt")}
               className="h-10 w-10 rounded-full"
               width={20}
               height={20}
             />
           </a>
-          <h3 className="font-display text-2xl font-bold">Precedent</h3>
+          <h3 className="font-display text-2xl font-bold">{t("template.demoModal.title")}</h3>
           <p className="text-sm text-gray-500">
-            Precedent is an opinionated collection of components, hooks, and
-            utilities for your Next.js project.
+            {t("template.demoModal.description")}
           </p>
         </div>
       </div>

@@ -5,9 +5,12 @@ import Link from "next/link";
 import useScroll from "@/lib/hooks/use-scroll";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { LayoutDashboard } from "lucide-react";
+import LanguageSwitcher from "@/components/layout/language-switcher";
+import { useLocale } from "@/components/shared/locale-provider";
 
 export default function NavBar() {
   const scrolled = useScroll(50);
+  const { t } = useLocale();
 
   return (
     <>
@@ -22,31 +25,34 @@ export default function NavBar() {
           <Link href="/" className="flex items-center font-display text-2xl">
             <Image
               src="/logo.png"
-              alt="Precedent logo"
+              alt={t("nav.brand")}
               width="30"
               height="30"
               className="mr-2 rounded-sm"
             ></Image>
-            <p>Precedent</p>
+            <p>{t("nav.brand")}</p>
           </Link>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="rounded-full border border-black bg-black px-4 py-1.5 text-sm text-white transition-colors hover:bg-white hover:text-black">
-                Sign In
-              </button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton>
-              <UserButton.MenuItems>
-                <UserButton.Link
-                  label="Dashboard"
-                  labelIcon={<LayoutDashboard className="h-4 w-4" />}
-                  href="/"
-                />
-              </UserButton.MenuItems>
-            </UserButton>
-          </SignedIn>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="rounded-full border border-black bg-black px-4 py-1.5 text-sm text-white transition-colors hover:bg-white hover:text-black">
+                  {t("nav.signIn")}
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton>
+                <UserButton.MenuItems>
+                  <UserButton.Link
+                    label={t("nav.dashboard")}
+                    labelIcon={<LayoutDashboard className="h-4 w-4" />}
+                    href="/"
+                  />
+                </UserButton.MenuItems>
+              </UserButton>
+            </SignedIn>
+          </div>
         </div>
       </div>
     </>
