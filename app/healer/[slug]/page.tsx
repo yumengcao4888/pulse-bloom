@@ -8,6 +8,7 @@ import {
   getMonthlyReflections,
   computeWeeklySentiment,
   computeWeeklyTrends,
+  capitalize,
 } from "@/lib/utils";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
@@ -366,7 +367,7 @@ export default async function HealerPage(props: PageProps) {
                       : "Unavailable"}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Emotion: {reflection.emotion?.label ?? "Unavailable"}
+                    Emotion: {reflection.emotion?.label ? capitalize(reflection.emotion.label) : "Unavailable"}
                   </p>
                   <p className="text-sm text-gray-500">
                     Created: {formatDate(reflection.createdAt)}
