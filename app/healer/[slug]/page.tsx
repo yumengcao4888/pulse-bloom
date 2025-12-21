@@ -169,6 +169,24 @@ export default async function HealerPage(props: PageProps) {
     metricToWord("supported", scores.allTime.supported),
     metricToWord("connected", scores.allTime.connected),
   ];
+  const emotionCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
+    (acc, reflection) => {
+      const label = reflection.emotion?.label;
+      if (!label) return acc;
+      acc[label] = (acc[label] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+  const totalEmotionCount = Object.values(emotionCounts).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
+  const emotionWords: Word[] = Object.entries(emotionCounts).map(([label, count]) => {
+    const percentage = totalEmotionCount === 0 ? 0 : (count / totalEmotionCount) * 100;
+    return metricToWord(label, Math.round(percentage));
+  });
+  wordcloudWords.push(...emotionWords);
 
   return (
     <>
