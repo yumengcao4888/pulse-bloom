@@ -187,6 +187,10 @@ export default async function HealerPage(props: PageProps) {
     return metricToWord(label, Math.round(percentage));
   });
   wordcloudWords.push(...emotionWords);
+  const topWords = [...wordcloudWords]
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 3)
+    .map((word) => word.text);
 
   return (
     <>
@@ -236,7 +240,20 @@ export default async function HealerPage(props: PageProps) {
               <p><b>🌤️ Overall mood</b></p>
               <p>Our community’s emotional tone this month: <b>{monthlySentiment} / 100</b>.</p>
               <p><b>🗣️ Top words</b></p>
-              <p>The voices in this space often whispered: <b><i>peace</i></b>, <b><i>trust</i></b>, <b><i>familia</i></b>.</p>
+              <p>
+                The voices in this space often whispered:{" "}
+                {topWords.length > 0
+                  ? topWords.map((word, index) => (
+                      <span key={`${word}-${index}`}>
+                        <b>
+                          <i>{word}</i>
+                        </b>
+                        {index < topWords.length - 1 ? ", " : ""}
+                      </span>
+                    ))
+                  : "—"}
+                .
+              </p>
             </div>
             {/* <div className="pt-2">
               <GradientGraph />
