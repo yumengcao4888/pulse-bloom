@@ -7,6 +7,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { LayoutDashboard } from "lucide-react";
 import LanguageSwitcher from "@/components/layout/language-switcher";
 import { useLocale } from "@/components/shared/locale-provider";
+import { yellowtail } from "@/app/fonts";
 
 export default function NavBar() {
   const scrolled = useScroll(50);
@@ -25,12 +26,12 @@ export default function NavBar() {
           <Link href="/" className="flex items-center font-display text-2xl">
             <Image
               src="/logo.png"
-              alt={t("nav.brand")}
+              alt="Pulse Bloom"
               width="30"
               height="30"
               className="mr-2 rounded-sm"
             ></Image>
-            <p>{t("nav.brand")}</p>
+            <p className={yellowtail.className}>PulseBloom</p>
           </Link>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
