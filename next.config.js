@@ -19,7 +19,7 @@ const nextConfig = {
     return [
       {
         source: "/github",
-        destination: "https://github.com/steven-tey/precedent",
+        destination: "https://github.com/yumengcao4888/pulse-bloom",
         permanent: false,
       },
     ];

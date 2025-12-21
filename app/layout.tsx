@@ -10,10 +10,10 @@ import { getLocale } from "@/lib/i18n-server";
 import { LocaleProvider } from "@/components/shared/locale-provider";
 
 export const metadata = {
-  title: "Precedent - Building blocks for your Next.js project",
+  title: "PulseBloom - Gently showing the impact of care",
   description:
-    "Precedent is the all-in-one solution for your Next.js project. It includes a design system, authentication, analytics, and more.",
-  metadataBase: new URL("https://precedent.dev"),
+    "PulseBloom is a gentle reflection tool for healers and space-holders, helping care become visible through shared emotional presence.",
+  metadataBase: new URL("https://pulse-bloom.vercel.app/"),
 };
 
 export default async function RootLayout({
