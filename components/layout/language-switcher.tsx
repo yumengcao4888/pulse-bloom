@@ -15,7 +15,9 @@ export default function LanguageSwitcher() {
 
   return (
     <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
-      <span className="text-gray-500">{t("nav.language")}</span>
+      <span className="hidden text-gray-500 sm:inline">
+        {t("nav.language")}
+      </span>
       <div className="flex overflow-hidden rounded-full border border-gray-200 bg-white/70">
         {locales.map((item) => (
           <button
