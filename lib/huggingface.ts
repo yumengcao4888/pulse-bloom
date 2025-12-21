@@ -4,6 +4,13 @@ const HF_URL =
 export type SentimentPrediction = {
   label: string;
   score: number;
+  scores: SentimentScores;
+};
+
+export type SentimentScores = {
+  negative: number;
+  neutral: number;
+  positive: number;
 };
 
 export async function classifyFeeling(
@@ -43,19 +50,14 @@ export async function classifyFeeling(
 }
 
 function normalizePrediction(data: unknown): SentimentPrediction | null {
-  if (Array.isArray(data)) {
-    for (const entry of data) {
-      const result = normalizePrediction(entry);
-      if (result) return result;
-    }
-    return null;
-  }
-
-  if (data && typeof data === "object" && "label" in data) {
-    const rawLabel = String((data as any).label).toLowerCase();
+  const scores = extractScores(data);
+  if (scores) {
+    const score = scores.positive * 1 + scores.neutral * 0.5 + scores.negative * 0;
+    const dominant = getDominantLabel(scores);
     return {
-      label: friendlyLabel(rawLabel),
-      score: Number((data as any).score ?? 0),
+      label: friendlyLabel(dominant),
+      score,
+      scores,
     };
   }
 
@@ -77,4 +79,64 @@ function friendlyLabel(raw: string): string {
     return "Positive";
   }
   return "Unclassified";
+}
+
+function extractScores(data: unknown): SentimentScores | null {
+  if (Array.isArray(data)) {
+    const direct = scoresFromArray(data);
+    if (direct) return direct;
+    for (const entry of data) {
+      const result = extractScores(entry);
+      if (result) return result;
+    }
+    return null;
+  }
+
+  if (data && typeof data === "object" && "label" in data && "score" in data) {
+    return scoresFromArray([data]);
+  }
+
+  if (data && typeof data === "object" && "error" in data) {
+    console.error("HF classification error payload:", data);
+  }
+
+  return null;
+}
+
+function scoresFromArray(entries: unknown[]): SentimentScores | null {
+  let negative: number | undefined;
+  let neutral: number | undefined;
+  let positive: number | undefined;
+
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    if (!("label" in entry) || !("score" in entry)) continue;
+    const rawLabel = String((entry as any).label).toLowerCase();
+    const score = Number((entry as any).score ?? 0);
+    if (rawLabel.includes("negative") || rawLabel.includes("label_0")) {
+      negative = score;
+    } else if (rawLabel.includes("neutral") || rawLabel.includes("label_1")) {
+      neutral = score;
+    } else if (rawLabel.includes("positive") || rawLabel.includes("label_2")) {
+      positive = score;
+    }
+  }
+
+  if (negative == null && neutral == null && positive == null) return null;
+
+  return {
+    negative: negative ?? 0,
+    neutral: neutral ?? 0,
+    positive: positive ?? 0,
+  };
+}
+
+function getDominantLabel(scores: SentimentScores): string {
+  const entries: Array<[string, number]> = [
+    ["negative", scores.negative],
+    ["neutral", scores.neutral],
+    ["positive", scores.positive],
+  ];
+  entries.sort((a, b) => b[1] - a[1]);
+  return entries[0]?.[0] ?? "unclassified";
 }

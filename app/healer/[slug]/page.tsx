@@ -359,9 +359,9 @@ export default async function HealerPage(props: PageProps) {
                   <p className="text-sm text-gray-500">
                     Sentiment:{" "}
                     {reflection.sentiment
-                      ? `${reflection.sentiment.label} (${(
+                      ? `${reflection.sentiment.label} (Score: ${(
                           reflection.sentiment.score * 100
-                        ).toFixed(0)}% confidence)`
+                        ).toFixed(0)})`
                       : "Unavailable"}
                   </p>
                   <p className="text-sm text-gray-500">
