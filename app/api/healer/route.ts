@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 const adjectives = [
   "gentle", "quiet", "soft", "warm", "glowing", "open", "steady",
@@ -26,6 +27,11 @@ function generateSlugFromName(name: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { userId } = auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     console.log("Received healer data:", body);
 
@@ -45,8 +51,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const existingHealer = await prisma.healer.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (existingHealer) {
+      return NextResponse.json(
+        { error: "Healer already exists", healer: existingHealer },
+        { status: 409 }
+      );
+    }
+
     const healer = await prisma.healer.create({
-      data: { name, pronouns, modality, focus, city, contact, bio, slug: generateSlugFromName(name) },
+      data: {
+        clerkId: userId,
+        name,
+        pronouns,
+        modality,
+        focus,
+        city,
+        contact,
+        bio,
+        slug: generateSlugFromName(name),
+      },
     });
 
     return NextResponse.json(
@@ -59,5 +86,24 @@ export async function POST(req: NextRequest) {
       { error: "Invalid request" },
       { status: 500 }
     );
+  }
+}
+
+export async function GET() {
+  try {
+    const { userId } = auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const healer = await prisma.healer.findUnique({
+      where: { clerkId: userId },
+      select: { slug: true },
+    });
+
+    return NextResponse.json({ healer }, { status: 200 });
+  } catch (err) {
+    console.error("Error in /api/healer GET:", err);
+    return NextResponse.json({ error: "Invalid request" }, { status: 500 });
   }
 }

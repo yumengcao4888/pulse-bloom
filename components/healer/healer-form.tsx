@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/shared/locale-provider";
 
 type HealerForm = {
@@ -26,6 +27,7 @@ const initialForm: HealerForm = {
 export default function HealerForm() {
   const [form, setForm] = useState<HealerForm>(initialForm);
   const { t } = useLocale();
+  const router = useRouter();
 
   const handleChange =
     (field: keyof HealerForm) =>
@@ -45,6 +47,19 @@ export default function HealerForm() {
         body: JSON.stringify(form),
       });
 
+      if (res.status === 401) {
+        alert(t("form.healer.save.error"));
+        return;
+      }
+
+      if (res.status === 409) {
+        const data = await res.json();
+        if (data?.healer?.slug) {
+          router.push(`/healer/${data.healer.slug}/healing-space`);
+          return;
+        }
+      }
+
       if (!res.ok) {
         throw new Error(t("form.healer.save.fail"));
       }
@@ -54,6 +69,9 @@ export default function HealerForm() {
 
       alert(t("form.healer.save.success"));
       setForm(initialForm);
+      if (data?.healer?.slug) {
+        router.push(`/healer/${data.healer.slug}/healing-space`);
+      }
     } catch (err) {
       console.error(err);
       alert(t("form.healer.save.error"));

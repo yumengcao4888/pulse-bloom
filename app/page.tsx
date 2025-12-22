@@ -1,3 +1,5 @@
+import HealingSpaceCta from "@/components/home/healing-space-cta";
+
 export default function HomePage() {
   return (
     <div className="relative z-10 flex w-full items-start px-5 xl:px-0">
@@ -45,9 +47,7 @@ export default function HomePage() {
               Create a space and invite your first reflection.
             </p>
           </div>
-          <button className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white md:w-auto">
-            Create a healing space
-          </button>
+          <HealingSpaceCta />
         </section>
 
       </div>
