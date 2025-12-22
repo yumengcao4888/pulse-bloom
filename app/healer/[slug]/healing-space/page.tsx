@@ -83,6 +83,7 @@ export default async function HealerDevPage(props: PageProps) {
   }
 
   const reflectionLink = `http://localhost:3000/reflection/${slug}`;
+  const sharableLink = `http://localhost:3000/healer/${slug}`;
   const hfEnabled = Boolean(process.env.HF_TOKEN);
 
   const reflectionsWithAnalysis = await Promise.all(
@@ -209,6 +210,12 @@ export default async function HealerDevPage(props: PageProps) {
               <b>{t("healer.dev.reflectionLink")}:</b>{" "}
               <Link href={reflectionLink} className="text-blue-600 underline">
                 {reflectionLink}
+              </Link>
+            </p>
+            <p className="text-gray-700">
+              <b>Sharable link:</b>{" "}
+              <Link href={sharableLink} className="text-blue-600 underline">
+                {sharableLink}
               </Link>
             </p>
             <p className="text-gray-700">
