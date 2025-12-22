@@ -1,93 +1,66 @@
-import { italianno } from "@/app/fonts";
-
-export default async function HealerPage() {
+export default function HomePage() {
   return (
-    <div className="relative z-10 w-full px-5 pb-20 pt-12 md:pt-16 xl:px-0">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-12">
-        <section className="rounded-3xl border bg-white/80 p-6 shadow-sm backdrop-blur md:p-10">
-          <h1 className="mt-3 text-3xl font-semibold leading-tight text-gray-900 md:text-5xl md:leading-tight">
+    <div className="relative z-10 flex min-h-screen w-full items-center px-5 xl:px-0">
+      <div className="mx-auto w-full max-w-5xl space-y-8">
+
+        <section className="rounded-3xl border bg-white/80 p-8 shadow-sm backdrop-blur md:p-12">
+          <h1 className="text-3xl font-semibold leading-tight text-gray-900 md:text-5xl">
             For healers who hold space, not scores.
           </h1>
           <p className="mt-4 text-base text-gray-600 md:text-lg">
-            PulseBloom helps healers gently show the impact of their care.
-            Without metrics. Without judgment. Just presence.
+            PulseBloom lets you invite clients to gently reflect and share the feeling of your space.
           </p>
-          <p className="mt-3 text-sm text-gray-500">
-            Invite your community to reflect. Let the feeling speak for itself.
-          </p>
-        </section>
-
-        <section className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border bg-white/80 p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-400">Invite reflection</p>
-            <p className="mt-3 text-base text-gray-700">
-              Clients gently reflect on how they felt in your space.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-white/80 p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-400">Feel the pattern</p>
-            <p className="mt-3 text-base text-gray-700">
-            PulseBloom notices shared emotional signals -- grounded, supported, connected.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-white/80 p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-400">Share your bloom</p>
-            <p className="mt-3 text-base text-gray-700">
-              A soft snapshot of your space, ready to share.
-            </p>
-          </div>
-        </section>
-
-        <section className="rounded-2xl border bg-white/80 p-6 shadow-sm md:p-8">
-          <h2 className="text-lg font-semibold text-gray-900 md:text-xl">Not a review system</h2>
-          <p className="mt-3 text-base text-gray-700">
-            PulseBloom is not a review system. It doesn’t rank, compare, or judge.
-          </p>
-          <p className="mt-2 text-base text-gray-700">
-            It simply reflects what your space feels like -- over time, together.
+          <p className="mt-2 text-sm text-gray-500">
+            No metrics. No judgment. Just presence.
           </p>
         </section>
 
-        <section className="rounded-2xl border bg-white/80 p-6 shadow-sm md:p-8">
-          <h2 className="text-lg font-semibold text-gray-900 md:text-xl">
-            Designed to protect both you and your community
-          </h2>
-          <div className="mt-4 grid gap-3 text-base text-gray-700 sm:grid-cols-3">
-            <p>No public comments</p>
-            <p>No individual tracking</p>
-            <p>No "performance" pressure</p>
+        <section className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+            <span className="block text-xs uppercase tracking-[0.2em] text-gray-400">
+              Invite
+            </span>
+            Clients reflect with a few gentle taps.
+          </div>
+          <div className="rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+            <span className="block text-xs uppercase tracking-[0.2em] text-gray-400">
+              Sense
+            </span>
+            Shared feelings emerge over time.
+          </div>
+          <div className="rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+            <span className="block text-xs uppercase tracking-[0.2em] text-gray-400">
+              Share
+            </span>
+            A soft snapshot of your space.
           </div>
         </section>
 
-        <section className="flex flex-col items-start gap-4 rounded-2xl border bg-white/80 p-6 shadow-sm md:p-8">
-          <p className="text-sm uppercase tracking-[0.2em] text-gray-400">A gentle output</p>
-          <p className="text-lg text-gray-800 md:text-xl">
-            "This month, our community felt grounded 83% of the time."
-          </p>
+        <section className="flex flex-col gap-3 rounded-2xl border bg-white/80 p-6 text-sm text-gray-700 shadow-sm md:flex-row md:items-center md:justify-between">
+          <div className="flex gap-4">
+            <span>No reviews</span>
+            <span>No tracking</span>
+            <span>No pressure</span>
+          </div>
+          <em className="text-gray-600">
+            “Our community felt grounded 83% of the time.”
+          </em>
         </section>
 
-        <section className="flex flex-col gap-4 rounded-2xl border bg-white/80 p-6 shadow-sm md:flex-row md:items-center md:justify-between md:p-8">
+        <section className="flex items-center justify-between rounded-2xl border bg-white/80 p-6 shadow-sm">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 md:text-xl">Begin with a gentle pulse</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Create a healing space and invite your first reflection.
+            <h2 className="text-base font-semibold text-gray-900">
+              Begin with a gentle pulse
+            </h2>
+            <p className="text-sm text-gray-600">
+              Create a space and invite your first reflection.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <button
-              className="rounded-full border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-gray-400 hover:text-gray-900"
-              type="button"
-            >
-              Create a healing space
-            </button>
-            <button
-              className="rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800"
-              type="button"
-            >
-              Start a gentle pulse
-            </button>
-          </div>
+          <button className="rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white">
+            Create a healing space
+          </button>
         </section>
+
       </div>
     </div>
   );
