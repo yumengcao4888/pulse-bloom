@@ -12,6 +12,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
+import PrintProfileButton from "@/components/healer/print-profile-button";
 import type { Word } from "react-wordcloud";
 
 import 'tippy.js/dist/tippy.css';
@@ -218,9 +219,12 @@ export default async function HealerDevPage(props: PageProps) {
                 {sharableLink}
               </Link>
             </p>
-            <p className="text-gray-700">
-              <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsWithAnalysis.length}
-            </p>
+            <div className="flex flex-wrap items-center gap-3 text-gray-700">
+              <p>
+                <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsWithAnalysis.length}
+              </p>
+              <PrintProfileButton slug={healer.slug} />
+            </div>
           </div>
         </div>
       </div>

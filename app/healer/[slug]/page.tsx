@@ -12,6 +12,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
+import AutoPrint from "@/components/healer/auto-print";
 import type { Word } from "react-wordcloud";
 
 import 'tippy.js/dist/tippy.css';
@@ -200,6 +201,7 @@ export default async function HealerPage(props: PageProps) {
 
   return (
     <>
+      <AutoPrint />
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
         <div className="my-10 mx-auto max-w-xl flex flex-col items-center space-y-6">
           <Image
