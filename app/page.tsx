@@ -36,8 +36,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="flex items-center justify-between rounded-2xl border bg-white/80 p-6 shadow-sm">
-          <div>
+        <section className="flex flex-col gap-4 rounded-2xl border bg-white/80 p-6 shadow-sm md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1">
             <h2 className="text-base font-semibold text-gray-900">
               Begin with a gentle pulse
             </h2>
@@ -45,7 +45,7 @@ export default function HomePage() {
               Create a space and invite your first reflection.
             </p>
           </div>
-          <button className="rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white">
+          <button className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white md:w-auto">
             Create a healing space
           </button>
         </section>
