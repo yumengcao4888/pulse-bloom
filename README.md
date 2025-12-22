@@ -1,9 +1,4 @@
-# PulseBloom
-
-<p align="center">
-  <img src="app/icon.png" alt="PulseBloom icon" width="96" height="96" />
-  <img src="public/default-healer.jpg" alt="Default healer avatar" width="96" height="96" />
-</p>
+# PulseBloom <img src="app/icon.png" alt="PulseBloom icon" width="28" height="28" />
 
 PulseBloom is a gentle reflection tool for healers and space-holders. It helps you invite clients to reflect, view a soft snapshot of shared feelings, and share a healing space.
 
@@ -17,11 +12,13 @@ PulseBloom is a gentle reflection tool for healers and space-holders. It helps y
 
 ## Tech Stack
 
-- Next.js App Router
-- React + TypeScript
-- Tailwind CSS
-- Prisma + Postgres
-- Clerk
+- [Next.js App Router](https://nextjs.org/)
+- [React](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Prisma](https://www.prisma.io/)
+- [Postgres](https://www.postgresql.org/)
+- [Clerk](https://clerk.com/)
 
 ## Local Development
 
@@ -64,5 +61,5 @@ Deploy on Vercel and set the same environment variables as `.env.local`. If you 
 
 ## Acknowledgements
 
-This project was initially bootstrapped using the Precedent template by Steven Tey.
+This project was initially bootstrapped using the [Precedent](https://github.com/steven-tey/precedent) template by [Steven Tey](https://github.com/steven-tey).
 The template provided a solid technical foundation during early development.
