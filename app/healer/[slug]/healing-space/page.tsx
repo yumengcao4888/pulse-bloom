@@ -83,8 +83,8 @@ export default async function HealerDevPage(props: PageProps) {
     return <div className="relative z-10 p-6 text-red-500">{t("healer.notFound")}</div>;
   }
 
-  const reflectionLink = `http://localhost:3000/reflection/${slug}`;
-  const sharableLink = `http://localhost:3000/healer/${slug}`;
+  const reflectionLink = `http://pulse-bloom.vercel.app/reflection/${slug}`;
+  const sharableLink = `http://pulse-bloom.vercel.app/healer/${slug}`;
   const hfEnabled = Boolean(process.env.HF_TOKEN);
 
   const reflectionsWithAnalysis = await Promise.all(
