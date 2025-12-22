@@ -15,20 +15,20 @@ export default function HomePage() {
           </p>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+        <section className="flex gap-4 overflow-x-auto pb-2 md:grid md:overflow-visible md:pb-0 md:grid-cols-3">
+          <div className="min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm md:min-w-0">
             <span className="block text-xs uppercase tracking-[0.2em] text-gray-400">
               Invite
             </span>
             Clients reflect with a few gentle taps.
           </div>
-          <div className="rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+          <div className="min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm md:min-w-0">
             <span className="block text-xs uppercase tracking-[0.2em] text-gray-400">
               Sense
             </span>
             Shared feelings emerge over time.
           </div>
-          <div className="rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+          <div className="min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm md:min-w-0">
             <span className="block text-xs uppercase tracking-[0.2em] text-gray-400">
               Share
             </span>
