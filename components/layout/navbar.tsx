@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import useScroll from "@/lib/hooks/use-scroll";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import { LayoutDashboard } from "lucide-react";
 import LanguageSwitcher from "@/components/layout/language-switcher";
 import { useLocale } from "@/components/shared/locale-provider";
@@ -13,6 +14,37 @@ import icon from "@/app/icon.png";
 export default function NavBar() {
   const scrolled = useScroll(50);
   const { t } = useLocale();
+  const { isSignedIn, userId } = useAuth();
+  const [healerSlug, setHealerSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const checkHealer = async () => {
+      setHealerSlug(null);
+      if (!isSignedIn || !userId) {
+        return;
+      }
+      try {
+        const res = await fetch("/api/healer", { method: "GET" });
+        if (!res.ok) {
+          return;
+        }
+        const data = await res.json();
+        if (isActive) {
+          setHealerSlug(data?.healer?.slug ?? null);
+        }
+      } catch (err) {
+        console.error("Failed to check healer status:", err);
+      }
+    };
+
+    checkHealer();
+
+    return () => {
+      isActive = false;
+    };
+  }, [isSignedIn, userId]);
 
   return (
     <>
@@ -46,11 +78,20 @@ export default function NavBar() {
             <SignedIn>
               <UserButton>
                 <UserButton.MenuItems>
-                  <UserButton.Link
-                    label={t("nav.dashboard")}
-                    labelIcon={<LayoutDashboard className="h-4 w-4" />}
-                    href="/"
-                  />
+                  {healerSlug && (
+                    <UserButton.Link
+                      label={t("nav.healingSpace")}
+                      labelIcon={<LayoutDashboard className="h-4 w-4" />}
+                      href={`/healer/${healerSlug}/healing-space`}
+                    />
+                  )}
+                  {!healerSlug && (
+                    <UserButton.Link
+                      label={t("nav.createHealingSpace")}
+                      labelIcon={<LayoutDashboard className="h-4 w-4" />}
+                      href="/healer"
+                    />
+                  )}
                 </UserButton.MenuItems>
               </UserButton>
             </SignedIn>
