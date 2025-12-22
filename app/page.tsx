@@ -38,17 +38,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-4 rounded-2xl border bg-white/80 p-6 shadow-sm md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <h2 className="text-base font-semibold text-gray-900">
-              Begin with a gentle pulse
-            </h2>
-            <p className="text-sm text-gray-600">
-              Create a space and invite your first reflection.
-            </p>
-          </div>
-          <HealingSpaceCta />
-        </section>
+        <HealingSpaceCta />
 
       </div>
     </div>
