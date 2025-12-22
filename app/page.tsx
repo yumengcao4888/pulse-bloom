@@ -1,11 +1,11 @@
 export default function HomePage() {
   return (
-    <div className="relative z-10 flex min-h-screen w-full items-center px-5 xl:px-0">
+    <div className="relative z-10 flex w-full items-start px-5 xl:px-0">
       <div className="mx-auto w-full max-w-5xl space-y-8">
 
         <section className="rounded-3xl border bg-white/80 p-8 shadow-sm backdrop-blur md:p-12">
           <h1 className="text-3xl font-semibold leading-tight text-gray-900 md:text-5xl">
-            For healers who hold space, not scores.
+            For healers who hold space.
           </h1>
           <p className="mt-4 text-base text-gray-600 md:text-lg">
             PulseBloom lets you invite clients to gently reflect and share the feeling of your space.
@@ -34,17 +34,6 @@ export default function HomePage() {
             </span>
             A soft snapshot of your space.
           </div>
-        </section>
-
-        <section className="flex flex-col gap-3 rounded-2xl border bg-white/80 p-6 text-sm text-gray-700 shadow-sm md:flex-row md:items-center md:justify-between">
-          <div className="flex gap-4">
-            <span>No reviews</span>
-            <span>No tracking</span>
-            <span>No pressure</span>
-          </div>
-          <em className="text-gray-600">
-            “Our community felt grounded 83% of the time.”
-          </em>
         </section>
 
         <section className="flex items-center justify-between rounded-2xl border bg-white/80 p-6 shadow-sm">
