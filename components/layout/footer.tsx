@@ -12,7 +12,7 @@ export default function Footer() {
           >
             GitHub
           </Link>{" "}
-          © copyleft 2025 PulseBloom
+          © Copyleft 2025 PulseBloom
         </p>
       </div>
     </footer>
