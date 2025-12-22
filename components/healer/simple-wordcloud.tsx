@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactWordcloud, {
   type CallbacksProp,
   type OptionsProp,
@@ -40,7 +40,7 @@ const wordcloudCallbacks: CallbacksProp = {
   onWordMouseOver: word => console.log("Word hovered:", word),
 };
 
-const wordcloudOptions: OptionsProp = {
+const baseWordcloudOptions: OptionsProp = {
   rotations: 2,
   rotationAngles: [0, 0],
   fontSizes: [30, 48],
@@ -59,16 +59,49 @@ function scaleWords(words: Word[]): Word[] {
 }
 
 function CommunityWordcloud({ words }: CommunityWordcloudProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<WordcloudSize>(DEFAULT_SIZE);
   const scaledWords = useMemo(() => scaleWords(words), [words]);
+  const options = useMemo<OptionsProp>(() => {
+    const isSmall = size[0] < 360;
+    return {
+      ...baseWordcloudOptions,
+      fontSizes: isSmall ? [16, 28] : [24, 40],
+    };
+  }, [size]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateSize = () => {
+      const width = container.clientWidth || DEFAULT_SIZE[0];
+      const height = Math.max(MIN_SIZE[1], Math.round(width * 0.65));
+      setSize([Math.max(MIN_SIZE[0], width), height]);
+    };
+
+    updateSize();
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(updateSize);
+      observer.observe(container);
+      return () => observer.disconnect();
+    }
+
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   return (
-    <ReactWordcloud
-      callbacks={wordcloudCallbacks}
-      minSize={MIN_SIZE}
-      options={wordcloudOptions}
-      size={DEFAULT_SIZE}
-      words={scaledWords}
-    />
+    <div ref={containerRef} className="w-full">
+      <ReactWordcloud
+        callbacks={wordcloudCallbacks}
+        minSize={MIN_SIZE}
+        options={options}
+        size={size}
+        words={scaledWords}
+      />
+    </div>
   );
 }
 
