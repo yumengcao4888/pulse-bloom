@@ -26,8 +26,8 @@ export default async function RootLayout({
   return (
     <ClerkProvider>
       <html lang={locale}>
-        <body className={cx(sfPro.variable, inter.variable)}>
-          <div className="fixed h-screen w-full bg-gradient-to-br from-indigo-50 via-white to-cyan-100" />
+        <body className={cx(sfPro.variable, inter.variable, "bg-white text-gray-900 dark:bg-black dark:text-gray-100")}>
+          <div className="fixed h-screen w-full bg-gradient-to-br from-indigo-50 via-white to-cyan-100 dark:from-black dark:via-black dark:to-black" />
           <LocaleProvider locale={locale}>
             <div className="relative z-10 flex min-h-screen flex-col">
               <Suspense fallback="...">
