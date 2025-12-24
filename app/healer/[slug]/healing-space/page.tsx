@@ -203,13 +203,29 @@ export default async function HealingSpacePage(props: PageProps) {
         <div className="my-10 mx-auto w-full">
           <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
             <div className="flex items-start gap-4">
-              <HealerProfileImage
-                src={profileImageUrl}
-                alt={t("healer.profile.photoAlt")}
-                width={88}
-                height={88}
-                className="h-[88px] w-[88px] rounded-full object-cover"
-              />
+              <div className="flex flex-col items-center gap-3 sm:items-start">
+                <HealerProfileImage
+                  src={profileImageUrl}
+                  alt={t("healer.profile.photoAlt")}
+                  width={88}
+                  height={88}
+                  className="h-[88px] w-[88px] rounded-full object-cover"
+                />
+                <div className="flex flex-col items-center gap-2 sm:hidden">
+                  <EditProfileSheet
+                    healer={{
+                      name: healer.name,
+                      pronouns: healer.pronouns,
+                      modality: healer.modality,
+                      focus: healer.focus,
+                      city: healer.city,
+                      contact: healer.contact,
+                      bio: healer.bio,
+                    }}
+                  />
+                  <InviteReflectionButton reflectionLink={reflectionLink} />
+                </div>
+              </div>
               <div className="flex flex-1 items-start justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-2">
@@ -231,7 +247,7 @@ export default async function HealingSpacePage(props: PageProps) {
                     <b>{t("healer.dev.contact")}:</b> {healer.contact}
                   </p>
                 </div>
-                <div className="flex shrink-0 flex-col items-end gap-2">
+                <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
                   <EditProfileSheet
                     healer={{
                       name: healer.name,
