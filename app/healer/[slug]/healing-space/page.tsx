@@ -14,6 +14,7 @@ import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
 import PrintProfileButton from "@/components/healer/print-profile-button";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
+import InviteReflectionButton from "@/components/healer/invite-reflection-button";
 import type { Word } from "react-wordcloud";
 import { clerkClient } from "@clerk/nextjs/server";
 
@@ -208,28 +209,28 @@ export default async function HealingSpacePage(props: PageProps) {
                 height={88}
                 className="h-[88px] w-[88px] rounded-full object-cover"
               />
-              <div className="flex-1">
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <h1 className="text-2xl font-semibold">{healer.name}</h1>
-                  {healer.pronouns && (
-                    <span className="text-lg font-normal text-gray-600">
-                      ({healer.pronouns})
-                    </span>
-                  )}
+              <div className="flex flex-1 items-center justify-between gap-4">
+                <div>
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <h1 className="text-2xl font-semibold">{healer.name}</h1>
+                    {healer.pronouns && (
+                      <span className="text-lg font-normal text-gray-600">
+                        ({healer.pronouns})
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-gray-700">
+                    <span>{healer.modality}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{healer.focus}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{healer.city}</span>
+                  </div>
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-gray-700">
-                  <span>{healer.modality}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{healer.focus}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{healer.city}</span>
-                </div>
+                <InviteReflectionButton reflectionLink={reflectionLink} />
               </div>
             </div>
             <div className="my-4 border-t border-gray-200" />
-            <div className="mb-3 flex justify-center">
-              <QRCodeSVG value={reflectionLink} size={120} />
-            </div>
             <p className="text-gray-700">
               <b>{t("healer.dev.contact")}:</b> {healer.contact}
             </p>
