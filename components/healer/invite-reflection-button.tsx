@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 import Modal from "@/components/shared/modal";
 
 type InviteReflectionButtonProps = {
@@ -13,6 +13,7 @@ export default function InviteReflectionButton({
 }: InviteReflectionButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const qrCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCopyLink = async () => {
@@ -28,6 +29,16 @@ export default function InviteReflectionButton({
     } catch (err) {
       console.error("Failed to copy reflection link:", err);
     }
+  };
+
+  const handleDownloadQr = () => {
+    const canvas = qrCanvasRef.current;
+    if (!canvas) return;
+    const dataUrl = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = "reflection-qr.png";
+    link.click();
   };
 
   useEffect(() => {
@@ -76,7 +87,7 @@ export default function InviteReflectionButton({
           </div>
           <div className="border-t border-gray-200" />
           <div className="flex justify-center">
-            <QRCodeSVG value={reflectionLink} size={140} />
+            <QRCodeCanvas ref={qrCanvasRef} value={reflectionLink} size={140} />
           </div>
           <div className="border-t border-gray-200" />
           <button
