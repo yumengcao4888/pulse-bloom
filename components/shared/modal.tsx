@@ -11,11 +11,13 @@ export default function Modal({
   className,
   showModal,
   setShowModal,
+  title = "Modal",
 }: {
   children: React.ReactNode;
   className?: string;
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
+  title?: string;
 }) {
   const { isMobile } = useMediaQuery();
 
@@ -56,6 +58,7 @@ export default function Modal({
             className,
           )}
         >
+          <Dialog.Title className="sr-only">{title}</Dialog.Title>
           {children}
         </Dialog.Content>
       </Dialog.Portal>

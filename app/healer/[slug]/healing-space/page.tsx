@@ -15,7 +15,7 @@ import MyWordcloud from "@/components/healer/simple-wordcloud";
 import PrintProfileButton from "@/components/healer/print-profile-button";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
 import InviteReflectionButton from "@/components/healer/invite-reflection-button";
-import EditProfileSheet from "@/components/healer/edit-profile-sheet";
+import EditProfileSheet from "@/components/healer/edit-space-sheet";
 import type { Word } from "react-wordcloud";
 import { clerkClient } from "@clerk/nextjs/server";
 
