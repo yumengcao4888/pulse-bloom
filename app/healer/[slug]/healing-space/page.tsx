@@ -15,6 +15,7 @@ import MyWordcloud from "@/components/healer/simple-wordcloud";
 import PrintProfileButton from "@/components/healer/print-profile-button";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
 import InviteReflectionButton from "@/components/healer/invite-reflection-button";
+import EditProfileSheet from "@/components/healer/edit-profile-sheet";
 import type { Word } from "react-wordcloud";
 import { clerkClient } from "@clerk/nextjs/server";
 
@@ -226,22 +227,29 @@ export default async function HealingSpacePage(props: PageProps) {
                     <span aria-hidden="true">·</span>
                     <span>{healer.city}</span>
                   </div>
+                  <p className="mt-1 text-sm text-gray-700">
+                    <b>{t("healer.dev.contact")}:</b> {healer.contact}
+                  </p>
                 </div>
-                <InviteReflectionButton reflectionLink={reflectionLink} />
+                <div className="flex flex-col items-end gap-2">
+                  <EditProfileSheet
+                    healer={{
+                      name: healer.name,
+                      pronouns: healer.pronouns,
+                      modality: healer.modality,
+                      focus: healer.focus,
+                      city: healer.city,
+                      contact: healer.contact,
+                      bio: healer.bio,
+                    }}
+                  />
+                  <InviteReflectionButton reflectionLink={reflectionLink} />
+                </div>
               </div>
             </div>
             <div className="my-4 border-t border-gray-200" />
             <p className="text-gray-700">
-              <b>{t("healer.dev.contact")}:</b> {healer.contact}
-            </p>
-            <p className="text-gray-700">
               <b>{t("healer.dev.bio")}:</b> {healer.bio}
-            </p>
-            <p className="text-gray-700">
-              <b>{t("healer.dev.reflectionLink")}:</b>{" "}
-              <Link href={reflectionLink} className="text-blue-600 underline">
-                {reflectionLink}
-              </Link>
             </p>
             <p className="text-gray-700">
               <b>Sharable link:</b>{" "}

@@ -107,3 +107,64 @@ export async function GET() {
     return NextResponse.json({ error: "Invalid request" }, { status: 500 });
   }
 }
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { name, pronouns, modality, focus, city, contact, bio } = body;
+    const missing: string[] = [];
+    if (!name) missing.push("name");
+    if (!modality) missing.push("modality");
+    if (!focus) missing.push("focus");
+    if (!bio) missing.push("bio");
+    if (missing.length > 0) {
+      return NextResponse.json(
+        {
+          error: "Missing required fields",
+          missing,
+        },
+        { status: 400 },
+      );
+    }
+
+    const existingHealer = await prisma.healer.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!existingHealer) {
+      return NextResponse.json(
+        { error: "Healer not found" },
+        { status: 404 },
+      );
+    }
+
+    const healer = await prisma.healer.update({
+      where: { clerkId: userId },
+      data: {
+        name,
+        pronouns,
+        modality,
+        focus,
+        city,
+        contact,
+        bio,
+      },
+    });
+
+    return NextResponse.json(
+      { success: true, healer },
+      { status: 200 },
+    );
+  } catch (err) {
+    console.error("Error in /api/healer PUT:", err);
+    return NextResponse.json(
+      { error: "Invalid request" },
+      { status: 500 },
+    );
+  }
+}

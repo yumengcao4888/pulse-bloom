@@ -87,7 +87,14 @@ export default function InviteReflectionButton({
           </div>
           <div className="border-t border-gray-200" />
           <div className="flex justify-center">
-            <QRCodeCanvas ref={qrCanvasRef} value={reflectionLink} size={140} />
+            <button
+              type="button"
+              onClick={handleDownloadQr}
+              className="rounded-lg p-1 transition hover:bg-gray-100"
+              aria-label="Download QR code"
+            >
+              <QRCodeCanvas ref={qrCanvasRef} value={reflectionLink} size={140} />
+            </button>
           </div>
           <div className="border-t border-gray-200" />
           <button
