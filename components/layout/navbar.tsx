@@ -14,7 +14,7 @@ import icon from "@/app/icon.png";
 export default function NavBar() {
   const scrolled = useScroll(50);
   const { t } = useLocale();
-  const { isSignedIn, userId } = useAuth();
+  const { isSignedIn, isLoaded, userId } = useAuth();
   const [healerSlug, setHealerSlug] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function NavBar() {
 
     const checkHealer = async () => {
       setHealerSlug(null);
-      if (!isSignedIn || !userId) {
+      if (!isLoaded || !isSignedIn || !userId) {
         return;
       }
       try {
@@ -44,7 +44,7 @@ export default function NavBar() {
     return () => {
       isActive = false;
     };
-  }, [isSignedIn, userId]);
+  }, [isLoaded, isSignedIn, userId]);
 
   return (
     <>

@@ -14,6 +14,7 @@ import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
 import AutoPrint from "@/components/healer/auto-print";
 import type { Word } from "react-wordcloud";
+import { clerkClient } from "@clerk/nextjs/server";
 
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -81,6 +82,19 @@ export default async function HealerPage(props: PageProps) {
 
   if (!healer) {
     return <div className="relative z-10 p-6 text-red-500">{t("healer.notFound")}</div>;
+  }
+
+  let profileImageUrl = "/default-healer.jpg";
+  if (healer.clerkId) {
+    try {
+      const client = await clerkClient();
+      const healerUser = await client.users.getUser(healer.clerkId);
+      if (healerUser.imageUrl) {
+        profileImageUrl = healerUser.imageUrl;
+      }
+    } catch (err) {
+      console.error("Failed to load healer profile image:", err);
+    }
   }
 
   const hfEnabled = Boolean(process.env.HF_TOKEN);
@@ -205,13 +219,13 @@ export default async function HealerPage(props: PageProps) {
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
         <div className="my-10 mx-auto max-w-xl flex flex-col items-center space-y-6">
           <Image
-          src="/default-healer.jpg"
-          alt={t("healer.profile.photoAlt")}
-          width={200}
-          height={200}
-          className="rounded-full object-cover"
-        />
-        <h1 className="mb-5 flex items-baseline gap-2 text-3xl font-semibold">
+            src={profileImageUrl}
+            alt={t("healer.profile.photoAlt")}
+            width={200}
+            height={200}
+            className="rounded-full object-cover"
+          />
+          <h1 className="mb-5 flex items-baseline gap-2 text-3xl font-semibold">
           <span>{healer.name}</span>
           {healer.pronouns && (
             <span className="text-xl font-normal text-gray-600">

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignUpButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 
 export default function HealingSpaceCta() {
   const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [hasHealer, setHasHealer] = useState(false);
   const [checkedHealer, setCheckedHealer] = useState(false);
@@ -14,6 +15,12 @@ export default function HealingSpaceCta() {
     let isActive = true;
 
     const checkHealer = async () => {
+      if (!isLoaded || !isSignedIn) {
+        if (isActive) {
+          setCheckedHealer(true);
+        }
+        return;
+      }
       try {
         const res = await fetch("/api/healer", { method: "GET" });
         if (!res.ok) {
@@ -37,11 +44,15 @@ export default function HealingSpaceCta() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [isLoaded, isSignedIn]);
 
   const handleClick = async () => {
     setIsLoading(true);
     try {
+      if (!isLoaded || !isSignedIn) {
+        router.push("/healer");
+        return;
+      }
       const res = await fetch("/api/healer", { method: "GET" });
       if (res.ok) {
         const data = await res.json();
