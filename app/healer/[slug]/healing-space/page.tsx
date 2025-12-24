@@ -199,39 +199,37 @@ export default async function HealingSpacePage(props: PageProps) {
     <>
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
         <div className="my-10 mx-auto max-w-xl">
-          <div className="mb-8 flex flex-col items-center space-y-4">
-            <HealerProfileImage
-              src={profileImageUrl}
-              alt={t("healer.profile.photoAlt")}
-              width={160}
-              height={160}
-              className="rounded-full object-cover"
-            />
-            <h1 className="flex items-baseline gap-2 text-3xl font-semibold">
-              <span>{healer.name}</span>
-              {healer.pronouns && (
-                <span className="text-xl font-normal text-gray-600">
-                  ({healer.pronouns})
-                </span>
-              )}
-            </h1>
-          </div>
           <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
+            <div className="flex items-center gap-4">
+              <HealerProfileImage
+                src={profileImageUrl}
+                alt={t("healer.profile.photoAlt")}
+                width={88}
+                height={88}
+                className="h-[88px] w-[88px] rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <h1 className="text-2xl font-semibold">{healer.name}</h1>
+                  {healer.pronouns && (
+                    <span className="text-lg font-normal text-gray-600">
+                      ({healer.pronouns})
+                    </span>
+                  )}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-gray-700">
+                  <span>{healer.modality}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{healer.focus}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{healer.city}</span>
+                </div>
+              </div>
+            </div>
+            <div className="my-4 border-t border-gray-200" />
             <div className="mb-3 flex justify-center">
               <QRCodeSVG value={reflectionLink} size={120} />
             </div>
-            <p className="text-gray-700">
-              <b>{t("healer.dev.pronouns")}:</b> {healer.pronouns}
-            </p>
-            <p className="text-gray-700">
-              <b>{t("healer.dev.modality")}:</b> {healer.modality}
-            </p>
-            <p className="text-gray-700">
-              <b>{t("healer.dev.focus")}:</b> {healer.focus}
-            </p>
-            <p className="text-gray-700">
-              <b>{t("healer.dev.city")}:</b> {healer.city}
-            </p>
             <p className="text-gray-700">
               <b>{t("healer.dev.contact")}:</b> {healer.contact}
             </p>
