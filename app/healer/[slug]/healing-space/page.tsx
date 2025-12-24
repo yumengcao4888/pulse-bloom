@@ -13,7 +13,9 @@ import { getTranslations } from "@/lib/i18n";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
 import PrintProfileButton from "@/components/healer/print-profile-button";
+import HealerProfileImage from "@/components/healer/healer-profile-image";
 import type { Word } from "react-wordcloud";
+import { clerkClient } from "@clerk/nextjs/server";
 
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -81,6 +83,19 @@ export default async function HealingSpacePage(props: PageProps) {
 
   if (!healer) {
     return <div className="relative z-10 p-6 text-red-500">{t("healer.notFound")}</div>;
+  }
+
+  let profileImageUrl = "/default-healer.jpg";
+  if (healer.clerkId) {
+    try {
+      const client = await clerkClient();
+      const healerUser = await client.users.getUser(healer.clerkId);
+      if (healerUser.hasImage && healerUser.imageUrl) {
+        profileImageUrl = healerUser.imageUrl;
+      }
+    } catch (err) {
+      console.error("Failed to load healer profile image:", err);
+    }
   }
 
   const reflectionLink = `http://pulse-bloom.vercel.app/reflection/${slug}`;
@@ -184,11 +199,27 @@ export default async function HealingSpacePage(props: PageProps) {
     <>
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
         <div className="my-10 mx-auto max-w-xl">
+          <div className="mb-8 flex flex-col items-center space-y-4">
+            <HealerProfileImage
+              src={profileImageUrl}
+              alt={t("healer.profile.photoAlt")}
+              width={160}
+              height={160}
+              className="rounded-full object-cover"
+            />
+            <h1 className="flex items-baseline gap-2 text-3xl font-semibold">
+              <span>{healer.name}</span>
+              {healer.pronouns && (
+                <span className="text-xl font-normal text-gray-600">
+                  ({healer.pronouns})
+                </span>
+              )}
+            </h1>
+          </div>
           <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
             <div className="mb-3 flex justify-center">
               <QRCodeSVG value={reflectionLink} size={120} />
             </div>
-            <h1 className="text-3xl font-semibold mb-5">{healer.name}</h1>
             <p className="text-gray-700">
               <b>{t("healer.dev.pronouns")}:</b> {healer.pronouns}
             </p>
