@@ -49,10 +49,8 @@ export default function NavBar() {
   return (
     <>
       <div
-        className={`fixed top-0 flex w-full justify-center ${
-          scrolled
-            ? "border-b border-gray-200 bg-white/50 backdrop-blur-xl"
-            : "bg-white/0"
+        className={`fixed top-0 flex w-full justify-center bg-white/30 backdrop-blur-xl ${
+          scrolled ? "border-b border-gray-200 bg-white/50" : ""
         } z-30 transition-all`}
       >
         <div className="mx-5 flex h-16 w-full max-w-screen-xl items-center justify-between">
