@@ -202,7 +202,7 @@ export default async function HealingSpacePage(props: PageProps) {
       <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0">
         <div className="my-10 mx-auto w-full">
           <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
-            <div className="flex items-start gap-4">
+            <div className="flex items-center gap-4 sm:items-start">
               <div className="flex flex-col items-center gap-3 sm:items-start">
                 <HealerProfileImage
                   src={profileImageUrl}
@@ -226,7 +226,7 @@ export default async function HealingSpacePage(props: PageProps) {
                   <InviteReflectionButton reflectionLink={reflectionLink} />
                 </div>
               </div>
-              <div className="flex flex-1 items-start justify-between gap-4">
+              <div className="flex flex-1 items-center justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-2">
                     <h1 className="break-words text-2xl font-semibold">{healer.name}</h1>
