@@ -54,7 +54,7 @@ export default function InviteReflectionButton({
       <button
         type="button"
         onClick={() => setShowModal(true)}
-        className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
+        className="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
       >
         Invite reflection
       </button>
