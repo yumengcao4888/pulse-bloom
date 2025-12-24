@@ -199,10 +199,10 @@ export default async function HealingSpacePage(props: PageProps) {
 
   return (
     <>
-      <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
-        <div className="my-10 mx-auto max-w-xl">
+      <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0">
+        <div className="my-10 mx-auto w-full">
           <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
-            <div className="flex items-center gap-4">
+            <div className="flex items-start gap-4">
               <HealerProfileImage
                 src={profileImageUrl}
                 alt={t("healer.profile.photoAlt")}
@@ -210,10 +210,10 @@ export default async function HealingSpacePage(props: PageProps) {
                 height={88}
                 className="h-[88px] w-[88px] rounded-full object-cover"
               />
-              <div className="flex flex-1 items-center justify-between gap-4">
-                <div>
+              <div className="flex flex-1 items-start justify-between gap-4">
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <h1 className="text-2xl font-semibold">{healer.name}</h1>
+                    <h1 className="break-words text-2xl font-semibold">{healer.name}</h1>
                     {healer.pronouns && (
                       <span className="text-lg font-normal text-gray-600">
                         ({healer.pronouns})
@@ -231,7 +231,7 @@ export default async function HealingSpacePage(props: PageProps) {
                     <b>{t("healer.dev.contact")}:</b> {healer.contact}
                   </p>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex shrink-0 flex-col items-end gap-2">
                   <EditProfileSheet
                     healer={{
                       name: healer.name,
@@ -267,7 +267,7 @@ export default async function HealingSpacePage(props: PageProps) {
         </div>
       </div>
 
-      <div className="relative z-10 w-full max-w-xl px-5 xl:px-0 space-y-6">
+      <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
         <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
           <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
           <p className="text-sm text-gray-500">

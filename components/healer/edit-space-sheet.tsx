@@ -88,6 +88,14 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
                 placeholder={t("form.healer.name.placeholder")}
                 value={form.name}
                 onChange={handleChange("name")}
+                minLength={1}
+                maxLength={30}
+                onInvalid={(e) => {
+                  e.currentTarget.setCustomValidity("Please fill out this field.");
+                }}
+                onInput={(e) => {
+                  e.currentTarget.setCustomValidity("");
+                }}
                 required
               />
             </div>
