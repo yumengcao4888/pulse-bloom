@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
 import {
@@ -13,6 +12,7 @@ import { getTranslations } from "@/lib/i18n";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
 import AutoPrint from "@/components/healer/auto-print";
+import HealerProfileImage from "@/components/healer/healer-profile-image";
 import type { Word } from "react-wordcloud";
 import { clerkClient } from "@clerk/nextjs/server";
 
@@ -89,7 +89,7 @@ export default async function HealerPage(props: PageProps) {
     try {
       const client = await clerkClient();
       const healerUser = await client.users.getUser(healer.clerkId);
-      if (healerUser.imageUrl) {
+      if (healerUser.hasImage && healerUser.imageUrl) {
         profileImageUrl = healerUser.imageUrl;
       }
     } catch (err) {
@@ -218,7 +218,7 @@ export default async function HealerPage(props: PageProps) {
       <AutoPrint />
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
         <div className="my-10 mx-auto max-w-xl flex flex-col items-center space-y-6">
-          <Image
+          <HealerProfileImage
             src={profileImageUrl}
             alt={t("healer.profile.photoAlt")}
             width={200}
@@ -273,7 +273,7 @@ export default async function HealerPage(props: PageProps) {
                         {index < topWords.length - 1 ? ", " : ""}
                       </span>
                     ))
-                  : t("common.none")}
+                  : <b>{t("common.none")}</b>}
                 .
               </p>
             </div>
