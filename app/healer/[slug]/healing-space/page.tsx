@@ -283,118 +283,116 @@ export default async function HealingSpacePage(props: PageProps) {
         </div>
       </div>
 
-      <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
-        <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
-          <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
-          <p className="text-sm text-gray-500">
-            {hfEnabled
-              ? t("reflection.hf.enabled")
-              : t("reflection.hf.disabled")}
-          </p>
-          {summaryEntries.length > 0 && (
-            <div className="grid gap-3 sm:grid-cols-3">
-              {summaryEntries.map(([label, count]) => (
+      {reflectionsWithAnalysis.length > 0 && (
+        <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
+          <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
+            <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
+            <p className="text-sm text-gray-500">
+              {hfEnabled
+                ? t("reflection.hf.enabled")
+                : t("reflection.hf.disabled")}
+            </p>
+            {summaryEntries.length > 0 && (
+              <div className="grid gap-3 sm:grid-cols-3">
+                {summaryEntries.map(([label, count]) => (
+                  <div
+                    key={label}
+                    className="rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-center text-sm shadow-sm"
+                  >
+                    <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
+                    <p className="text-lg font-semibold text-gray-800">{count}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="grid gap-4 md:grid-cols-3">
+              {metricComparisons.map((metric) => (
                 <div
-                  key={label}
-                  className="rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-center text-sm shadow-sm"
+                  key={metric.label}
+                  className="rounded-xl border border-gray-200 bg-white/70 p-4 shadow-sm"
                 >
-                  <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
-                  <p className="text-lg font-semibold text-gray-800">{count}</p>
+                  <p className="text-sm font-semibold text-gray-700 mb-3">{metric.label}</p>
+                  <div className="grid gap-3 text-sm sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-500">{t("healer.metric.monthly")}</p>
+                      <p className="mt-1 text-lg font-semibold text-gray-800">{metric.monthly}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-500">{t("healer.metric.allTime")}</p>
+                      <p className="mt-1 text-lg font-semibold text-gray-800">{metric.allTime}</p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-          )}
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {metricComparisons.map((metric) => (
-              <div
-                key={metric.label}
-                className="rounded-xl border border-gray-200 bg-white/70 p-4 shadow-sm"
-              >
-                <p className="text-sm font-semibold text-gray-700 mb-3">{metric.label}</p>
-                <div className="grid gap-3 text-sm sm:grid-cols-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">{t("healer.metric.monthly")}</p>
-                    <p className="mt-1 text-lg font-semibold text-gray-800">{metric.monthly}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">{t("healer.metric.allTime")}</p>
-                    <p className="mt-1 text-lg font-semibold text-gray-800">{metric.allTime}</p>
-                  </div>
-                </div>
+            {weeklyTrends.length > 0 ? (
+              <div className="mt-6">
+                <TrendChart data={weeklyTrends} />
               </div>
-            ))}
-          </div>
+            ) : (
+              <p className="mt-6 text-sm text-gray-500">
+                {t("reflection.addPrompt")}
+              </p>
+            )}
 
-          {weeklyTrends.length > 0 ? (
-            <div className="mt-6">
-              <TrendChart data={weeklyTrends} />
-            </div>
-          ) : (
-            <p className="mt-6 text-sm text-gray-500">
-              {t("reflection.addPrompt")}
-            </p>
-          )}
-
-          {hasHeatmapData ? (
-            <div className="mt-6 rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-sm">
-              <h3 className="mb-3 text-lg font-semibold text-gray-800">{t("healer.heatmap.title")}</h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full table-fixed text-sm">
-                  <thead>
-                    <tr>
-                      <th className="border-b px-3 py-2 text-left text-xs uppercase tracking-wide text-gray-500">
-                        {t("healer.heatmap.metricWeek")}
-                      </th>
-                      {heatmapWeeks.map((week) => (
-                        <th
-                          key={week}
-                          className="border-b px-3 py-2 text-center text-xs uppercase tracking-wide text-gray-500"
-                        >
-                          {formatWeekLabel(week)}
+            {hasHeatmapData ? (
+              <div className="mt-6 rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-sm">
+                <h3 className="mb-3 text-lg font-semibold text-gray-800">{t("healer.heatmap.title")}</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full table-fixed text-sm">
+                    <thead>
+                      <tr>
+                        <th className="border-b px-3 py-2 text-left text-xs uppercase tracking-wide text-gray-500">
+                          {t("healer.heatmap.metricWeek")}
                         </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {heatmapRows.map((row) => (
-                      <tr key={row.label}>
-                        <td className="border-b px-3 py-2 font-medium text-gray-700">{row.label}</td>
-                        {row.values.map((value, index) => (
-                          <td
-                            key={`${row.label}-${heatmapWeeks[index]}`}
-                            className="border-b px-2 py-1"
+                        {heatmapWeeks.map((week) => (
+                          <th
+                            key={week}
+                            className="border-b px-3 py-2 text-center text-xs uppercase tracking-wide text-gray-500"
                           >
-                            <div
-                              className="flex h-12 items-center justify-center rounded text-xs font-semibold uppercase tracking-wide"
-                              style={getHeatStyle(value)}
-                            >
-                              {value == null ? t("common.none") : `${value}%`}
-                            </div>
-                          </td>
+                            {formatWeekLabel(week)}
+                          </th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {heatmapRows.map((row) => (
+                        <tr key={row.label}>
+                          <td className="border-b px-3 py-2 font-medium text-gray-700">{row.label}</td>
+                          {row.values.map((value, index) => (
+                            <td
+                              key={`${row.label}-${heatmapWeeks[index]}`}
+                              className="border-b px-2 py-1"
+                            >
+                              <div
+                                className="flex h-12 items-center justify-center rounded text-xs font-semibold uppercase tracking-wide"
+                                style={getHeatStyle(value)}
+                              >
+                                {value == null ? t("common.none") : `${value}%`}
+                              </div>
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  {t("healer.heatmap.caption")}
+                </p>
               </div>
-              <p className="mt-2 text-xs text-gray-500">
-                {t("healer.heatmap.caption")}
+            ) : (
+              <p className="mt-6 text-sm text-gray-500">
+                {t("reflection.addHeatmap")}
               </p>
+            )}
+
+            <div className="w-full max-w-md mx-auto rounded-2xl border bg-white/70 p-5 shadow-sm">
+              <MyWordcloud words={wordcloudWords} />
             </div>
-          ) : (
-            <p className="mt-6 text-sm text-gray-500">
-              {t("reflection.addHeatmap")}
-            </p>
-          )}
 
-          <div className="w-full max-w-md mx-auto rounded-2xl border bg-white/70 p-5 shadow-sm">
-            <MyWordcloud words={wordcloudWords} />
-          </div>
-
-          {reflectionsWithAnalysis.length === 0 ? (
-            <p className="text-gray-600">{t("reflection.none")}</p>
-          ) : (
             <div className="space-y-4">
               {reflectionsWithAnalysis.map((reflection) => (
                 <div key={reflection.id} className="rounded-xl border border-gray-200 p-4">
@@ -432,10 +430,10 @@ export default async function HealingSpacePage(props: PageProps) {
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </div>
 
-      </div>
+        </div>
+      )}
     </>
   );
 }
