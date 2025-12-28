@@ -26,6 +26,8 @@ const messages = {
     "form.healer.pronouns.label": "Pronouns you'd like us to use",
     "form.healer.pronouns.placeholder":
       "e.g. she/her, they/them, he/him, xe/xem, or however you identify",
+    "form.healer.pronouns.error":
+      "Please use a format like they/them or they/them/theirs to help others understand how to refer to you.",
     "form.healer.modality.label": "Primary care approach / modality",
     "form.healer.modality.placeholder": "e.g. yoga, community acupuncture, peer support",
     "form.healer.focus.label": "Who do you center in your work?",
@@ -197,6 +199,7 @@ const messages = {
     "form.healer.pronouns.label": "Pronombres que te gustaría que usemos",
     "form.healer.pronouns.placeholder":
       "p. ej., ella/ella, elle/elle, él/él, xe/xem, o como te identifiques",
+    "form.healer.pronouns.error": "Usa el formato they/them o they/them/theirs.",
     "form.healer.modality.label": "Enfoque principal de cuidado / modalidad",
     "form.healer.modality.placeholder": "p. ej., yoga, acupuntura comunitaria, apoyo entre pares",
     "form.healer.focus.label": "¿A quién centras en tu trabajo?",

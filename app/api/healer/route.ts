@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { isValidPronouns, normalizePronouns } from "@/lib/pronouns";
 
 const adjectives = [
   "gentle", "quiet", "soft", "warm", "glowing", "open", "steady",
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
     console.log("Received healer data:", body);
 
     const { name, pronouns, modality, focus, city, contact, bio } = body;
+    const normalizedPronouns = normalizePronouns(pronouns);
     const missing: string[] = [];
     if (!name) missing.push("name");
     if (!modality) missing.push("modality");
@@ -47,6 +49,12 @@ export async function POST(req: NextRequest) {
           error: "Missing required fields",
           missing,
         },
+        { status: 400 }
+      );
+    }
+    if (!isValidPronouns(pronouns)) {
+      return NextResponse.json(
+        { error: "invalid_pronouns" },
         { status: 400 }
       );
     }
@@ -66,7 +74,7 @@ export async function POST(req: NextRequest) {
       data: {
         clerkId: userId,
         name,
-        pronouns,
+        pronouns: normalizedPronouns,
         modality,
         focus,
         city,
@@ -117,6 +125,7 @@ export async function PUT(req: NextRequest) {
 
     const body = await req.json();
     const { name, pronouns, modality, focus, city, contact, bio } = body;
+    const normalizedPronouns = normalizePronouns(pronouns);
     const missing: string[] = [];
     if (!name) missing.push("name");
     if (!modality) missing.push("modality");
@@ -128,6 +137,12 @@ export async function PUT(req: NextRequest) {
           error: "Missing required fields",
           missing,
         },
+        { status: 400 },
+      );
+    }
+    if (!isValidPronouns(pronouns)) {
+      return NextResponse.json(
+        { error: "invalid_pronouns" },
         { status: 400 },
       );
     }
@@ -147,7 +162,7 @@ export async function PUT(req: NextRequest) {
       where: { clerkId: userId },
       data: {
         name,
-        pronouns,
+        pronouns: normalizedPronouns,
         modality,
         focus,
         city,

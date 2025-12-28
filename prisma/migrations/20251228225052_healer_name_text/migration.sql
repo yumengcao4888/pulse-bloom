@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Healer" ALTER COLUMN "name" SET DATA TYPE TEXT;

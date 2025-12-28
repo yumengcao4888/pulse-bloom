@@ -15,7 +15,7 @@ datasource db {
 model Healer {
   id        Int      @id @default(autoincrement())
   clerkId   String?  @unique
-  name        String   @db.VarChar(255)
+  name        String   @db.Text
   pronouns    String?
   modality    String
   focus       String

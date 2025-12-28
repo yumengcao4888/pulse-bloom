@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useState, FormEvent } from 'react';
+import { useRef, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/shared/locale-provider";
+import { isValidPronouns } from "@/lib/pronouns";
 
 type HealerForm = {
   name: string;
@@ -26,6 +27,8 @@ const initialForm: HealerForm = {
 
 export default function HealerForm() {
   const [form, setForm] = useState<HealerForm>(initialForm);
+  const [pronounError, setPronounError] = useState("");
+  const pronounsRef = useRef<HTMLInputElement>(null);
   const { t } = useLocale();
   const router = useRouter();
 
@@ -35,8 +38,39 @@ export default function HealerForm() {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
+  const validatePronouns = (value: string) => {
+    if (!value.trim()) return "";
+    return isValidPronouns(value) ? "" : t("form.healer.pronouns.error");
+  };
+
+  const handlePronounsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setForm((prev) => ({ ...prev, pronouns: value }));
+    const error = validatePronouns(value);
+    setPronounError(error);
+    e.currentTarget.setCustomValidity(error);
+  };
+
+  const handlePronounsBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const error = validatePronouns(e.currentTarget.value);
+    setPronounError(error);
+    e.currentTarget.setCustomValidity(error);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const pronounsValidation = validatePronouns(form.pronouns);
+    if (pronounsValidation) {
+      setPronounError(pronounsValidation);
+      if (pronounsRef.current) {
+        pronounsRef.current.setCustomValidity(pronounsValidation);
+        pronounsRef.current.reportValidity();
+      }
+      return;
+    }
+    if (pronounsRef.current) {
+      pronounsRef.current.setCustomValidity("");
+    }
 
     try {
       const res = await fetch("/api/healer", {
@@ -61,6 +95,18 @@ export default function HealerForm() {
       }
 
       if (!res.ok) {
+        if (res.status === 400) {
+          const data = await res.json();
+          if (data?.error === "invalid_pronouns") {
+            const error = t("form.healer.pronouns.error");
+            setPronounError(error);
+            if (pronounsRef.current) {
+              pronounsRef.current.setCustomValidity(error);
+              pronounsRef.current.reportValidity();
+            }
+            return;
+          }
+        }
         throw new Error(t("form.healer.save.fail"));
       }
 
@@ -110,8 +156,14 @@ export default function HealerForm() {
           className="w-full rounded-md border px-3 py-2 text-sm"
           placeholder={t("form.healer.pronouns.placeholder")}
           value={form.pronouns}
-          onChange={handleChange('pronouns')}
+          onChange={handlePronounsChange}
+          onBlur={handlePronounsBlur}
+          ref={pronounsRef}
+          pattern="^[a-zA-Z]+/[a-zA-Z]+(/[a-zA-Z]+)?$"
         />
+        {pronounError ? (
+          <p className="text-sm text-red-600">{pronounError}</p>
+        ) : null}
       </div>
 
       <div className="space-y-1">
