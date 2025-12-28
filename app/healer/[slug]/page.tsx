@@ -225,8 +225,14 @@ export default async function HealerPage(props: PageProps) {
             height={200}
             className="rounded-full object-cover"
           />
-          <h1 className="mb-5 flex items-baseline gap-2 text-3xl font-semibold">
-          <span>{healer.name}</span>
+          <h1 className="mb-5 flex min-w-0 w-full items-baseline gap-2 text-3xl font-semibold">
+          <span
+            className="line-clamp-2 min-w-0 max-w-[90%] flex-1 break-all"
+            title={healer.name}
+            aria-label={healer.name}
+          >
+            {healer.name}
+          </span>
           {healer.pronouns && (
             <span className="text-xl font-normal text-gray-600">
               ({healer.pronouns})

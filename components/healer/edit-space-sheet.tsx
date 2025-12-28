@@ -89,7 +89,7 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
                 value={form.name}
                 onChange={handleChange("name")}
                 minLength={1}
-                maxLength={30}
+                maxLength={255}
                 onInvalid={(e) => {
                   e.currentTarget.setCustomValidity("Please fill out this field.");
                 }}

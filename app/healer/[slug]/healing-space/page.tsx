@@ -84,8 +84,14 @@ export default async function HealingSpacePage(props: PageProps) {
               </div>
               <div className="flex flex-1 items-center justify-between gap-4">
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-2">
-                    <h1 className="break-words text-2xl font-semibold">{healer.name}</h1>
+                  <div className="flex min-w-0 flex-wrap items-baseline gap-2">
+                    <h1
+                      className="line-clamp-2 min-w-0 max-w-full flex-1 break-all text-2xl font-semibold"
+                      title={healer.name}
+                      aria-label={healer.name}
+                    >
+                      {healer.name}
+                    </h1>
                     {healer.pronouns && (
                       <span className="text-lg font-normal text-gray-600">
                         ({healer.pronouns})

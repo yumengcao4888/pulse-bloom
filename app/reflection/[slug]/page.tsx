@@ -27,6 +27,8 @@ export default async function ReflectionPage(props: PageProps) {
     return <div className="relative z-10 p-8 text-red-500 text-lg">{t("healer.notFound")}</div>;
   }
 
+  const headline = t("reflection.headline", { name: healer.name });
+
   return (
     <div className="relative z-10 rounded-2xl border bg-white/70 p-6 shadow-sm">
       {submitted && (
@@ -36,8 +38,12 @@ export default async function ReflectionPage(props: PageProps) {
       )}
 
       <div className="max-w-xl mx-auto p-8">
-        <h1 className={`${sriracha.className} text-2xl font-bold mb-0`}>
-          {t("reflection.headline", { name: healer.name })}
+        <h1
+          className={`${sriracha.className} line-clamp-2 break-all text-2xl font-bold mb-0`}
+          title={headline}
+          aria-label={headline}
+        >
+          {headline}
         </h1>
         <p className="text-gray-600 mb-5">
           {t("reflection.subhead")}
