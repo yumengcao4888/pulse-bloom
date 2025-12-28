@@ -225,20 +225,20 @@ export default async function HealerPage(props: PageProps) {
             height={200}
             className="rounded-full object-cover"
           />
-          <h1 className="mb-5 flex min-w-0 w-full items-baseline gap-2 text-3xl font-semibold">
-          <span
-            className="line-clamp-2 min-w-0 max-w-[90%] flex-1 break-all"
-            title={healer.name}
-            aria-label={healer.name}
-          >
-            {healer.name}
-          </span>
-          {healer.pronouns && (
-            <span className="text-xl font-normal text-gray-600">
-              ({healer.pronouns})
-            </span>
-          )}
-        </h1>
+          <div className="mb-5 flex min-w-0 w-full flex-col items-center gap-1 text-3xl font-semibold">
+            <h1
+              className="line-clamp-2 min-w-0 max-w-[60%] w-full break-all text-center"
+              title={healer.name}
+              aria-label={healer.name}
+            >
+              {healer.name}
+            </h1>
+            {healer.pronouns && (
+              <span className="w-full text-center text-xl font-normal text-gray-600">
+                ({healer.pronouns})
+              </span>
+            )}
+          </div>
           <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm">
             <p className="text-gray-700">
               <b>{t("healer.profile.approach")}</b> {healer.modality}

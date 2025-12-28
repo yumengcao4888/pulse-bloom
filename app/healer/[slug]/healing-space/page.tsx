@@ -84,7 +84,7 @@ export default async function HealingSpacePage(props: PageProps) {
               </div>
               <div className="flex flex-1 items-center justify-between gap-4">
                 <div className="min-w-0">
-                  <div className="flex min-w-0 flex-wrap items-baseline gap-2">
+                  <div className="flex min-w-0 flex-col gap-1">
                     <h1
                       className="line-clamp-2 min-w-0 max-w-full flex-1 break-all text-2xl font-semibold"
                       title={healer.name}
