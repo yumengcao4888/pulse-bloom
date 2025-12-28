@@ -98,13 +98,6 @@ export default async function HealingSpacePage(props: PageProps) {
                       </span>
                     )}
                   </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-gray-700">
-                    <span>{healer.modality}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{healer.focus}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{healer.city}</span>
-                  </div>
                   <p className="mt-1 text-sm text-gray-700">
                     <b>{t("healer.dev.contact")}:</b> {healer.contact}
                   </p>
@@ -126,6 +119,17 @@ export default async function HealingSpacePage(props: PageProps) {
               </div>
             </div>
             <div className="my-4 border-t border-gray-200" />
+            <div className="space-y-1 text-gray-700">
+              <p>
+                <b>{t("healer.dev.modality")}:</b> {healer.modality}
+              </p>
+              <p>
+                <b>{t("healer.dev.focus")}:</b> {healer.focus}
+              </p>
+              <p>
+                <b>{t("healer.dev.city")}:</b> {healer.city}
+              </p>
+            </div>
             <p className="text-gray-700">
               <b>{t("healer.dev.bio")}:</b> {healer.bio}
             </p>
