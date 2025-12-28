@@ -8,17 +8,25 @@ type TriStateButtonProps = {
   label: string;
   value: TriState;
   onChange: (value: TriState) => void;
+  disabled?: boolean;
 };
 
-export function TriStateButton({ name, label, value, onChange }: TriStateButtonProps) {
+export function TriStateButton({
+  name,
+  label,
+  value,
+  onChange,
+  disabled = false,
+}: TriStateButtonProps) {
   const handleClick = () => {
+    if (disabled) return;
     const next: TriState =
       value === null ? "yes" : value === "yes" ? "no" : "yes";
     onChange(next);
   };
 
   const base =
-    "w-full px-4 py-3 rounded-lg cursor-pointer transition inline-flex items-center justify-center gap-1";
+    "w-full px-4 py-3 rounded-lg transition inline-flex items-center justify-center gap-1 disabled:cursor-not-allowed disabled:opacity-70";
 
   const color =
     value === "yes"
@@ -35,6 +43,7 @@ export function TriStateButton({ name, label, value, onChange }: TriStateButtonP
       type="button"
       name={name}
       onClick={handleClick}
+      disabled={disabled}
       className={`${base} ${color}`}
     >
       <span>{label}</span>

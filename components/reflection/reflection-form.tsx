@@ -55,12 +55,7 @@ export default function ReflectionForm({ slug }: Props) {
         return;
       }
 
-      setGrounded(null);
-      setSupported(null);
-      setConnected(null);
-      setFeeling("");
       setSubmitting(false);
-
       router.push(`/reflection/${slug}?submitted=1`);
     } catch (err) {
       console.error(err);
@@ -70,7 +65,12 @@ export default function ReflectionForm({ slug }: Props) {
   }
 
   return (
-    <form action="/api/reflection" onSubmit={handleSubmit} method="POST" className="space-y-4">
+    <form
+      action="/api/reflection"
+      onSubmit={handleSubmit}
+      method="POST"
+      className="space-y-4"
+    >
       <input type="hidden" name="slug" value={slug} />
 
       <div className="space-y-2">
@@ -114,12 +114,15 @@ export default function ReflectionForm({ slug }: Props) {
         />
       </label>
 
-      <button
-        type="submit"
-        className="bg-blue-50/60 text-blue-800 hover:bg-violet-100/80 px-4 py-2 rounded transition-colors"
-      >
-        {submitting ? t("reflection.submitting") : t("reflection.submit")}
-      </button>
+      <div className="flex justify-center">
+        <button
+          type="submit"
+          className="bg-blue-50/60 text-blue-800 hover:bg-violet-100/80 px-4 py-2 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={submitting}
+        >
+          {submitting ? t("reflection.submitting") : t("reflection.submit")}
+        </button>
+      </div>
     </form>
   );
 }

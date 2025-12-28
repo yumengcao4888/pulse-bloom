@@ -16,7 +16,6 @@ export default async function ReflectionPage(props: PageProps) {
   const t = getTranslations(locale);
   const rawSearchParams =
     props.searchParams ? await props.searchParams : ({} as { submitted?: string });
-
   const submitted = rawSearchParams.submitted === "1";
 
   const healer = await prisma.healer.findUnique({
@@ -29,26 +28,38 @@ export default async function ReflectionPage(props: PageProps) {
 
   const headline = t("reflection.headline", { name: healer.name });
 
-  return (
-    <div className="relative z-10 rounded-2xl border bg-white/70 p-6 shadow-sm">
-      {submitted && (
-        <p className="mb-0 rounded-lg bg-emerald-50 text-emerald-800 px-4 py-2 text-sm">
-          {t("reflection.thankYou")}
-        </p>
-      )}
+  const containerClassName = submitted
+    ? "relative z-10 min-h-[50vh] w-full px-5 flex items-center justify-center"
+    : "relative z-10 w-full max-w-xl px-5 xl:px-0";
+  const cardClassName = submitted
+    ? "w-full max-w-xl rounded-2xl border bg-white/70 p-6 shadow-sm"
+    : "rounded-2xl border bg-white/70 p-6 shadow-sm";
 
-      <div className="max-w-xl mx-auto p-8">
-        <h1
-          className={`${sriracha.className} line-clamp-2 break-all text-2xl font-bold mb-0`}
-          title={headline}
-          aria-label={headline}
-        >
-          {headline}
-        </h1>
-        <p className="text-gray-600 mb-5">
-          {t("reflection.subhead")}
-        </p>
-        <ReflectionForm slug={slug} />
+  return (
+    <div className={containerClassName}>
+      <div className={cardClassName}>
+        {submitted ? (
+          <div className="mx-auto p-8 text-center">
+            <p className="text-base text-gray-700">
+              {t("reflection.received.line1")}
+            </p>
+            <p className="mt-2 text-base text-gray-700">
+              <em className="italic">{t("reflection.received.line2")}</em>
+            </p>
+          </div>
+        ) : (
+          <div className="mx-auto p-8">
+            <h1
+              className={`${sriracha.className} mb-0 line-clamp-2 break-all text-2xl font-bold`}
+              title={headline}
+              aria-label={headline}
+            >
+              {headline}
+            </h1>
+            <p className="mb-5 text-gray-600">{t("reflection.subhead")}</p>
+            <ReflectionForm slug={slug} />
+          </div>
+        )}
       </div>
     </div>
   );
