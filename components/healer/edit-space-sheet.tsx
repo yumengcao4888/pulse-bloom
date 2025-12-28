@@ -221,13 +221,15 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
                 <span className="text-gray-500 text-sm">{t("form.optional")}</span>
               </label>
               <div className="flex flex-wrap gap-2 text-sm">
-                {[
-                  { id: "email", label: t("form.healer.contact.type.email") },
-                  { id: "phone", label: t("form.healer.contact.type.phone") },
-                  { id: "website", label: t("form.healer.contact.type.website") },
-                  { id: "social", label: t("form.healer.contact.type.social") },
-                  { id: "other", label: t("form.healer.contact.type.other") },
-                ].map((type) => (
+                {(
+                  [
+                    { id: "email", label: t("form.healer.contact.type.email") },
+                    { id: "phone", label: t("form.healer.contact.type.phone") },
+                    { id: "website", label: t("form.healer.contact.type.website") },
+                    { id: "social", label: t("form.healer.contact.type.social") },
+                    { id: "other", label: t("form.healer.contact.type.other") },
+                  ] as const
+                ).map((type) => (
                   <button
                     type="button"
                     key={type.id}
