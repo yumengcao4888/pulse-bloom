@@ -39,18 +39,18 @@ export default async function ReflectionPage(props: PageProps) {
     <div className={containerClassName}>
       <div className={cardClassName}>
         {submitted ? (
-          <div className="mx-auto p-8 text-center">
-            <p className="text-base text-gray-700">
+          <div className="mx-auto p-8 text-center text-sm sm:text-base">
+            <p className="text-gray-700">
               {t("reflection.received.line1")}
             </p>
-            <p className="mt-2 text-base text-gray-700">
+            <p className="mt-2 text-gray-700">
               <em className="italic">{t("reflection.received.line2")}</em>
             </p>
           </div>
         ) : (
-          <div className="mx-auto p-8">
+          <div className="mx-auto p-8 text-sm sm:text-base">
             <h1
-              className={`${sriracha.className} mb-0 line-clamp-2 break-all text-2xl font-bold`}
+              className={`${sriracha.className} mb-0 line-clamp-2 break-all text-xl font-bold sm:text-2xl`}
               title={headline}
               aria-label={headline}
             >

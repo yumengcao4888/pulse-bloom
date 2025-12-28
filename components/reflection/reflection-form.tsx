@@ -69,7 +69,7 @@ export default function ReflectionForm({ slug }: Props) {
       action="/api/reflection"
       onSubmit={handleSubmit}
       method="POST"
-      className="space-y-4"
+      className="space-y-4 text-sm sm:text-base"
     >
       <input type="hidden" name="slug" value={slug} />
 
@@ -94,7 +94,7 @@ export default function ReflectionForm({ slug }: Props) {
         />
 
         {error && (
-          <p className="text-red-500 text-sm">
+          <p className="text-sm text-red-500">
             {error}
           </p>
         )}
