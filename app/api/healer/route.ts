@@ -36,8 +36,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log("Received healer data:", body);
 
-    const { name, pronouns, modality, focus, city, contact, bio } = body;
+    const { name, pronouns, modality, focus, city, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
+    const allowedContactTypes = ["email", "phone", "website", "social", "other"] as const;
+    const normalizedContactType =
+      contactType && allowedContactTypes.includes(contactType) ? contactType : null;
     const missing: string[] = [];
     if (!name) missing.push("name");
     if (!modality) missing.push("modality");
@@ -55,6 +58,12 @@ export async function POST(req: NextRequest) {
     if (!isValidPronouns(pronouns)) {
       return NextResponse.json(
         { error: "invalid_pronouns" },
+        { status: 400 }
+      );
+    }
+    if (contactType && !normalizedContactType) {
+      return NextResponse.json(
+        { error: "invalid_contact_type" },
         { status: 400 }
       );
     }
@@ -79,6 +88,7 @@ export async function POST(req: NextRequest) {
         focus,
         city,
         contact,
+        contactType: normalizedContactType,
         bio,
         slug: generateSlugFromName(name),
       },
@@ -124,8 +134,11 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, pronouns, modality, focus, city, contact, bio } = body;
+    const { name, pronouns, modality, focus, city, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
+    const allowedContactTypes = ["email", "phone", "website", "social", "other"] as const;
+    const normalizedContactType =
+      contactType && allowedContactTypes.includes(contactType) ? contactType : null;
     const missing: string[] = [];
     if (!name) missing.push("name");
     if (!modality) missing.push("modality");
@@ -143,6 +156,12 @@ export async function PUT(req: NextRequest) {
     if (!isValidPronouns(pronouns)) {
       return NextResponse.json(
         { error: "invalid_pronouns" },
+        { status: 400 },
+      );
+    }
+    if (contactType && !normalizedContactType) {
+      return NextResponse.json(
+        { error: "invalid_contact_type" },
         { status: 400 },
       );
     }
@@ -167,6 +186,7 @@ export async function PUT(req: NextRequest) {
         focus,
         city,
         contact,
+        contactType: normalizedContactType,
         bio,
       },
     });

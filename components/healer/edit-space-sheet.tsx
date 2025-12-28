@@ -16,6 +16,7 @@ type HealerProfile = {
   focus: string;
   city: string | null;
   contact: string | null;
+  contactType: "email" | "phone" | "website" | "social" | "other" | null;
   bio: string;
 };
 
@@ -83,11 +84,17 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
     }
 
     setIsSaving(true);
+    const payload = {
+      ...form,
+      contactType: form.contact?.trim() ? form.contactType ?? null : null,
+      contact: form.contact?.trim() || null,
+    };
+
     try {
       const res = await fetch("/api/healer", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -215,19 +222,21 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
               </label>
               <div className="flex flex-wrap gap-2 text-sm">
                 {[
-                  t("form.healer.contact.type.email"),
-                  t("form.healer.contact.type.phone"),
-                  t("form.healer.contact.type.website"),
-                  t("form.healer.contact.type.social"),
-                  t("form.healer.contact.type.other"),
+                  { id: "email", label: t("form.healer.contact.type.email") },
+                  { id: "phone", label: t("form.healer.contact.type.phone") },
+                  { id: "website", label: t("form.healer.contact.type.website") },
+                  { id: "social", label: t("form.healer.contact.type.social") },
+                  { id: "other", label: t("form.healer.contact.type.other") },
                 ].map((type) => (
                   <button
                     type="button"
-                    key={type}
-                    className="rounded-full border px-3 py-1 hover:bg-gray-100"
-                    onClick={() => setForm((prev) => ({ ...prev, contact: `${type}: ` }))}
+                    key={type.id}
+                    className={`rounded-full border px-3 py-1 hover:bg-gray-100 ${
+                      form.contactType === type.id ? "bg-gray-100" : ""
+                    }`}
+                    onClick={() => setForm((prev) => ({ ...prev, contactType: type.id }))}
                   >
-                    {type}
+                    {type.label}
                   </button>
                 ))}
               </div>

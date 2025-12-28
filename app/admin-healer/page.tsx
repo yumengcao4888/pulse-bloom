@@ -7,6 +7,12 @@ export const dynamic = "force-dynamic"
 export default async function HealerListPage() {
   const locale = await getLocale();
   const t = getTranslations(locale);
+  const contactTypeLabels = {
+    email: t("form.healer.contact.type.email"),
+    phone: t("form.healer.contact.type.phone"),
+    website: t("form.healer.contact.type.website"),
+    social: t("form.healer.contact.type.social"),
+  } as const;
   const healers = await prisma.healer.findMany({
     orderBy: { createdAt: "asc" },
     include: {
@@ -50,7 +56,13 @@ export default async function HealerListPage() {
               <td className="border px-4 py-2">{p.modality}</td>
               <td className="border px-4 py-2">{p.focus}</td>
               <td className="border px-4 py-2">{p.city}</td>
-              <td className="border px-4 py-2">{p.contact}</td>
+              <td className="border px-4 py-2">
+                {p.contactType === "other"
+                  ? `${t("admin.table.contact")}: ${p.contact}`
+                  : p.contactType
+                  ? `${contactTypeLabels[p.contactType as keyof typeof contactTypeLabels]}: ${p.contact}`
+                  : p.contact}
+              </td>
               <td className="border px-4 py-2 text-center">{p._count?.reflections ?? 0}</td>
               <td className="border px-4 py-2">{p.bio}</td>
               <td className="border px-4 py-2">

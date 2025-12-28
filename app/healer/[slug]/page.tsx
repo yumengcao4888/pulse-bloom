@@ -70,6 +70,12 @@ export default async function HealerPage(props: PageProps) {
     const date = new Date(week);
     return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
   };
+  const contactTypeLabels = {
+    email: t("form.healer.contact.type.email"),
+    phone: t("form.healer.contact.type.phone"),
+    website: t("form.healer.contact.type.website"),
+    social: t("form.healer.contact.type.social"),
+  } as const;
 
   const healer = await prisma.healer.findUnique({
     where: { slug },
@@ -250,7 +256,14 @@ export default async function HealerPage(props: PageProps) {
               <b>{t("healer.profile.location")}</b> {healer.city}
             </p>
             <p className="text-gray-700">
-              <b>{t("healer.profile.contact")}</b> {healer.contact}
+              <b>
+                {healer.contactType === "other"
+                  ? t("healer.profile.contact")
+                  : healer.contactType
+                  ? `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`
+                  : t("healer.profile.contact")}
+              </b>{" "}
+              {healer.contact}
             </p>
             <p className="text-gray-700">
               <b>{t("healer.profile.about")}</b> {healer.bio}

@@ -20,6 +20,12 @@ export default async function HealingSpacePage(props: PageProps) {
   const { slug } = await props.params;
   const locale = await getLocale();
   const t = getTranslations(locale);
+  const contactTypeLabels = {
+    email: t("form.healer.contact.type.email"),
+    phone: t("form.healer.contact.type.phone"),
+    website: t("form.healer.contact.type.website"),
+    social: t("form.healer.contact.type.social"),
+  } as const;
 
   const healer = await prisma.healer.findUnique({
     where: { slug },
@@ -76,6 +82,7 @@ export default async function HealingSpacePage(props: PageProps) {
                       focus: healer.focus,
                       city: healer.city,
                       contact: healer.contact,
+                      contactType: healer.contactType,
                       bio: healer.bio,
                     }}
                   />
@@ -99,7 +106,14 @@ export default async function HealingSpacePage(props: PageProps) {
                     )}
                   </div>
                   <p className="mt-1 text-sm text-gray-700">
-                    <b>{t("healer.dev.contact")}:</b> {healer.contact}
+                    <b>
+                      {healer.contactType === "other"
+                        ? `${t("healer.dev.contact")}:`
+                        : healer.contactType
+                        ? `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`
+                        : `${t("healer.dev.contact")}:`}
+                    </b>{" "}
+                    {healer.contact}
                   </p>
                 </div>
                 <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
@@ -111,6 +125,7 @@ export default async function HealingSpacePage(props: PageProps) {
                       focus: healer.focus,
                       city: healer.city,
                       contact: healer.contact,
+                      contactType: healer.contactType,
                       bio: healer.bio,
                     }}
                   />

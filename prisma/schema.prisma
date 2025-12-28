@@ -21,6 +21,7 @@ model Healer {
   focus       String
   city        String?
   contact     String?
+  contactType ContactType?
   bio         String
 
   slug        String @unique
@@ -28,6 +29,14 @@ model Healer {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum ContactType {
+  email
+  phone
+  website
+  social
+  other
 }
 
 model Reflection {

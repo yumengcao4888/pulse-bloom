@@ -53,6 +53,7 @@ async function main() {
         focus: 'Trauma integration',
         city: faker.location.city(),
         contact: faker.internet.email({ firstName }),
+        contactType: "email",
         bio: faker.lorem.paragraphs({ min: 1, max: 2 }),
         slug,
         reflections: {

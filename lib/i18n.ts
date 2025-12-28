@@ -40,7 +40,7 @@ const messages = {
     "form.healer.contact.type.email": "Email",
     "form.healer.contact.type.phone": "Phone",
     "form.healer.contact.type.website": "Website",
-    "form.healer.contact.type.social": "IG / Social",
+    "form.healer.contact.type.social": "Social",
     "form.healer.contact.type.other": "Other",
     "form.healer.bio.label": "Tell us a little about your practice",
     "form.healer.bio.placeholder":
@@ -214,7 +214,7 @@ const messages = {
     "form.healer.contact.type.email": "Correo",
     "form.healer.contact.type.phone": "Teléfono",
     "form.healer.contact.type.website": "Sitio web",
-    "form.healer.contact.type.social": "IG / Social",
+    "form.healer.contact.type.social": "Social",
     "form.healer.contact.type.other": "Otro",
     "form.healer.bio.label": "Cuéntanos un poco sobre tu práctica",
     "form.healer.bio.placeholder":
