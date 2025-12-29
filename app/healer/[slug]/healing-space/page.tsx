@@ -138,7 +138,7 @@ export default async function HealingSpacePage(props: PageProps) {
                       pronouns: healer.pronouns,
                       modality: healer.modality,
                       focus: healer.focus,
-                      city: healer.city,
+                      location: healer.location,
                       contact: healer.contact,
                       contactType: healer.contactType,
                       bio: healer.bio,
@@ -155,7 +155,7 @@ export default async function HealingSpacePage(props: PageProps) {
                   pronouns: healer.pronouns,
                   modality: healer.modality,
                   focus: healer.focus,
-                  city: healer.city,
+                  location: healer.location,
                   contact: healer.contact,
                   contactType: healer.contactType,
                   bio: healer.bio,
@@ -166,29 +166,29 @@ export default async function HealingSpacePage(props: PageProps) {
             <div className="my-4 border-t border-gray-200" />
             <div className="space-y-1 text-gray-700">
               <p>
-                <b>{t("healer.dev.modality")}:</b> {healer.modality}
+                <b>{"Modality"}:</b> {healer.modality}
               </p>
               <p>
                 <b>{t("healer.dev.focus")}:</b> {healer.focus}
               </p>
               <p>
-                <b>{t("healer.dev.city")}:</b> {healer.city}
+                <b>{t("healer.dev.city")}:</b> {healer.location}
               </p>
-            </div>
-            <p className="text-gray-700">
-              <b>{t("healer.dev.bio")}:</b> {healer.bio}
-            </p>
-            <p className="text-gray-700">
-              <b>Sharable link:</b>{" "}
-              <Link href={sharableLink} className="text-blue-600 underline">
-                {sharableLink}
-              </Link>
-            </p>
-            <div className="flex flex-wrap items-center gap-3 text-gray-700">
-              <p>
-                <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsCount}
+              <p className="text-gray-700">
+                <b>{t("healer.dev.bio")}:</b> {healer.bio}
               </p>
-              <PrintProfileButton slug={healer.slug} />
+              <p className="text-gray-700">
+                <b>Sharable link:</b>{" "}
+                <Link href={sharableLink} className="text-blue-600 underline">
+                  {sharableLink}
+                </Link>
+              </p>
+              <div className="flex flex-wrap items-center gap-3 text-gray-700">
+                <p>
+                  <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsCount}
+                </p>
+                <PrintProfileButton slug={healer.slug} />
+              </div>
             </div>
           </div>
         </div>

@@ -19,7 +19,7 @@ model Healer {
   pronouns    String?
   modality    String
   focus       String
-  city        String?
+  location    String?
   contact     String?
   contactType ContactType?
   bio         String

@@ -14,7 +14,7 @@ type HealerProfile = {
   pronouns: string | null;
   modality: string;
   focus: string;
-  city: string | null;
+  location: string | null;
   contact: string | null;
   contactType: "email" | "phone" | "website" | "social" | null;
   bio: string;
@@ -268,8 +268,8 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
                 type="text"
                 className="w-full rounded-md border px-3 py-2 text-sm"
                 placeholder={t("form.healer.city.placeholder")}
-                value={form.city ?? ""}
-                onChange={handleChange("city")}
+                value={form.location ?? ""}
+                onChange={handleChange("location")}
               />
             </div>
             <div className="space-y-1">

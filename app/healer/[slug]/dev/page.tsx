@@ -203,7 +203,7 @@ export default async function HealerDevPage(props: PageProps) {
               <b>{t("healer.dev.focus")}:</b> {healer.focus}
             </p>
             <p className="text-gray-700">
-              <b>{t("healer.dev.city")}:</b> {healer.city}
+              <b>{t("healer.dev.city")}:</b> {healer.location}
             </p>
             <p className="text-gray-700">
               <b>

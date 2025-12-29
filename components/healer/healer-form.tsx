@@ -10,7 +10,7 @@ type HealerForm = {
   pronouns: string;
   modality: string;
   focus: string;
-  city: string;
+  location: string;
   contact: string;
   contactType: "email" | "phone" | "website" | "social" | "";
   bio: string;
@@ -21,7 +21,7 @@ const initialForm: HealerForm = {
   pronouns: '',
   modality: '',
   focus: '',
-  city: '',
+  location: '',
   contact: '',
   contactType: '',
   bio: '',
@@ -265,8 +265,8 @@ export default function HealerForm() {
           type="text"
           className="w-full rounded-md border px-3 py-2 text-sm"
           placeholder={t("form.healer.city.placeholder")}
-          value={form.city}
-          onChange={handleChange('city')}
+          value={form.location}
+          onChange={handleChange('location')}
         />
       </div>
 

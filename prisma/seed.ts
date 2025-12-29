@@ -51,7 +51,7 @@ async function main() {
         pronouns: faker.helpers.arrayElement(pronounOptions),
         modality: 'Somatic Experiencing',
         focus: 'Trauma integration',
-        city: faker.location.city(),
+        location: faker.location.city(),
         contact: faker.internet.email({ firstName }),
         contactType: "email",
         bio: faker.lorem.paragraphs({ min: 1, max: 2 }),

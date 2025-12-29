@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log("Received healer data:", body);
 
-    const { name, pronouns, modality, focus, city, contact, contactType, bio } = body;
+    const { name, pronouns, modality, focus, location, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
     const allowedContactTypes = ["email", "phone", "website", "social"] as const;
     const normalizedContactType =
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         pronouns: normalizedPronouns,
         modality,
         focus,
-        city,
+        location,
         contact,
         contactType: normalizedContactType,
         bio,
@@ -134,7 +134,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, pronouns, modality, focus, city, contact, contactType, bio } = body;
+    const { name, pronouns, modality, focus, location, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
     const allowedContactTypes = ["email", "phone", "website", "social"] as const;
     const normalizedContactType =
@@ -184,7 +184,7 @@ export async function PUT(req: NextRequest) {
         pronouns: normalizedPronouns,
         modality,
         focus,
-        city,
+        location,
         contact,
         contactType: normalizedContactType,
         bio,

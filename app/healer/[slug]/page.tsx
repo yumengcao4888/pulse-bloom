@@ -266,7 +266,7 @@ export default async function HealerPage(props: PageProps) {
               <b>{t("healer.profile.workWith")}</b> {healer.focus}
             </p>
             <p className="text-gray-700">
-              <b>{t("healer.profile.location")}</b> {healer.city}
+              <b>{t("healer.profile.location")}</b> {healer.location}
             </p>
             {healer.contactType ? (
               <p className="line-clamp-3 break-words text-gray-700">

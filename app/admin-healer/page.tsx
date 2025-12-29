@@ -55,7 +55,7 @@ export default async function HealerListPage() {
               <td className="border px-4 py-2">{p.pronouns}</td>
               <td className="border px-4 py-2">{p.modality}</td>
               <td className="border px-4 py-2">{p.focus}</td>
-              <td className="border px-4 py-2">{p.city}</td>
+              <td className="border px-4 py-2">{p.location}</td>
               <td className="border px-4 py-2">
                 {p.contactType
                   ? `${contactTypeLabels[p.contactType as keyof typeof contactTypeLabels]}: ${p.contact}`
