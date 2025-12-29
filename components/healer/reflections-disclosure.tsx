@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Word } from "react-wordcloud";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
@@ -92,19 +92,24 @@ type ReflectionsDisclosureProps = {
   reflectionsCount: number;
 };
 
+type SectionKey =
+  | "index-score"
+  | "trends"
+  | "heatmap"
+  | "wordcloud"
+  | "printout";
+
 export default function ReflectionsDisclosure({
   slug,
   reflectionsCount,
 }: ReflectionsDisclosureProps) {
   const { t, locale } = useLocale();
-  const [showIndexScore, setShowIndexScore] = useState(false);
-  const [showTrends, setShowTrends] = useState(false);
-  const [showHeatmap, setShowHeatmap] = useState(false);
-  const [showWordcloud, setShowWordcloud] = useState(false);
-  const [showPrintout, setShowPrintout] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
   const [data, setData] = useState<ReflectionsPayload | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [printoutPage, setPrintoutPage] = useState(1);
+  const pageSize = 10;
 
   const loadReflections = useCallback(async () => {
     if (isLoading || data) return;
@@ -134,8 +139,14 @@ export default function ReflectionsDisclosure({
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
 
   const hasData = Boolean(data);
-  const shouldShowContent =
-    showIndexScore || showTrends || showHeatmap || showWordcloud || showPrintout;
+  const shouldShowContent = activeSection !== null;
+  const handleSectionToggle = (section: SectionKey) => {
+    setActiveSection((prev) => {
+      const next = prev === section ? null : section;
+      if (next) ensureDataLoaded();
+      return next;
+    });
+  };
 
   const metricComparisons = useMemo(() => {
     if (!data) return [];
@@ -157,6 +168,18 @@ export default function ReflectionsDisclosure({
       },
     ];
   }, [data, t]);
+
+  useEffect(() => {
+    if (activeSection !== "printout") {
+      setPrintoutPage(1);
+    }
+  }, [activeSection]);
+
+  useEffect(() => {
+    if (!data) return;
+    const totalPages = Math.max(1, Math.ceil(data.reflections.length / pageSize));
+    setPrintoutPage((prev) => Math.min(Math.max(1, prev), totalPages));
+  }, [data]);
 
   const heatmap = useMemo(() => {
     if (!data) {
@@ -218,68 +241,44 @@ export default function ReflectionsDisclosure({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() =>
-              setShowIndexScore((prev) => {
-                const next = !prev;
-                if (next) ensureDataLoaded();
-                return next;
-              })
-            }
+            onClick={() => handleSectionToggle("index-score")}
             className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
           >
-            {showIndexScore ? "Hide index & score" : "Index & score"}
+            {activeSection === "index-score" ? "Hide index & score" : "Index & score"}
           </button>
           <button
             type="button"
-            onClick={() =>
-              setShowTrends((prev) => {
-                const next = !prev;
-                if (next) ensureDataLoaded();
-                return next;
-              })
-            }
+            onClick={() => handleSectionToggle("trends")}
             className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
           >
-            {showTrends ? "Hide all-time weekly trends" : "All-time weekly trends"}
+            {activeSection === "trends"
+              ? "Hide all-time weekly trends"
+              : "All-time weekly trends"}
           </button>
           <button
             type="button"
-            onClick={() =>
-              setShowHeatmap((prev) => {
-                const next = !prev;
-                if (next) ensureDataLoaded();
-                return next;
-              })
-            }
+            onClick={() => handleSectionToggle("heatmap")}
             className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
           >
-            {showHeatmap ? "Hide emotional heat map" : "Emotional heat map"}
+            {activeSection === "heatmap"
+              ? "Hide emotional heat map"
+              : "Emotional heat map"}
           </button>
           <button
             type="button"
-            onClick={() =>
-              setShowWordcloud((prev) => {
-                const next = !prev;
-                if (next) ensureDataLoaded();
-                return next;
-              })
-            }
+            onClick={() => handleSectionToggle("wordcloud")}
             className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
           >
-            {showWordcloud ? "Hide word cloud" : "Word cloud"}
+            {activeSection === "wordcloud" ? "Hide word cloud" : "Word cloud"}
           </button>
           <button
             type="button"
-            onClick={() =>
-              setShowPrintout((prev) => {
-                const next = !prev;
-                if (next) ensureDataLoaded();
-                return next;
-              })
-            }
+            onClick={() => handleSectionToggle("printout")}
             className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
           >
-            {showPrintout ? "Hide reflection printout" : "Reflection printout"}
+            {activeSection === "printout"
+              ? "Hide reflection printout"
+              : "Reflection printout"}
           </button>
         </div>
         {shouldShowContent && !hasData && isLoading && <ReflectionsSkeleton />}
@@ -297,7 +296,7 @@ export default function ReflectionsDisclosure({
         )}
         {data && (
           <>
-                {showIndexScore && (
+                {activeSection === "index-score" && (
                   <p className="text-sm text-gray-500">
                     {data.hfEnabled
                       ? t("reflection.hf.enabled")
@@ -305,7 +304,7 @@ export default function ReflectionsDisclosure({
                   </p>
                 )}
 
-                {showIndexScore && data.summaryEntries.length > 0 && (
+                {activeSection === "index-score" && data.summaryEntries.length > 0 && (
                   <div className="grid gap-3 sm:grid-cols-3">
                     {data.summaryEntries.map(({ label, count }) => {
                       const displayLabel =
@@ -325,7 +324,7 @@ export default function ReflectionsDisclosure({
                   </div>
                 )}
 
-                {showIndexScore && (
+                {activeSection === "index-score" && (
                   <div className="grid gap-4 md:grid-cols-3">
                     {metricComparisons.map((metric) => (
                       <div
@@ -358,7 +357,7 @@ export default function ReflectionsDisclosure({
                   </div>
                 )}
 
-                {showTrends && (
+                {activeSection === "trends" && (
                   <>
                     {data.weeklyTrends.length > 0 ? (
                       <div className="mt-6">
@@ -372,7 +371,7 @@ export default function ReflectionsDisclosure({
                   </>
                 )}
 
-                {showHeatmap && (
+                {activeSection === "heatmap" && (
                   <>
                     {heatmap.hasHeatmapData ? (
                       <div className="mt-6 rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-sm">
@@ -432,59 +431,102 @@ export default function ReflectionsDisclosure({
                   </>
                 )}
 
-                {showWordcloud && (
+                {activeSection === "wordcloud" && (
                   <div className="w-full max-w-md mx-auto rounded-2xl border bg-white/70 p-5 shadow-sm">
                     <MyWordcloud words={data.wordcloudWords} />
                   </div>
                 )}
 
-                {showPrintout && (
+                {activeSection === "printout" && (
                   <div className="space-y-4">
                     {data.reflections.length === 0 ? (
                       <p className="text-sm text-gray-500">{t("reflection.none")}</p>
                     ) : (
-                      data.reflections.map((reflection) => (
-                        <div
-                          key={reflection.id}
-                          className="rounded-xl border border-gray-200 p-4"
-                        >
-                          <div className="mb-2 flex flex-wrap gap-4 text-sm text-gray-700">
-                            <span>
-                              <b>{t("reflection.grounded")}:</b>{" "}
-                              {formatBool(reflection.grounded)}
-                            </span>
-                            <span>
-                              <b>{t("reflection.supported")}:</b>{" "}
-                              {formatBool(reflection.supported)}
-                            </span>
-                            <span>
-                              <b>{t("reflection.connected")}:</b>{" "}
-                              {formatBool(reflection.connected)}
-                            </span>
-                          </div>
-                          <p className="text-base text-gray-800 mb-2">
-                            <b>{t("reflection.feeling")}:</b>{" "}
-                            {reflection.feeling ?? t("common.na")}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {t("reflection.sentiment")}:{" "}
-                            {reflection.sentiment
-                              ? `${reflection.sentiment.label} (Score: ${(
-                                  reflection.sentiment.score * 100
-                                ).toFixed(0)})`
-                              : t("common.unavailable")}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {t("reflection.emotion")}:{" "}
-                            {reflection.emotion?.label
-                              ? capitalize(reflection.emotion.label)
-                              : t("common.unavailable")}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {t("reflection.created")}: {formatDate(reflection.createdAt)}
-                          </p>
-                        </div>
-                      ))
+                      (() => {
+                        const totalPages = Math.max(
+                          1,
+                          Math.ceil(data.reflections.length / pageSize),
+                        );
+                        const startIndex = (printoutPage - 1) * pageSize;
+                        const pageItems = data.reflections.slice(
+                          startIndex,
+                          startIndex + pageSize,
+                        );
+
+                        return (
+                          <>
+                            {pageItems.map((reflection) => (
+                              <div
+                                key={reflection.id}
+                                className="rounded-xl border border-gray-200 p-4"
+                              >
+                                <div className="mb-2 flex flex-wrap gap-4 text-sm text-gray-700">
+                                  <span>
+                                    <b>{t("reflection.grounded")}:</b>{" "}
+                                    {formatBool(reflection.grounded)}
+                                  </span>
+                                  <span>
+                                    <b>{t("reflection.supported")}:</b>{" "}
+                                    {formatBool(reflection.supported)}
+                                  </span>
+                                  <span>
+                                    <b>{t("reflection.connected")}:</b>{" "}
+                                    {formatBool(reflection.connected)}
+                                  </span>
+                                </div>
+                                <p className="text-base text-gray-800 mb-2">
+                                  <b>{t("reflection.feeling")}:</b>{" "}
+                                  {reflection.feeling ?? t("common.na")}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {t("reflection.sentiment")}:{" "}
+                                  {reflection.sentiment
+                                    ? `${reflection.sentiment.label} (Score: ${(
+                                        reflection.sentiment.score * 100
+                                      ).toFixed(0)})`
+                                    : t("common.unavailable")}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {t("reflection.emotion")}:{" "}
+                                  {reflection.emotion?.label
+                                    ? capitalize(reflection.emotion.label)
+                                    : t("common.unavailable")}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {t("reflection.created")}:{" "}
+                                  {formatDate(reflection.createdAt)}
+                                </p>
+                              </div>
+                            ))}
+                            {totalPages > 1 && (
+                              <div className="flex flex-wrap items-center justify-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setPrintoutPage((prev) => Math.max(1, prev - 1))
+                                  }
+                                  className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                  disabled={printoutPage <= 1}
+                                >
+                                  Last page
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setPrintoutPage((prev) =>
+                                      Math.min(totalPages, prev + 1),
+                                    )
+                                  }
+                                  className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                  disabled={printoutPage >= totalPages}
+                                >
+                                  Next page
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()
                     )}
                   </div>
                 )}
