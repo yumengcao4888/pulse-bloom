@@ -100,7 +100,7 @@ export default async function HealingSpacePage(props: PageProps) {
                     )}
                   </div>
                   {healer.contactType ? (
-                    <p className="mt-1 text-sm text-gray-700">
+                    <p className="mt-1 line-clamp-3 break-all text-sm text-gray-700">
                       {healer.contactType === "social" ? (
                         (() => {
                           const { label, rest } = formatSocialContact(healer.contact);

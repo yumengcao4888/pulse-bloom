@@ -50,9 +50,10 @@ export default async function ReflectionPage(props: PageProps) {
         ) : (
           <div className="mx-auto p-8 text-sm sm:text-base">
             <h1
-              className={`${sriracha.className} mb-0 line-clamp-2 break-all text-xl font-bold sm:text-2xl`}
+              className={`${sriracha.className} mb-0 line-clamp-2 break-words hyphens-auto text-xl font-bold sm:text-2xl`}
               title={headline}
               aria-label={headline}
+              lang={locale}
             >
               {headline}
             </h1>

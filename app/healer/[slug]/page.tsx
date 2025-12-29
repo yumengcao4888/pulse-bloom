@@ -265,7 +265,7 @@ export default async function HealerPage(props: PageProps) {
               <b>{t("healer.profile.location")}</b> {healer.city}
             </p>
             {healer.contactType ? (
-              <p className="text-gray-700">
+              <p className="line-clamp-3 break-all text-gray-700">
                 {healer.contactType === "social" ? (
                   (() => {
                     const { label, rest } = formatSocialContact(healer.contact);
