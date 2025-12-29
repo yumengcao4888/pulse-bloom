@@ -164,26 +164,31 @@ export default async function HealingSpacePage(props: PageProps) {
               <InviteReflectionButton reflectionLink={reflectionLink} />
             </div>
             <div className="my-4 border-t border-gray-200" />
-            <div className="space-y-1 text-gray-700">
+            <div className="text-gray-700">
               <p>
                 <b>{"Modality"}:</b> {healer.modality}
               </p>
+              <div className="my-2 border-t border-dashed border-gray-200" />
               <p>
                 <b>{t("healer.dev.focus")}:</b> {healer.focus}
               </p>
+              <div className="my-2 border-t border-dashed border-gray-200" />
               <p>
                 <b>{t("healer.dev.city")}:</b> {healer.location}
               </p>
+              <div className="my-2 border-t border-dashed border-gray-200" />
               <p className="text-gray-700">
                 <b>{t("healer.dev.bio")}:</b> {healer.bio}
               </p>
+              <div className="my-2 border-t border-dashed border-gray-200" />
               <p className="text-gray-700">
                 <b>Sharable link:</b>{" "}
                 <Link href={sharableLink} className="text-blue-600 underline">
                   {sharableLink}
                 </Link>
               </p>
-              <div className="flex flex-wrap items-center gap-3 text-gray-700">
+              <div className="my-2 border-t border-dashed border-gray-200" />
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-gray-700">
                 <p>
                   <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsCount}
                 </p>

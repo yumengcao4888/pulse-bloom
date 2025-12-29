@@ -262,12 +262,15 @@ export default async function HealerPage(props: PageProps) {
             <p className="text-gray-700">
               <b>{t("healer.profile.approach")}</b> {healer.modality}
             </p>
+            <div className="my-2 border-t border-dashed border-gray-200" />
             <p className="text-gray-700">
               <b>{t("healer.profile.workWith")}</b> {healer.focus}
             </p>
+            <div className="my-2 border-t border-dashed border-gray-200" />
             <p className="text-gray-700">
               <b>{t("healer.profile.location")}</b> {healer.location}
             </p>
+            <div className="my-2 border-t border-dashed border-gray-200" />
             {healer.contactType ? (
               <p className="line-clamp-3 break-words text-gray-700">
                 {healer.contactType === "social" ? (
@@ -295,6 +298,7 @@ export default async function HealerPage(props: PageProps) {
                 )}
               </p>
             ) : null}
+            <div className="my-2 border-t border-dashed border-gray-200" />
             <p className="text-gray-700">
               <b>{t("healer.profile.about")}</b> {healer.bio}
             </p>
