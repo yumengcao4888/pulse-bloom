@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
-import PrintProfileButton from "@/components/healer/print-profile-button";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
 import ShareLinkButton from "@/components/healer/share-link-button";
 import EditProfileSheet from "@/components/healer/edit-space-sheet";
@@ -208,20 +206,13 @@ export default async function HealingSpacePage(props: PageProps) {
               <p className="break-words hyphens-auto text-gray-700" lang={locale}>
                 <b>{t("healer.dev.bio")}:</b> {healer.bio}
               </p>
-              <div className="my-2 border-t border-dashed border-gray-200" />
-              <div className="mt-3 flex flex-wrap items-center gap-3 text-gray-700">
-                <p>
-                  <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsCount}
-                </p>
-                <PrintProfileButton slug={healer.slug} />
-              </div>
             </div>
           </div>
         </div>
       </div>
 
       {reflectionsCount > 0 && (
-        <ReflectionsDisclosure slug={slug} />
+        <ReflectionsDisclosure slug={slug} reflectionsCount={reflectionsCount} />
       )}
     </>
   );

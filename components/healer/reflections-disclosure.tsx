@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import type { Word } from "react-wordcloud";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
+import PrintProfileButton from "@/components/healer/print-profile-button";
 import { useLocale } from "@/components/shared/locale-provider";
 import { capitalize, fetcher } from "@/lib/utils";
 import type { ScoreSummary, TrendPoint } from "@/lib/utils";
@@ -86,7 +87,15 @@ function formatPercent(value: number | null | undefined, fallback: string) {
   return value == null ? fallback : `${value}%`;
 }
 
-export default function ReflectionsDisclosure({ slug }: { slug: string }) {
+type ReflectionsDisclosureProps = {
+  slug: string;
+  reflectionsCount: number;
+};
+
+export default function ReflectionsDisclosure({
+  slug,
+  reflectionsCount,
+}: ReflectionsDisclosureProps) {
   const { t, locale } = useLocale();
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<ReflectionsPayload | null>(null);
@@ -207,6 +216,12 @@ export default function ReflectionsDisclosure({ slug }: { slug: string }) {
 
         {isOpen && (
           <>
+            <div className="flex flex-wrap items-center gap-3 text-gray-700">
+              <p>
+                <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsCount}
+              </p>
+              <PrintProfileButton slug={slug} />
+            </div>
             {!hasData && isLoading && <ReflectionsSkeleton />}
             {error && (
               <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
