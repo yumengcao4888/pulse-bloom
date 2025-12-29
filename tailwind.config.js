@@ -11,6 +11,7 @@ module.exports = {
     extend: {
       colors: {
         "pulse-bloom": "var(--pulse-bloom)",
+        "pulse-bloom-soft": "var(--pulse-bloom-soft)",
       },
       fontFamily: {
         display: ["var(--font-sf)", "system-ui", "sans-serif"],
