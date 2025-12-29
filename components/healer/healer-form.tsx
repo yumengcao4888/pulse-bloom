@@ -12,7 +12,7 @@ type HealerForm = {
   focus: string;
   city: string;
   contact: string;
-  contactType: "email" | "phone" | "website" | "social" | "other" | "";
+  contactType: "email" | "phone" | "website" | "social" | "";
   bio: string;
 };
 
@@ -278,7 +278,6 @@ export default function HealerForm() {
                 { id: "phone", label: t("form.healer.contact.type.phone") },
                 { id: "website", label: t("form.healer.contact.type.website") },
                 { id: "social", label: t("form.healer.contact.type.social") },
-                { id: "other", label: t("form.healer.contact.type.other") },
               ] as const
             ).map((type) => (
             <button

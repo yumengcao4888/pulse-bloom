@@ -207,9 +207,7 @@ export default async function HealerDevPage(props: PageProps) {
             </p>
             <p className="text-gray-700">
               <b>
-                {healer.contactType === "other"
-                  ? `${t("healer.dev.contact")}:`
-                  : healer.contactType
+                {healer.contactType
                   ? `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`
                   : `${t("healer.dev.contact")}:`}
               </b>{" "}

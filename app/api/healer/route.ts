@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     const { name, pronouns, modality, focus, city, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
-    const allowedContactTypes = ["email", "phone", "website", "social", "other"] as const;
+    const allowedContactTypes = ["email", "phone", "website", "social"] as const;
     const normalizedContactType =
       contactType && allowedContactTypes.includes(contactType) ? contactType : null;
     const missing: string[] = [];
@@ -136,7 +136,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { name, pronouns, modality, focus, city, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
-    const allowedContactTypes = ["email", "phone", "website", "social", "other"] as const;
+    const allowedContactTypes = ["email", "phone", "website", "social"] as const;
     const normalizedContactType =
       contactType && allowedContactTypes.includes(contactType) ? contactType : null;
     const missing: string[] = [];

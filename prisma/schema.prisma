@@ -36,7 +36,6 @@ enum ContactType {
   phone
   website
   social
-  other
 }
 
 model Reflection {

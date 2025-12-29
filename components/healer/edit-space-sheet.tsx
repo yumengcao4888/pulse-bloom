@@ -16,7 +16,7 @@ type HealerProfile = {
   focus: string;
   city: string | null;
   contact: string | null;
-  contactType: "email" | "phone" | "website" | "social" | "other" | null;
+  contactType: "email" | "phone" | "website" | "social" | null;
   bio: string;
 };
 
@@ -279,7 +279,6 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
                     { id: "phone", label: t("form.healer.contact.type.phone") },
                     { id: "website", label: t("form.healer.contact.type.website") },
                     { id: "social", label: t("form.healer.contact.type.social") },
-                    { id: "other", label: t("form.healer.contact.type.other") },
                   ] as const
                 ).map((type) => (
                   <button

@@ -258,9 +258,7 @@ export default async function HealerPage(props: PageProps) {
             {healer.contactType ? (
               <p className="text-gray-700">
                 <b>
-                  {healer.contactType === "other"
-                    ? t("healer.profile.contact")
-                    : `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`}
+                  {`${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`}
                 </b>{" "}
                 {healer.contact}
               </p>

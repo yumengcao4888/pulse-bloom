@@ -57,9 +57,7 @@ export default async function HealerListPage() {
               <td className="border px-4 py-2">{p.focus}</td>
               <td className="border px-4 py-2">{p.city}</td>
               <td className="border px-4 py-2">
-                {p.contactType === "other"
-                  ? `${t("admin.table.contact")}: ${p.contact}`
-                  : p.contactType
+                {p.contactType
                   ? `${contactTypeLabels[p.contactType as keyof typeof contactTypeLabels]}: ${p.contact}`
                   : p.contact}
               </td>

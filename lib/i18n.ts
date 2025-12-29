@@ -47,7 +47,6 @@ const messages = {
     "form.healer.contact.type.phone": "Phone",
     "form.healer.contact.type.website": "Website",
     "form.healer.contact.type.social": "Social",
-    "form.healer.contact.type.other": "Other",
     "form.healer.bio.label": "Tell us a little about your practice",
     "form.healer.bio.placeholder":
       "Share anything you'd like - your background, care values, or current offerings.",
@@ -227,7 +226,6 @@ const messages = {
     "form.healer.contact.type.phone": "Teléfono",
     "form.healer.contact.type.website": "Sitio web",
     "form.healer.contact.type.social": "Social",
-    "form.healer.contact.type.other": "Otro",
     "form.healer.bio.label": "Cuéntanos un poco sobre tu práctica",
     "form.healer.bio.placeholder":
       "Comparte lo que quieras: tu trayectoria, valores de cuidado u ofertas actuales.",
