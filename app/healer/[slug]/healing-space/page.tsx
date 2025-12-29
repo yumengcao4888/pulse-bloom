@@ -181,7 +181,7 @@ export default async function HealingSpacePage(props: PageProps) {
                   <div className="my-2 border-t border-dashed border-gray-200" />
                 </>
               ) : null}
-              <p className="text-gray-700">
+              <p className="break-words hyphens-auto text-gray-700" lang={locale}>
                 <b>{t("healer.dev.bio")}:</b> {healer.bio}
               </p>
               <div className="my-2 border-t border-dashed border-gray-200" />
