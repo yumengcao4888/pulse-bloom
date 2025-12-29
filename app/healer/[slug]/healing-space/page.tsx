@@ -4,7 +4,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import PrintProfileButton from "@/components/healer/print-profile-button";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
-import InviteReflectionButton from "@/components/healer/invite-reflection-button";
+import ShareLinkButton from "@/components/healer/share-link-button";
 import EditProfileSheet from "@/components/healer/edit-space-sheet";
 import ReflectionsDisclosure from "@/components/healer/reflections-disclosure";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -68,8 +68,8 @@ export default async function HealingSpacePage(props: PageProps) {
     }
   }
 
-  const reflectionLink = `http://pulse-bloom.vercel.app/reflection/${slug}`;
-  const sharableLink = `http://pulse-bloom.vercel.app/healer/${slug}`;
+  const reflectionLink = `https://pulse-bloom.vercel.app/reflection/${slug}`;
+  const sharableLink = `https://pulse-bloom.vercel.app/healer/${slug}`;
   const reflectionsCount = healer._count?.reflections ?? 0;
 
   return (
@@ -131,7 +131,7 @@ export default async function HealingSpacePage(props: PageProps) {
                     </p>
                   ) : null}
                 </div>
-                <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
+                <div className="hidden shrink-0 flex-col items-center gap-2 sm:flex">
                   <EditProfileSheet
                     healer={{
                       name: healer.name,
@@ -144,11 +144,23 @@ export default async function HealingSpacePage(props: PageProps) {
                       bio: healer.bio,
                     }}
                   />
-                  <InviteReflectionButton reflectionLink={reflectionLink} />
+                  <ShareLinkButton
+                    link={sharableLink}
+                    buttonLabel="Share your space"
+                    title="Share your space"
+                    description="Share this link or QR code to let others see your space."
+                    buttonClassName="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
+                  />
+                  <ShareLinkButton
+                    link={reflectionLink}
+                    buttonLabel="Invite reflection"
+                    title="Invite reflection"
+                    description="Share this link or QRcode with your clients."
+                  />
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex w-full justify-center gap-2 sm:hidden">
+            <div className="mt-4 flex w-full items-center justify-center gap-2 sm:hidden">
               <EditProfileSheet
                 healer={{
                   name: healer.name,
@@ -161,7 +173,19 @@ export default async function HealingSpacePage(props: PageProps) {
                   bio: healer.bio,
                 }}
               />
-              <InviteReflectionButton reflectionLink={reflectionLink} />
+              <ShareLinkButton
+                link={sharableLink}
+                buttonLabel="Share your space"
+                title="Share your space"
+                description="Share this link or QR code to let others see your space."
+                buttonClassName="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
+              />
+              <ShareLinkButton
+                link={reflectionLink}
+                buttonLabel="Invite reflection"
+                title="Invite reflection"
+                description="Share this link or QRcode with your clients."
+              />
             </div>
             <div className="my-4 border-t border-gray-200" />
             <div className="text-gray-700">
@@ -183,13 +207,6 @@ export default async function HealingSpacePage(props: PageProps) {
               ) : null}
               <p className="break-words hyphens-auto text-gray-700" lang={locale}>
                 <b>{t("healer.dev.bio")}:</b> {healer.bio}
-              </p>
-              <div className="my-2 border-t border-dashed border-gray-200" />
-              <p className="text-gray-700">
-                <b>Sharable link:</b>{" "}
-                <Link href={sharableLink} className="text-blue-600 underline">
-                  {sharableLink}
-                </Link>
               </p>
               <div className="my-2 border-t border-dashed border-gray-200" />
               <div className="mt-3 flex flex-wrap items-center gap-3 text-gray-700">

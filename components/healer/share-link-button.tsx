@@ -4,13 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import Modal from "@/components/shared/modal";
 
-type InviteReflectionButtonProps = {
-  reflectionLink: string;
+type ShareLinkButtonProps = {
+  link: string;
+  buttonLabel: string;
+  title: string;
+  description: string;
+  buttonClassName?: string;
 };
 
-export default function InviteReflectionButton({
-  reflectionLink,
-}: InviteReflectionButtonProps) {
+export default function ShareLinkButton({
+  link,
+  buttonLabel,
+  title,
+  description,
+  buttonClassName,
+}: ShareLinkButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isQrExpanded, setIsQrExpanded] = useState(false);
@@ -18,7 +26,7 @@ export default function InviteReflectionButton({
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(reflectionLink);
+      await navigator.clipboard.writeText(link);
       setCopied(true);
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
@@ -44,20 +52,21 @@ export default function InviteReflectionButton({
       <button
         type="button"
         onClick={() => setShowModal(true)}
-        className="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
+        className={
+          buttonClassName ??
+          "inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
+        }
       >
-        Invite reflection
+        {buttonLabel}
       </button>
       <Modal showModal={showModal} setShowModal={setShowModal} className="p-6">
         <div className="space-y-4">
           <div className="space-y-3 text-center">
-            <h2 className="text-xl font-semibold">Invite reflection</h2>
-            <p className="text-sm text-gray-500">
-              Share this link or QRcode with your clients.
-            </p>
+            <h2 className="text-xl font-semibold">{title}</h2>
+            <p className="text-sm text-gray-500">{description}</p>
           </div>
           <div className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
-            <span className="truncate">{reflectionLink}</span>
+            <span className="truncate">{link}</span>
             <button
               type="button"
               onClick={handleCopyLink}
@@ -86,7 +95,7 @@ export default function InviteReflectionButton({
               aria-label={isQrExpanded ? "Shrink QR code" : "Expand QR code"}
               aria-pressed={isQrExpanded}
             >
-              <QRCodeCanvas value={reflectionLink} size={isQrExpanded ? 240 : 140} />
+              <QRCodeCanvas value={link} size={isQrExpanded ? 240 : 140} />
             </button>
           </div>
           <div className="border-t border-gray-200" />
