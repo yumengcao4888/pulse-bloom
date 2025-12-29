@@ -105,16 +105,16 @@ export default async function HealingSpacePage(props: PageProps) {
                       </span>
                     )}
                   </div>
-                  <p className="mt-1 text-sm text-gray-700">
-                    <b>
-                      {healer.contactType === "other"
-                        ? `${t("healer.dev.contact")}:`
-                        : healer.contactType
-                        ? `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`
-                        : `${t("healer.dev.contact")}:`}
-                    </b>{" "}
-                    {healer.contact}
-                  </p>
+                  {healer.contactType ? (
+                    <p className="mt-1 text-sm text-gray-700">
+                      <b>
+                        {healer.contactType === "other"
+                          ? `${t("healer.dev.contact")}:`
+                          : `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`}
+                      </b>{" "}
+                      {healer.contact}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
                   <EditProfileSheet

@@ -37,6 +37,7 @@ const messages = {
     "form.healer.contact.label": "How can people reach you?",
     "form.healer.contact.placeholder":
       "Feel free to include one or more ways, each on a new line if you'd like.",
+    "form.healer.contact.email.error": "Please enter a valid email address (name@domain).",
     "form.healer.contact.type.email": "Email",
     "form.healer.contact.type.phone": "Phone",
     "form.healer.contact.type.website": "Website",
@@ -211,6 +212,7 @@ const messages = {
     "form.healer.contact.label": "¿Cómo pueden contactarte?",
     "form.healer.contact.placeholder":
       "Puedes incluir una o más vías, cada una en una línea nueva si quieres.",
+    "form.healer.contact.email.error": "Introduce un correo válido (nombre@dominio).",
     "form.healer.contact.type.email": "Correo",
     "form.healer.contact.type.phone": "Teléfono",
     "form.healer.contact.type.website": "Sitio web",

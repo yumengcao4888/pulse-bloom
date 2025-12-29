@@ -255,16 +255,16 @@ export default async function HealerPage(props: PageProps) {
             <p className="text-gray-700">
               <b>{t("healer.profile.location")}</b> {healer.city}
             </p>
-            <p className="text-gray-700">
-              <b>
-                {healer.contactType === "other"
-                  ? t("healer.profile.contact")
-                  : healer.contactType
-                  ? `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`
-                  : t("healer.profile.contact")}
-              </b>{" "}
-              {healer.contact}
-            </p>
+            {healer.contactType ? (
+              <p className="text-gray-700">
+                <b>
+                  {healer.contactType === "other"
+                    ? t("healer.profile.contact")
+                    : `${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`}
+                </b>{" "}
+                {healer.contact}
+              </p>
+            ) : null}
             <p className="text-gray-700">
               <b>{t("healer.profile.about")}</b> {healer.bio}
             </p>

@@ -30,7 +30,9 @@ const initialForm: HealerForm = {
 export default function HealerForm() {
   const [form, setForm] = useState<HealerForm>(initialForm);
   const [pronounError, setPronounError] = useState("");
+  const [contactError, setContactError] = useState("");
   const pronounsRef = useRef<HTMLInputElement>(null);
+  const contactRef = useRef<HTMLTextAreaElement>(null);
   const { t } = useLocale();
   const router = useRouter();
 
@@ -45,18 +47,35 @@ export default function HealerForm() {
     return isValidPronouns(value) ? "" : t("form.healer.pronouns.error");
   };
 
+  const validateContact = (contactType: HealerForm["contactType"], value: string) => {
+    if (contactType !== "email") return "";
+    const trimmed = value.trim();
+    if (!trimmed) return t("form.healer.contact.email.error");
+    const isValidEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed);
+    return isValidEmail ? "" : t("form.healer.contact.email.error");
+  };
+
+  const handleContactTypeSelect = (contactType: HealerForm["contactType"]) => {
+    const nextType = form.contactType === contactType ? "" : contactType;
+    setForm((prev) => ({ ...prev, contactType: nextType }));
+    if (contactError && !validateContact(nextType, form.contact)) {
+      setContactError("");
+    }
+  };
+
   const handlePronounsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setForm((prev) => ({ ...prev, pronouns: value }));
     const error = validatePronouns(value);
     setPronounError(error);
-    e.currentTarget.setCustomValidity(error);
   };
 
-  const handlePronounsBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const error = validatePronouns(e.currentTarget.value);
-    setPronounError(error);
-    e.currentTarget.setCustomValidity(error);
+  const handleContactChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setForm((prev) => ({ ...prev, contact: value }));
+    if (contactError && !validateContact(form.contactType, value)) {
+      setContactError("");
+    }
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -64,14 +83,18 @@ export default function HealerForm() {
     const pronounsValidation = validatePronouns(form.pronouns);
     if (pronounsValidation) {
       setPronounError(pronounsValidation);
-      if (pronounsRef.current) {
-        pronounsRef.current.setCustomValidity(pronounsValidation);
-        pronounsRef.current.reportValidity();
-      }
       return;
     }
-    if (pronounsRef.current) {
-      pronounsRef.current.setCustomValidity("");
+
+    const contactValidation = validateContact(form.contactType, form.contact);
+    if (contactValidation) {
+      setContactError(contactValidation);
+      if (contactRef.current) {
+        contactRef.current.setCustomValidity(contactValidation);
+        contactRef.current.reportValidity();
+        contactRef.current.setCustomValidity("");
+      }
+      return;
     }
 
     const payload = {
@@ -108,10 +131,6 @@ export default function HealerForm() {
           if (data?.error === "invalid_pronouns") {
             const error = t("form.healer.pronouns.error");
             setPronounError(error);
-            if (pronounsRef.current) {
-              pronounsRef.current.setCustomValidity(error);
-              pronounsRef.current.reportValidity();
-            }
             return;
           }
         }
@@ -165,9 +184,7 @@ export default function HealerForm() {
           placeholder={t("form.healer.pronouns.placeholder")}
           value={form.pronouns}
           onChange={handlePronounsChange}
-          onBlur={handlePronounsBlur}
           ref={pronounsRef}
-          pattern="^[a-zA-Z]+/[a-zA-Z]+(/[a-zA-Z]+)?$"
         />
         {pronounError ? (
           <p className="text-sm text-red-600">{pronounError}</p>
@@ -231,7 +248,7 @@ export default function HealerForm() {
                 type="button"
                 key={type.id}
                 className={`rounded-full border px-3 py-1 hover:bg-gray-100 ${form.contactType === type.id ? "bg-gray-100" : ""}`}
-                onClick={() => setForm({ ...form, contactType: type.id })}
+                onClick={() => handleContactTypeSelect(type.id)}
             >
                 {type.label}
             </button>
@@ -242,8 +259,12 @@ export default function HealerForm() {
             className="w-full rounded-md border px-3 py-2 text-sm min-h-[80px]"
             placeholder={t("form.healer.contact.placeholder")}
             value={form.contact}
-            onChange={handleChange('contact')}
+            onChange={handleContactChange}
+            ref={contactRef}
         />
+        {contactError ? (
+          <p className="text-sm text-red-600">{contactError}</p>
+        ) : null}
       </div>
 
       <div className="space-y-1">
@@ -261,7 +282,11 @@ export default function HealerForm() {
         <button
           type="button"
           className="rounded-md border px-4 py-2 text-sm"
-          onClick={() => setForm(initialForm)}
+          onClick={() => {
+            setForm(initialForm);
+            setPronounError("");
+            setContactError("");
+          }}
         >
           {t("form.reset")}
         </button>
