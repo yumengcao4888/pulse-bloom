@@ -122,13 +122,18 @@ export default function HealerForm() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const normalizedContact = form.contactType ? form.contact : "";
+    if (!form.contactType && form.contact) {
+      setForm((prev) => ({ ...prev, contact: "" }));
+      setContactError("");
+    }
     const pronounsValidation = validatePronouns(form.pronouns);
     if (pronounsValidation) {
       setPronounError(pronounsValidation);
       return;
     }
 
-    const contactValidation = validateContact(form.contactType, form.contact);
+    const contactValidation = validateContact(form.contactType, normalizedContact);
     if (contactValidation) {
       setContactError(contactValidation);
       return;
@@ -136,8 +141,8 @@ export default function HealerForm() {
 
     const payload = {
       ...form,
-      contactType: form.contact.trim() ? form.contactType || null : null,
-      contact: form.contact.trim() || null,
+      contactType: normalizedContact.trim() ? form.contactType || null : null,
+      contact: normalizedContact.trim() || null,
     };
 
     try {
