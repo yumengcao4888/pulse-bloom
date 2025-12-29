@@ -26,6 +26,10 @@ export default async function HealingSpacePage(props: PageProps) {
     website: t("form.healer.contact.type.website"),
     social: t("form.healer.contact.type.social"),
   } as const;
+  const formatContactWithDots = (value: string | null) => {
+    if (!value) return "";
+    return value.replace(/\./g, ".\u200b");
+  };
   const formatSocialContact = (value: string | null) => {
     if (!value) return { label: "", rest: "" };
     const splitIndex = value.indexOf(":");
@@ -100,17 +104,17 @@ export default async function HealingSpacePage(props: PageProps) {
                     )}
                   </div>
                   {healer.contactType ? (
-                    <p className="mt-1 line-clamp-3 break-all text-sm text-gray-700">
+                    <p className="mt-1 line-clamp-3 break-words text-sm text-gray-700">
                       {healer.contactType === "social" ? (
                         (() => {
                           const { label, rest } = formatSocialContact(healer.contact);
                           if (!label) {
-                            return healer.contact;
+                            return formatContactWithDots(healer.contact);
                           }
                           return (
                             <>
                               <b>{label}</b>
-                              {rest ? ` ${rest}` : ""}
+                              {rest ? ` ${formatContactWithDots(rest)}` : ""}
                             </>
                           );
                         })()
@@ -121,7 +125,7 @@ export default async function HealingSpacePage(props: PageProps) {
                               healer.contactType as keyof typeof contactTypeLabels
                             ]}:`}
                           </b>{" "}
-                          {healer.contact}
+                          {formatContactWithDots(healer.contact)}
                         </>
                       )}
                     </p>
