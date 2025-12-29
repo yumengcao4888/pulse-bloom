@@ -6,6 +6,7 @@ import ShareLinkButton from "@/components/healer/share-link-button";
 import EditProfileSheet from "@/components/healer/edit-space-sheet";
 import ReflectionsDisclosure from "@/components/healer/reflections-disclosure";
 import { clerkClient } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
 
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -66,8 +67,12 @@ export default async function HealingSpacePage(props: PageProps) {
     }
   }
 
-  const reflectionLink = `https://pulse-bloom.vercel.app/reflection/${slug}`;
-  const sharableLink = `https://pulse-bloom.vercel.app/healer/${slug}`;
+  const headerList = await headers();
+  const host = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "";
+  const protocol = headerList.get("x-forwarded-proto") ?? "https";
+  const baseUrl = host ? `${protocol}://${host}` : "https://pulse-bloom.vercel.app";
+  const reflectionLink = `${baseUrl}/reflection/${slug}`;
+  const sharableLink = `${baseUrl}/healer/${slug}`;
   const reflectionsCount = healer._count?.reflections ?? 0;
 
   return (
