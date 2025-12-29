@@ -13,7 +13,7 @@ export default function InviteReflectionButton({
 }: InviteReflectionButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
-  const qrCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isQrExpanded, setIsQrExpanded] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCopyLink = async () => {
@@ -29,16 +29,6 @@ export default function InviteReflectionButton({
     } catch (err) {
       console.error("Failed to copy reflection link:", err);
     }
-  };
-
-  const handleDownloadQr = () => {
-    const canvas = qrCanvasRef.current;
-    if (!canvas) return;
-    const dataUrl = canvas.toDataURL("image/png");
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = "reflection-qr.png";
-    link.click();
   };
 
   useEffect(() => {
@@ -89,11 +79,14 @@ export default function InviteReflectionButton({
           <div className="flex justify-center">
             <button
               type="button"
-              onClick={handleDownloadQr}
-              className="rounded-lg p-1 transition hover:bg-gray-100"
-              aria-label="Download QR code"
+              onClick={() => setIsQrExpanded((prev) => !prev)}
+              className={`rounded-lg p-1 transition hover:bg-gray-100 ${
+                isQrExpanded ? "cursor-zoom-out" : "cursor-zoom-in"
+              }`}
+              aria-label={isQrExpanded ? "Shrink QR code" : "Expand QR code"}
+              aria-pressed={isQrExpanded}
             >
-              <QRCodeCanvas ref={qrCanvasRef} value={reflectionLink} size={140} />
+              <QRCodeCanvas value={reflectionLink} size={isQrExpanded ? 240 : 140} />
             </button>
           </div>
           <div className="border-t border-gray-200" />
