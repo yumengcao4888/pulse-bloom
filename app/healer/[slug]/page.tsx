@@ -257,22 +257,8 @@ export default async function HealerPage(props: PageProps) {
                 ({healer.pronouns})
               </span>
             )}
-          </div>
-          <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm">
-            <p className="text-gray-700">
-              <b>{t("healer.profile.approach")}</b> {healer.modality}
-            </p>
-            <div className="my-2 border-t border-dashed border-gray-200" />
-            <p className="text-gray-700">
-              <b>{t("healer.profile.workWith")}</b> {healer.focus}
-            </p>
-            <div className="my-2 border-t border-dashed border-gray-200" />
-            <p className="text-gray-700">
-              <b>{t("healer.profile.location")}</b> {healer.location}
-            </p>
-            <div className="my-2 border-t border-dashed border-gray-200" />
             {healer.contactType ? (
-              <p className="line-clamp-3 break-words text-gray-700">
+              <p className="line-clamp-3 break-words text-center text-base font-normal text-gray-600">
                 {healer.contactType === "social" ? (
                   (() => {
                     const { label, rest } = formatSocialContact(healer.contact);
@@ -298,7 +284,24 @@ export default async function HealerPage(props: PageProps) {
                 )}
               </p>
             ) : null}
+          </div>
+          <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm">
+            <p className="text-gray-700">
+              <b>{t("healer.profile.approach")}</b> {healer.modality}
+            </p>
             <div className="my-2 border-t border-dashed border-gray-200" />
+            <p className="text-gray-700">
+              <b>{t("healer.profile.workWith")}</b> {healer.focus}
+            </p>
+            <div className="my-2 border-t border-dashed border-gray-200" />
+            {healer.location ? (
+              <>
+                <p className="text-gray-700">
+                  <b>{t("healer.profile.location")}</b> {healer.location}
+                </p>
+                <div className="my-2 border-t border-dashed border-gray-200" />
+              </>
+            ) : null}
             <p className="text-gray-700">
               <b>{t("healer.profile.about")}</b> {healer.bio}
             </p>

@@ -173,10 +173,14 @@ export default async function HealingSpacePage(props: PageProps) {
                 <b>{t("healer.dev.focus")}:</b> {healer.focus}
               </p>
               <div className="my-2 border-t border-dashed border-gray-200" />
-              <p>
-                <b>{t("healer.dev.city")}:</b> {healer.location}
-              </p>
-              <div className="my-2 border-t border-dashed border-gray-200" />
+              {healer.location ? (
+                <>
+                  <p>
+                    <b>{t("healer.dev.city")}:</b> {healer.location}
+                  </p>
+                  <div className="my-2 border-t border-dashed border-gray-200" />
+                </>
+              ) : null}
               <p className="text-gray-700">
                 <b>{t("healer.dev.bio")}:</b> {healer.bio}
               </p>
