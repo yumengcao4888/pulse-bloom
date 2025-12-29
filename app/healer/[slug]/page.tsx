@@ -76,6 +76,15 @@ export default async function HealerPage(props: PageProps) {
     website: t("form.healer.contact.type.website"),
     social: t("form.healer.contact.type.social"),
   } as const;
+  const formatSocialContact = (value: string | null) => {
+    if (!value) return { label: "", rest: "" };
+    const splitIndex = value.indexOf(":");
+    if (splitIndex === -1) return { label: "", rest: value };
+    return {
+      label: value.slice(0, splitIndex + 1),
+      rest: value.slice(splitIndex + 1).trimStart(),
+    };
+  };
 
   const healer = await prisma.healer.findUnique({
     where: { slug },
@@ -257,10 +266,29 @@ export default async function HealerPage(props: PageProps) {
             </p>
             {healer.contactType ? (
               <p className="text-gray-700">
-                <b>
-                  {`${contactTypeLabels[healer.contactType as keyof typeof contactTypeLabels]}:`}
-                </b>{" "}
-                {healer.contact}
+                {healer.contactType === "social" ? (
+                  (() => {
+                    const { label, rest } = formatSocialContact(healer.contact);
+                    if (!label) {
+                      return healer.contact;
+                    }
+                    return (
+                      <>
+                        <b>{label}</b>
+                        {rest ? ` ${rest}` : ""}
+                      </>
+                    );
+                  })()
+                ) : (
+                  <>
+                    <b>
+                      {`${contactTypeLabels[
+                        healer.contactType as keyof typeof contactTypeLabels
+                      ]}:`}
+                    </b>{" "}
+                    {healer.contact}
+                  </>
+                )}
               </p>
             ) : null}
             <p className="text-gray-700">

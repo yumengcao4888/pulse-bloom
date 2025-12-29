@@ -36,7 +36,7 @@ const messages = {
     "form.healer.city.placeholder": "e.g. online / based in Chicago, IL",
     "form.healer.contact.label": "How can people reach you?",
     "form.healer.contact.placeholder":
-      "Feel free to include one or more ways, each on a new line if you'd like.",
+      "Just one way to reach you is more than enough. Whatever feels right for you.",
     "form.healer.contact.email.error": "Please enter a valid email address (name@domain).",
     "form.healer.contact.phone.error":
       "Please enter a valid phone number format. Try numbers only, and include country code or extension if needed.",

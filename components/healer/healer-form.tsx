@@ -297,11 +297,12 @@ export default function HealerForm() {
         </div>
 
         <textarea
-            className="w-full rounded-md border px-3 py-2 text-sm min-h-[80px]"
-            placeholder={t("form.healer.contact.placeholder")}
-            value={form.contact}
-            onChange={handleContactChange}
-            ref={contactRef}
+          className="w-full rounded-md border px-3 py-2 text-sm"
+          placeholder={t("form.healer.contact.placeholder")}
+          value={form.contact}
+          onChange={handleContactChange}
+          ref={contactRef}
+          rows={2}
         />
         {contactError ? (
           <p className="text-sm text-red-600">{contactError}</p>
