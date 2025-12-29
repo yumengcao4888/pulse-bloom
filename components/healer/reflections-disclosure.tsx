@@ -109,6 +109,9 @@ export default function ReflectionsDisclosure({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [printoutPage, setPrintoutPage] = useState(1);
+  const [printoutRange, setPrintoutRange] = useState<
+    "all-time" | "week" | "month" | "year"
+  >("all-time");
   const pageSize = 10;
 
   const loadReflections = useCallback(async () => {
@@ -144,6 +147,9 @@ export default function ReflectionsDisclosure({
     setActiveSection((prev) => {
       const next = prev === section ? null : section;
       if (next) ensureDataLoaded();
+      if (next === "printout") {
+        setPrintoutRange("all-time");
+      }
       return next;
     });
   };
@@ -169,6 +175,31 @@ export default function ReflectionsDisclosure({
     ];
   }, [data, t]);
 
+  const filteredPrintout = useMemo(() => {
+    if (!data) return [];
+    if (printoutRange === "all-time") return data.reflections;
+
+    const now = new Date();
+    let startDate = new Date(0);
+
+    if (printoutRange === "week") {
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - now.getDay());
+      startDate.setHours(0, 0, 0, 0);
+    } else if (printoutRange === "month") {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      startDate.setHours(0, 0, 0, 0);
+    } else if (printoutRange === "year") {
+      startDate = new Date(now.getFullYear(), 0, 1);
+      startDate.setHours(0, 0, 0, 0);
+    }
+
+    return data.reflections.filter((reflection) => {
+      const createdAt = new Date(reflection.createdAt);
+      return createdAt >= startDate;
+    });
+  }, [data, printoutRange]);
+
   useEffect(() => {
     if (activeSection !== "printout") {
       setPrintoutPage(1);
@@ -177,9 +208,15 @@ export default function ReflectionsDisclosure({
 
   useEffect(() => {
     if (!data) return;
-    const totalPages = Math.max(1, Math.ceil(data.reflections.length / pageSize));
+    const totalPages = Math.max(1, Math.ceil(filteredPrintout.length / pageSize));
     setPrintoutPage((prev) => Math.min(Math.max(1, prev), totalPages));
-  }, [data]);
+  }, [data, filteredPrintout.length]);
+
+  useEffect(() => {
+    if (activeSection === "printout") {
+      setPrintoutPage(1);
+    }
+  }, [printoutRange, activeSection]);
 
   const heatmap = useMemo(() => {
     if (!data) {
@@ -439,16 +476,105 @@ export default function ReflectionsDisclosure({
 
                 {activeSection === "printout" && (
                   <div className="space-y-4">
-                    {data.reflections.length === 0 ? (
+                    <div className="text-sm text-gray-600">
+                      <h3 className="text-base font-semibold text-gray-800">
+                        About the Sentiment and Emotion Scores
+                      </h3>
+                      <p className="mt-2">
+                        Each reflection includes a sentiment score (0-100) and a
+                        suggested emotion, estimated by trusted open-source NLP
+                        models.
+                      </p>
+                      <p className="mt-2">
+                        <b>Sentiment Score</b> reflects the emotional tone - lower
+                        scores suggest heavier or more difficult reflections, higher
+                        scores suggest lighter or more positive tones.
+                        <br />
+                        {"-> "}Powered by{" "}
+                        <a
+                          href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
+                          className="text-blue-600 underline"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          CardiffNLP's sentiment model
+                        </a>
+                      </p>
+                      <p className="mt-2">
+                        <b>Emotion Label</b> reflects the emotional nuance
+                        identified in the text.
+                        <br />
+                        {"-> "}Based on{" "}
+                        <a
+                          href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
+                          className="text-blue-600 underline"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          GoEmotions model by Sam Lowe
+                        </a>
+                      </p>
+                      <p className="mt-2">
+                        These tools are here to help you notice gentle patterns -
+                        there's no right or wrong way to feel.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPrintoutRange("all-time")}
+                        className={
+                          printoutRange === "all-time"
+                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                        }
+                      >
+                        All-time
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPrintoutRange("week")}
+                        className={
+                          printoutRange === "week"
+                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                        }
+                      >
+                        This week
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPrintoutRange("month")}
+                        className={
+                          printoutRange === "month"
+                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                        }
+                      >
+                        This month
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPrintoutRange("year")}
+                        className={
+                          printoutRange === "year"
+                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                        }
+                      >
+                        This year
+                      </button>
+                    </div>
+                    {filteredPrintout.length === 0 ? (
                       <p className="text-sm text-gray-500">{t("reflection.none")}</p>
                     ) : (
                       (() => {
                         const totalPages = Math.max(
                           1,
-                          Math.ceil(data.reflections.length / pageSize),
+                          Math.ceil(filteredPrintout.length / pageSize),
                         );
                         const startIndex = (printoutPage - 1) * pageSize;
-                        const pageItems = data.reflections.slice(
+                        const pageItems = filteredPrintout.slice(
                           startIndex,
                           startIndex + pageSize,
                         );
@@ -458,41 +584,35 @@ export default function ReflectionsDisclosure({
                             {pageItems.map((reflection) => (
                               <div
                                 key={reflection.id}
-                                className="rounded-xl border border-gray-200 p-4"
+                                className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
                               >
-                                <div className="mb-2 flex flex-wrap gap-4 text-sm text-gray-700">
-                                  <span>
-                                    <b>{t("reflection.grounded")}:</b>{" "}
-                                    {formatBool(reflection.grounded)}
-                                  </span>
-                                  <span>
-                                    <b>{t("reflection.supported")}:</b>{" "}
-                                    {formatBool(reflection.supported)}
-                                  </span>
-                                  <span>
-                                    <b>{t("reflection.connected")}:</b>{" "}
-                                    {formatBool(reflection.connected)}
-                                  </span>
-                                </div>
-                                <p className="text-base text-gray-800 mb-2">
+                                <p className="mb-1">
+                                  <b>{t("reflection.grounded")}:</b>{" "}
+                                  {formatBool(reflection.grounded)}{" "}
+                                  <b className="ml-3">{t("reflection.supported")}:</b>{" "}
+                                  {formatBool(reflection.supported)}{" "}
+                                  <b className="ml-3">{t("reflection.connected")}:</b>{" "}
+                                  {formatBool(reflection.connected)}
+                                </p>
+                                <p className="mb-2 text-base text-gray-800">
                                   <b>{t("reflection.feeling")}:</b>{" "}
                                   {reflection.feeling ?? t("common.na")}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-gray-500">
                                   {t("reflection.sentiment")}:{" "}
                                   {reflection.sentiment
-                                    ? `${reflection.sentiment.label} (Score: ${(
-                                        reflection.sentiment.score * 100
-                                      ).toFixed(0)})`
+                                    ? `${capitalize(reflection.sentiment.label)} (${Math.round(
+                                        reflection.sentiment.score * 100,
+                                      )} / 100)`
                                     : t("common.unavailable")}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-gray-500">
                                   {t("reflection.emotion")}:{" "}
                                   {reflection.emotion?.label
                                     ? capitalize(reflection.emotion.label)
                                     : t("common.unavailable")}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-gray-500">
                                   {t("reflection.created")}:{" "}
                                   {formatDate(reflection.createdAt)}
                                 </p>

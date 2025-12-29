@@ -9,6 +9,9 @@ module.exports = {
   },
   theme: {
     extend: {
+      colors: {
+        "pulse-bloom": "var(--pulse-bloom)",
+      },
       fontFamily: {
         display: ["var(--font-sf)", "system-ui", "sans-serif"],
         default: ["var(--font-inter)", "system-ui", "sans-serif"],
