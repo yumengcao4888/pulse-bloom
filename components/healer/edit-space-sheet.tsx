@@ -56,19 +56,62 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
   };
 
   const validateContact = (contactType: HealerProfile["contactType"], value: string) => {
-    if (contactType !== "email") return "";
     const trimmed = value.trim();
-    if (!trimmed) return t("form.healer.contact.email.error");
-    const isValidEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed);
-    return isValidEmail ? "" : t("form.healer.contact.email.error");
+    if (!contactType) return "";
+    if (!trimmed) return "";
+    if (contactType === "email") {
+      const isValidEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed);
+      return isValidEmail ? "" : t("form.healer.contact.email.error");
+    }
+    if (contactType === "phone") {
+      const normalized = trimmed.replace(/\s+/g, " ").trim();
+      const hasDigit = /[0-9]/.test(normalized);
+      const isValidPhone =
+        hasDigit &&
+        /^[0-9+().#\-\s]*$/.test(normalized) &&
+        !/[a-wyz]/i.test(normalized) &&
+        /^.*?(?:\b(?:ext|x|#)\s*\d+)?$/i.test(normalized);
+      return isValidPhone ? "" : t("form.healer.contact.phone.error");
+    }
+    if (contactType === "website") {
+      const hasDot = /\./.test(trimmed);
+      const hasSpaces = /\s/.test(trimmed);
+      const startsWithAlnum = /^[a-z0-9]/i.test(trimmed);
+      const isValidWebsite = hasDot && !hasSpaces && startsWithAlnum;
+      return isValidWebsite ? "" : t("form.healer.contact.website.error");
+    }
+    if (contactType === "social") {
+      const hasColon = /^[^:\s][^:]*:\s+.+$/.test(trimmed);
+      return hasColon ? "" : t("form.healer.contact.social.error");
+    }
+    return "";
   };
 
   const handleContactTypeSelect = (contactType: HealerProfile["contactType"]) => {
     const nextType = form.contactType === contactType ? null : contactType;
-    setForm((prev) => ({ ...prev, contactType: nextType }));
-    if (contactError && !validateContact(nextType, form.contact ?? "")) {
-      setContactError("");
-    }
+    const nextContact = nextType === "social"
+      ? (() => {
+          const trimmed = (form.contact ?? "").trim();
+          const hasSocialFormat = /^[^:\s][^:]*:\s+.+$/.test(trimmed);
+          const trimmedStart = (form.contact ?? "").trimStart();
+          const prefixed = trimmedStart.startsWith("Platform: ")
+            ? trimmedStart
+            : `Platform: ${trimmedStart}`;
+          return hasSocialFormat ? form.contact ?? "" : prefixed;
+        })()
+      : form.contact ?? "";
+    setForm((prev) => {
+      if (nextType !== "social") {
+        return { ...prev, contactType: nextType };
+      }
+      return {
+        ...prev,
+        contactType: nextType,
+        contact: nextContact,
+      };
+    });
+    const error = validateContact(nextType, nextContact);
+    setContactError(error);
   };
 
   const handlePronounsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,9 +124,8 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
   const handleContactChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setForm((prev) => ({ ...prev, contact: value }));
-    if (contactError && !validateContact(form.contactType, value)) {
-      setContactError("");
-    }
+    const error = validateContact(form.contactType, value);
+    setContactError(error);
   };
 
   const handleSave = async () => {
@@ -96,11 +138,6 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
     const contactValidation = validateContact(form.contactType, form.contact ?? "");
     if (contactValidation) {
       setContactError(contactValidation);
-      if (contactRef.current) {
-        contactRef.current.setCustomValidity(contactValidation);
-        contactRef.current.reportValidity();
-        contactRef.current.setCustomValidity("");
-      }
       return;
     }
 

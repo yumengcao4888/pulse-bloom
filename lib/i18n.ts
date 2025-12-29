@@ -38,6 +38,11 @@ const messages = {
     "form.healer.contact.placeholder":
       "Feel free to include one or more ways, each on a new line if you'd like.",
     "form.healer.contact.email.error": "Please enter a valid email address (name@domain).",
+    "form.healer.contact.phone.error":
+      "Please enter a valid phone number format. Try numbers only, and include country code or extension if needed.",
+    "form.healer.contact.website.error":
+      "Please enter a full website URL, such as https://your-site.com",
+    "form.healer.contact.social.error": "Please use the format platform: account — for example, Instagram: @yourname",
     "form.healer.contact.type.email": "Email",
     "form.healer.contact.type.phone": "Phone",
     "form.healer.contact.type.website": "Website",
@@ -213,6 +218,11 @@ const messages = {
     "form.healer.contact.placeholder":
       "Puedes incluir una o más vías, cada una en una línea nueva si quieres.",
     "form.healer.contact.email.error": "Introduce un correo válido (nombre@dominio).",
+    "form.healer.contact.phone.error":
+      "That doesn’t seem like a valid phone number format. Try numbers only, and include country code or extension if needed.",
+    "form.healer.contact.website.error":
+      "Please enter a full website URL, such as https://your-site.com",
+    "form.healer.contact.social.error": "Please format your social link as: platform: account",
     "form.healer.contact.type.email": "Correo",
     "form.healer.contact.type.phone": "Teléfono",
     "form.healer.contact.type.website": "Sitio web",
