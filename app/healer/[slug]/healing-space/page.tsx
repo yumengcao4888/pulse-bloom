@@ -82,21 +82,6 @@ export default async function HealingSpacePage(props: PageProps) {
                   height={88}
                   className="h-[88px] w-[88px] rounded-full object-cover"
                 />
-                <div className="flex flex-col items-center gap-2 sm:hidden">
-                  <EditProfileSheet
-                    healer={{
-                      name: healer.name,
-                      pronouns: healer.pronouns,
-                      modality: healer.modality,
-                      focus: healer.focus,
-                      city: healer.city,
-                      contact: healer.contact,
-                      contactType: healer.contactType,
-                      bio: healer.bio,
-                    }}
-                  />
-                  <InviteReflectionButton reflectionLink={reflectionLink} />
-                </div>
               </div>
               <div className="flex flex-1 items-center justify-between gap-4">
                 <div className="min-w-0">
@@ -158,6 +143,21 @@ export default async function HealingSpacePage(props: PageProps) {
                   <InviteReflectionButton reflectionLink={reflectionLink} />
                 </div>
               </div>
+            </div>
+            <div className="mt-4 flex w-full justify-center gap-2 sm:hidden">
+              <EditProfileSheet
+                healer={{
+                  name: healer.name,
+                  pronouns: healer.pronouns,
+                  modality: healer.modality,
+                  focus: healer.focus,
+                  city: healer.city,
+                  contact: healer.contact,
+                  contactType: healer.contactType,
+                  bio: healer.bio,
+                }}
+              />
+              <InviteReflectionButton reflectionLink={reflectionLink} />
             </div>
             <div className="my-4 border-t border-gray-200" />
             <div className="space-y-1 text-gray-700">
