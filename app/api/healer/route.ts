@@ -33,10 +33,11 @@ function generateSlugFromName(name: string) {
 
 function getBotProtectionError(body: BotCheckPayload) {
   const vercelEnv = process.env.VERCEL_ENV;
+  const isLocalDev = !vercelEnv && process.env.NODE_ENV === "development";
   const bypassBotProtection =
     vercelEnv === "development" ||
     vercelEnv === "preview" ||
-    process.env.NODE_ENV === "development";
+    isLocalDev;
   const minSubmitMs = 2000;
 
   if (bypassBotProtection) {

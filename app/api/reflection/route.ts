@@ -6,10 +6,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { slug, grounded, supported, connected, feeling, honeypot, startedAt } = body;
     const vercelEnv = process.env.VERCEL_ENV;
+    const isLocalDev = !vercelEnv && process.env.NODE_ENV === "development";
     const bypassBotProtection =
       vercelEnv === "development" ||
       vercelEnv === "preview" ||
-      process.env.NODE_ENV === "development";
+      isLocalDev;
     const minSubmitMs = 2000;
 
     if (!slug || typeof slug !== "string") {
