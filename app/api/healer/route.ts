@@ -13,6 +13,11 @@ const nouns = [
   "garden", "field", "harbor", "meadow", "pulse", "leaf",
 ];
 
+type BotCheckPayload = {
+  honeypot?: string;
+  startedAt?: number | string;
+};
+
 function generateSlugFromName(name: string) {
 
   const cleaned = name.toLowerCase().replace(/[^a-z]/g, "");
@@ -26,6 +31,36 @@ function generateSlugFromName(name: string) {
   return `${prefix}-${adj}-${noun}-${num}`;
 }
 
+function getBotProtectionError(body: BotCheckPayload) {
+  const vercelEnv = process.env.VERCEL_ENV;
+  const bypassBotProtection =
+    vercelEnv === "development" ||
+    vercelEnv === "preview" ||
+    process.env.NODE_ENV === "development";
+  const minSubmitMs = 2000;
+
+  if (bypassBotProtection) {
+    return null;
+  }
+
+  if (typeof body.honeypot === "string" && body.honeypot.trim() !== "") {
+    return { status: 400, error: "Bot detected" };
+  }
+
+  const startedAtMs =
+    typeof body.startedAt === "number" ? body.startedAt : Number(body.startedAt);
+  if (!Number.isFinite(startedAtMs) || startedAtMs <= 0) {
+    return { status: 400, error: "Invalid submission time" };
+  }
+
+  const elapsedMs = Date.now() - startedAtMs;
+  if (elapsedMs < minSubmitMs) {
+    return { status: 429, error: "Submission too fast" };
+  }
+
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -35,6 +70,11 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     console.log("Received healer data:", body);
+
+    const botError = getBotProtectionError(body);
+    if (botError) {
+      return NextResponse.json({ error: botError.error }, { status: botError.status });
+    }
 
     const { name, pronouns, modality, focus, location, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
@@ -134,6 +174,11 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
+    const botError = getBotProtectionError(body);
+    if (botError) {
+      return NextResponse.json({ error: botError.error }, { status: botError.status });
+    }
+
     const { name, pronouns, modality, focus, location, contact, contactType, bio } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
     const allowedContactTypes = ["email", "phone", "website", "social"] as const;

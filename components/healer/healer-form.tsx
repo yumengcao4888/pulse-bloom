@@ -31,6 +31,8 @@ export default function HealerForm() {
   const [form, setForm] = useState<HealerForm>(initialForm);
   const [pronounError, setPronounError] = useState("");
   const [contactError, setContactError] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [startedAt] = useState(() => Date.now());
   const pronounsRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLTextAreaElement>(null);
   const { t } = useLocale();
@@ -143,6 +145,8 @@ export default function HealerForm() {
       ...form,
       contactType: normalizedContact.trim() ? form.contactType || null : null,
       contact: normalizedContact.trim() || null,
+      honeypot,
+      startedAt,
     };
 
     try {
@@ -195,6 +199,21 @@ export default function HealerForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <input type="hidden" name="startedAt" value={startedAt} />
+      <div className="absolute left-[-10000px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label htmlFor="company">
+          Company
+        </label>
+        <input
+          id="company"
+          name="company"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
       <div className="space-y-1">
         <label className="block text-sm font-medium">{t("form.healer.name.label")}</label>
         <input

@@ -30,6 +30,8 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
   const [form, setForm] = useState<HealerProfile>(healer);
   const [pronounError, setPronounError] = useState("");
   const [contactError, setContactError] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [startedAt, setStartedAt] = useState(() => Date.now());
   const pronounsRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLTextAreaElement>(null);
   const { isMobile } = useMediaQuery();
@@ -41,6 +43,8 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
       setForm(healer);
       setPronounError("");
       setContactError("");
+      setHoneypot("");
+      setStartedAt(Date.now());
     }
   }, [open, healer]);
 
@@ -151,6 +155,8 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
       ...form,
       contactType: normalizedContact.trim() ? form.contactType ?? null : null,
       contact: normalizedContact.trim() || null,
+      honeypot,
+      startedAt,
     };
 
     try {
@@ -193,6 +199,21 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
         <p className="text-sm text-gray-500">These details help others recognize and feel your space.</p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-1 min-h-0 flex-col">
+        <input type="hidden" name="startedAt" value={startedAt} />
+        <div className="absolute left-[-10000px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
+          <label htmlFor="company">
+            Company
+          </label>
+          <input
+            id="company"
+            name="company"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+        </div>
         <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
           <div className="rounded-2xl border bg-white/70 p-4 shadow-sm space-y-3">
             <div className="space-y-1">
