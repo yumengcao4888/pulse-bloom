@@ -31,7 +31,7 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
   const [pronounError, setPronounError] = useState("");
   const [contactError, setContactError] = useState("");
   const [honeypot, setHoneypot] = useState("");
-  const [startedAt, setStartedAt] = useState(() => Date.now());
+  const startedAtRef = useRef(Date.now());
   const pronounsRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLTextAreaElement>(null);
   const { isMobile } = useMediaQuery();
@@ -43,10 +43,15 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
       setForm(healer);
       setPronounError("");
       setContactError("");
-      setHoneypot("");
-      setStartedAt(Date.now());
     }
   }, [open, healer]);
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) {
+      startedAtRef.current = Date.now();
+      setHoneypot("");
+    }
+    setOpen(nextOpen);
+  };
 
   const handleChange =
     (field: keyof HealerProfile) =>
@@ -156,7 +161,7 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
       contactType: normalizedContact.trim() ? form.contactType ?? null : null,
       contact: normalizedContact.trim() || null,
       honeypot,
-      startedAt,
+      startedAt: startedAtRef.current,
     };
 
     try {
@@ -199,7 +204,7 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
         <p className="text-sm text-gray-500">These details help others recognize and feel your space.</p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-1 min-h-0 flex-col">
-        <input type="hidden" name="startedAt" value={startedAt} />
+        <input type="hidden" name="startedAt" value={startedAtRef.current} />
         <div className="absolute left-[-10000px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
           <label htmlFor="company">
             Company
@@ -375,12 +380,12 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
       <>
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => handleOpenChange(true)}
           className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
         >
           Edit your space
         </button>
-        <Drawer.Root open={open} onOpenChange={setOpen}>
+        <Drawer.Root open={open} onOpenChange={handleOpenChange}>
           <Drawer.Overlay className="fixed inset-0 z-40 bg-gray-100 bg-opacity-10 backdrop-blur" />
           <Drawer.Portal>
         <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 mt-24 flex h-[85vh] flex-col rounded-t-[16px] border-t border-gray-200 bg-white overflow-hidden">
@@ -400,12 +405,12 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => handleOpenChange(true)}
         className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
       >
         Edit your space
       </button>
-      <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Root open={open} onOpenChange={handleOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-40 bg-gray-100 bg-opacity-40 backdrop-blur-sm" />
           <Dialog.Content className="fixed inset-y-0 right-0 z-50 w-full max-w-md border-l border-gray-200 bg-white shadow-xl">
