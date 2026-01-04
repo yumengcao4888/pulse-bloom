@@ -119,6 +119,10 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
         contact: nextContact,
       };
     });
+    if (!nextType && nextContact.trim()) {
+      setContactError("Just one more step. What type of contact is this?");
+      return;
+    }
     const error = validateContact(nextType, nextContact);
     setContactError(error);
   };
@@ -133,6 +137,10 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
   const handleContactChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setForm((prev) => ({ ...prev, contact: value }));
+    if (!form.contactType && value.trim()) {
+      setContactError("Just one more step. What type of contact is this?");
+      return;
+    }
     const error = validateContact(form.contactType, value);
     setContactError(error);
   };
@@ -140,8 +148,8 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
   const handleSave = async () => {
     const normalizedContact = form.contactType ? form.contact ?? "" : "";
     if (!form.contactType && form.contact) {
-      setForm((prev) => ({ ...prev, contact: "" }));
-      setContactError("");
+      setContactError("Just one more step. What type of contact is this?");
+      return;
     }
     const pronounsValidation = validatePronouns(form.pronouns ?? "");
     if (pronounsValidation) {
