@@ -20,6 +20,8 @@ export default function ReflectionForm({ slug }: Props) {
   const [supported, setSupported] = useState<TriState>(null);
   const [connected, setConnected] = useState<TriState>(null);
   const [feeling, setFeeling] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [startedAt] = useState(() => Date.now());
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -46,6 +48,8 @@ export default function ReflectionForm({ slug }: Props) {
           supported,
           connected,
           feeling,
+          honeypot,
+          startedAt,
         }),
       });
 
@@ -72,6 +76,21 @@ export default function ReflectionForm({ slug }: Props) {
       className="space-y-4 text-sm sm:text-base"
     >
       <input type="hidden" name="slug" value={slug} />
+      <input type="hidden" name="startedAt" value={startedAt} />
+      <div className="absolute left-[-10000px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label htmlFor="company">
+          Company
+        </label>
+        <input
+          id="company"
+          name="company"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
 
       <div className="space-y-2">
         <TriStateButton

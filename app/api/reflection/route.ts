@@ -4,10 +4,32 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { slug, grounded, supported, connected, feeling } = body;
+    const { slug, grounded, supported, connected, feeling, honeypot, startedAt } = body;
+    const vercelEnv = process.env.VERCEL_ENV;
+    const bypassBotProtection =
+      vercelEnv === "development" ||
+      vercelEnv === "preview" ||
+      process.env.NODE_ENV === "development";
+    const minSubmitMs = 2000;
 
     if (!slug || typeof slug !== "string") {
       return NextResponse.json({ error: "Missing slug" }, { status: 400 });
+    }
+
+    if (!bypassBotProtection) {
+      if (typeof honeypot === "string" && honeypot.trim() !== "") {
+        return NextResponse.json({ error: "Bot detected" }, { status: 400 });
+      }
+
+      const startedAtMs = typeof startedAt === "number" ? startedAt : Number(startedAt);
+      if (!Number.isFinite(startedAtMs) || startedAtMs <= 0) {
+        return NextResponse.json({ error: "Invalid submission time" }, { status: 400 });
+      }
+
+      const elapsedMs = Date.now() - startedAtMs;
+      if (elapsedMs < minSubmitMs) {
+        return NextResponse.json({ error: "Submission too fast" }, { status: 429 });
+      }
     }
 
     const healer = await prisma.healer.findUnique({
