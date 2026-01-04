@@ -5,8 +5,9 @@ import HealerProfileImage from "@/components/healer/healer-profile-image";
 import ShareLinkButton from "@/components/healer/share-link-button";
 import EditProfileSheet from "@/components/healer/edit-space-sheet";
 import ReflectionsDisclosure from "@/components/healer/reflections-disclosure";
-import { clerkClient } from "@clerk/nextjs/server";
+import { clerkClient, auth } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -17,6 +18,10 @@ type PageProps = {
 
 export default async function HealingSpacePage(props: PageProps) {
   const { slug } = await props.params;
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/");
+  }
   const locale = await getLocale();
   const t = getTranslations(locale);
   const contactTypeLabels = {
@@ -52,6 +57,10 @@ export default async function HealingSpacePage(props: PageProps) {
 
   if (!healer) {
     return <div className="relative z-10 p-6 text-red-500">{t("healer.notFound")}</div>;
+  }
+
+  if (healer.clerkId !== userId) {
+    redirect("/");
   }
 
   let profileImageUrl = "/default-healer.jpg";
