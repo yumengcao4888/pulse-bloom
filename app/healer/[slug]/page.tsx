@@ -306,39 +306,41 @@ export default async function HealerPage(props: PageProps) {
               <b>{t("healer.profile.about")}</b> {healer.bio}
             </p>
           </div>
-          <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
-            <h2 className="text-2xl font-semibold">{t("healer.monthly.title")}</h2>
-            <div className="border-t border-gray-200" />
-            <div className="text-gray-700">
-              <p><b>🌱 {t("healer.monthly.grounded")}</b></p>
-              <p><b>{formatPercent(scores.monthly.grounded)}</b> {t("healer.monthly.grounded.value")}</p>
-              <div className="my-2 border-t border-dashed border-gray-200" />
-              <p><b>💛 {t("healer.monthly.supported")}</b></p>
-              <p><b>{formatPercent(scores.monthly.supported)}</b> {t("healer.monthly.supported.value")}</p>
-              <div className="my-2 border-t border-dashed border-gray-200" />
-              <p><b>🤝 {t("healer.monthly.connected")}</b></p>
-              <p><b>{formatPercent(scores.monthly.connected)}</b> {t("healer.monthly.connected.value")}</p>
-              <div className="my-2 border-t border-dashed border-gray-200" />
-              <p><b>🌤️ {t("healer.monthly.mood")}</b></p>
-              <p>{t("healer.monthly.mood.value")} <b>{monthlySentimentDisplay}</b>.</p>
-              <div className="my-2 border-t border-dashed border-gray-200" />
-              <p><b>🗣️ {t("healer.monthly.topWords")}</b></p>
-              <p>
-                {t("healer.monthly.topWords.value")}{" "}
-                {topWords.length > 0
-                  ? topWords.map((word, index) => (
-                      <span key={`${word}-${index}`}>
-                        <b>
-                          <i>{word}</i>
-                        </b>
-                        {index < topWords.length - 1 ? ", " : ""}
-                      </span>
-                    ))
-                  : <b>{t("common.none")}</b>}
-                .
-              </p>
+          {reflectionsWithAnalysis.length > 0 ? (
+            <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
+              <h2 className="text-2xl font-semibold">{t("healer.monthly.title")}</h2>
+              <div className="border-t border-gray-200" />
+              <div className="text-gray-700">
+                <p><b>🌱 {t("healer.monthly.grounded")}</b></p>
+                <p><b>{formatPercent(scores.monthly.grounded)}</b> {t("healer.monthly.grounded.value")}</p>
+                <div className="my-2 border-t border-dashed border-gray-200" />
+                <p><b>💛 {t("healer.monthly.supported")}</b></p>
+                <p><b>{formatPercent(scores.monthly.supported)}</b> {t("healer.monthly.supported.value")}</p>
+                <div className="my-2 border-t border-dashed border-gray-200" />
+                <p><b>🤝 {t("healer.monthly.connected")}</b></p>
+                <p><b>{formatPercent(scores.monthly.connected)}</b> {t("healer.monthly.connected.value")}</p>
+                <div className="my-2 border-t border-dashed border-gray-200" />
+                <p><b>🌤️ {t("healer.monthly.mood")}</b></p>
+                <p>{t("healer.monthly.mood.value")} <b>{monthlySentimentDisplay}</b>.</p>
+                <div className="my-2 border-t border-dashed border-gray-200" />
+                <p><b>🗣️ {t("healer.monthly.topWords")}</b></p>
+                <p>
+                  {t("healer.monthly.topWords.value")}{" "}
+                  {topWords.length > 0
+                    ? topWords.map((word, index) => (
+                        <span key={`${word}-${index}`}>
+                          <b>
+                            <i>{word}</i>
+                          </b>
+                          {index < topWords.length - 1 ? ", " : ""}
+                        </span>
+                      ))
+                    : <b>{t("common.none")}</b>}
+                  .
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </>
