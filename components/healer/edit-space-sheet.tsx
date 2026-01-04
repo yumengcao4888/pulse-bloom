@@ -295,13 +295,13 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-medium">
-                {t("form.healer.city.label")}{" "}
-                <span className="text-gray-500 text-sm">{t("form.optional")}</span>
+                Where do you usually offer care?{" "}
+                <span className="text-gray-500 text-sm">(optional)</span>
               </label>
               <input
                 type="text"
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder={t("form.healer.city.placeholder")}
+                placeholder="e.g. Online / Chicago, IL / Hybrid"
                 value={form.location ?? ""}
                 onChange={handleChange("location")}
               />
