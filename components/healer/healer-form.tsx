@@ -186,7 +186,6 @@ export default function HealerForm() {
       const data = await res.json();
       console.log("Saved healer:", data);
 
-      alert(t("form.healer.save.success"));
       setForm(initialForm);
       if (data?.healer?.slug) {
         router.push(`/healer/${data.healer.slug}/healing-space`);
