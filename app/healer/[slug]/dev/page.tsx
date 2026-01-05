@@ -88,7 +88,7 @@ export default async function HealerDevPage(props: PageProps) {
     return <div className="relative z-10 p-6 text-red-500">{t("healer.notFound")}</div>;
   }
 
-  const reflectionLink = `http://localhost:3000/reflection/${slug}`;
+  const reflectionLink = `http://localhost:3000/healer/${slug}/reflect`;
   const hfEnabled = Boolean(process.env.HF_TOKEN);
 
   const reflectionsWithAnalysis = await Promise.all(

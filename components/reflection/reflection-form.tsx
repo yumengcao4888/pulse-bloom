@@ -60,7 +60,7 @@ export default function ReflectionForm({ slug }: Props) {
       }
 
       setSubmitting(false);
-      router.push(`/reflection/${slug}?submitted=1`);
+      router.push(`/healer/${slug}/reflect?submitted=1`);
     } catch (err) {
       console.error(err);
       setError(t("reflection.error"));

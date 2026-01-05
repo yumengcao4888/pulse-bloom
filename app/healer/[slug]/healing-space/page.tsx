@@ -80,7 +80,7 @@ export default async function HealingSpacePage(props: PageProps) {
   const host = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "";
   const protocol = headerList.get("x-forwarded-proto") ?? "https";
   const baseUrl = host ? `${protocol}://${host}` : "https://pulse-bloom.vercel.app";
-  const reflectionLink = `${baseUrl}/reflection/${slug}`;
+  const reflectionLink = `${baseUrl}/healer/${slug}/reflect`;
   const sharableLink = `${baseUrl}/healer/${slug}`;
   const reflectionsCount = healer._count?.reflections ?? 0;
   const monthlyThreshold = new Date();
