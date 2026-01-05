@@ -495,9 +495,9 @@ export default function ReflectionsDisclosure({
                     <p>
                       <b>Through the lens of language:</b>
                     </p>
-                    <div>
+                    <div className="text-left">
                       <Tooltip content="Based on GoEmotions model by Sam Lowe">
-                        <span>
+                        <span className="text-left">
                           {"\u2013\u00a0"}
                           <b>
                             {formatEmotionLabel(primaryEmotion.label, true)}
@@ -521,9 +521,9 @@ export default function ReflectionsDisclosure({
                         </span>
                       </Tooltip>
                     </div>
-                    <div>
+                    <div className="text-left">
                       <Tooltip content="Powered by CardiffNLP's sentiment model">
-                        <span>
+                        <span className="text-left">
                           {"\u2013\u00a0"}The emotional warmth was measured at
                           {"\u00a0"}
                           <b>{formattedSentimentScore}</b>.
