@@ -499,8 +499,8 @@ export default function ReflectionsDisclosure({
                 className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
               >
                 {activeSection === "trends"
-                  ? "Hide all-time weekly trends"
-                  : "All-time weekly trends"}
+                  ? "Hide over time weekly trends"
+                  : "Over time weekly trends"}
               </button>
               <button
                 type="button"
@@ -597,7 +597,7 @@ export default function ReflectionsDisclosure({
                             : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
                         }
                       >
-                        All-time
+                        Over time
                       </button>
                       <button
                         type="button"

@@ -110,7 +110,7 @@ const messages = {
     "healer.monthly.topWords": "Top words",
     "healer.monthly.topWords.value": "The voices in this space often whispered:",
     "healer.monthly.toggle.month": "This month",
-    "healer.monthly.toggle.allTime": "All time",
+    "healer.monthly.toggle.allTime": "Over time",
     "healer.reflections.title": "Reflections",
     "healer.reflections.subtitle": "Soft echoes from your space.",
     "healer.reflections.view": "View reflections",

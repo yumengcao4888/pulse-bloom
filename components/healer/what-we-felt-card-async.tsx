@@ -24,7 +24,7 @@ export default function WhatWeFeltCardAsync({
   monthly,
   allTime,
   monthlyLabel,
-  allTimeLabel,
+  overTimeLabel,
   showToggle,
   defaultView = "monthly",
 }: Props) {
@@ -74,7 +74,7 @@ export default function WhatWeFeltCardAsync({
       monthly={monthlyData}
       allTime={allTimeData}
       monthlyLabel={monthlyLabel}
-      allTimeLabel={allTimeLabel}
+      overTimeLabel={overTimeLabel}
       showToggle={showToggle}
       defaultView={defaultView}
     />

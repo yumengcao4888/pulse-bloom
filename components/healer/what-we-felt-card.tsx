@@ -26,7 +26,7 @@ export type WhatWeFeltCardProps = {
   monthly: FeltCardData;
   allTime: FeltCardData;
   monthlyLabel: string;
-  allTimeLabel: string;
+  overTimeLabel: string;
   showToggle: boolean;
   defaultView?: "monthly" | "allTime";
 };
@@ -35,7 +35,7 @@ export default function WhatWeFeltCard({
   monthly,
   allTime,
   monthlyLabel,
-  allTimeLabel,
+  overTimeLabel,
   showToggle,
   defaultView = "monthly",
 }: WhatWeFeltCardProps) {
@@ -82,7 +82,7 @@ export default function WhatWeFeltCard({
               onClick={() => setView("allTime")}
               aria-pressed={view === "allTime"}
             >
-              {allTimeLabel}
+              {overTimeLabel}
             </button>
           </div>
         ) : null}

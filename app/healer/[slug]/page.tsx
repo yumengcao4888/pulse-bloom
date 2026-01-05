@@ -204,7 +204,7 @@ export default async function HealerPage(props: PageProps) {
               monthly={monthlyCardData}
               allTime={allTimeCardData}
               monthlyLabel={t("healer.monthly.toggle.month")}
-              allTimeLabel={t("healer.monthly.toggle.allTime")}
+              overTimeLabel={t("healer.monthly.toggle.allTime")}
               showToggle={showMonthlyToggle}
               defaultView={monthlyCount === 0 ? "allTime" : "monthly"}
             />
