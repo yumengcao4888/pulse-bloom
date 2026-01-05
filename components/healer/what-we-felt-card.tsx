@@ -41,11 +41,27 @@ export default function WhatWeFeltCard({
 }: WhatWeFeltCardProps) {
   const [view, setView] = useState<"monthly" | "allTime">(defaultView);
   const data = view === "monthly" ? monthly : allTime;
+  const renderTitle = (title: string) => {
+    const splitIndex = title.indexOf(",");
+    if (splitIndex === -1) {
+      return title;
+    }
+    const first = title.slice(0, splitIndex + 1);
+    const rest = title.slice(splitIndex + 1).trimStart();
+    return (
+      <>
+        <span className="block md:inline">{first}</span>
+        <span className="block md:inline md:before:content-[' ']">{rest}</span>
+      </>
+    );
+  };
 
   return (
     <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold whitespace-nowrap">{data.title}</h2>
+        <h2 className="text-2xl font-semibold whitespace-nowrap">
+          {renderTitle(data.title)}
+        </h2>
         {showToggle ? (
           <div className="flex flex-col overflow-hidden rounded-full border border-gray-200 bg-white/70 text-xs font-semibold uppercase tracking-wide sm:flex-row">
             <button
