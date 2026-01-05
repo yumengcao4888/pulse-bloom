@@ -449,7 +449,7 @@ export default function ReflectionCard({
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                CardiffNLP's sentiment model
+                                CardiffNLP&apos;s sentiment model
                               </a>
                               .
                             </p>
@@ -565,7 +565,7 @@ export default function ReflectionCard({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          CardiffNLP's sentiment model
+                          CardiffNLP&apos;s sentiment model
                         </a>
                       </p>
                       <p className="mt-2">
@@ -584,7 +584,7 @@ export default function ReflectionCard({
                       </p>
                       <p className="mt-2">
                         These tools are here to help you notice gentle patterns -
-                        there's no right or wrong way to feel.
+                        there&apos;s no right or wrong way to feel.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">

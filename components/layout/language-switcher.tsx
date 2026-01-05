@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LOCALE_COOKIE, locales, type Locale } from "@/lib/i18n";
 import { useLocale } from "@/components/shared/locale-provider";
@@ -7,11 +8,13 @@ import { useLocale } from "@/components/shared/locale-provider";
 export default function LanguageSwitcher() {
   const router = useRouter();
   const { locale, t } = useLocale();
+  const [pendingLocale, setPendingLocale] = useState<Locale | null>(null);
 
-  const setLocale = (nextLocale: Locale) => {
-    document.cookie = `${LOCALE_COOKIE}=${nextLocale}; path=/; max-age=31536000`;
+  useEffect(() => {
+    if (!pendingLocale) return;
+    document.cookie = `${LOCALE_COOKIE}=${pendingLocale}; path=/; max-age=31536000`;
     router.refresh();
-  };
+  }, [pendingLocale, router]);
 
   return (
     <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
@@ -23,7 +26,11 @@ export default function LanguageSwitcher() {
           <button
             key={item}
             type="button"
-            onClick={() => setLocale(item)}
+            onClick={() => {
+              if (item !== locale) {
+                setPendingLocale(item);
+              }
+            }}
             className={`px-2.5 py-1 transition ${
               item === locale
                 ? "bg-black text-white"

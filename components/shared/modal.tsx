@@ -9,21 +9,21 @@ import useMediaQuery from "@/lib/hooks/use-media-query";
 export default function Modal({
   children,
   className,
-  showModal,
-  setShowModal,
+  open,
+  setOpen,
   title = "Modal",
 }: {
   children: React.ReactNode;
   className?: string;
-  showModal: boolean;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
   title?: string;
 }) {
   const { isMobile } = useMediaQuery();
 
   if (isMobile) {
     return (
-      <Drawer.Root open={showModal} onOpenChange={setShowModal}>
+      <Drawer.Root open={open} onOpenChange={setOpen}>
         <Drawer.Overlay className="fixed inset-0 z-40 bg-gray-100 bg-opacity-10 backdrop-blur" />
         <Drawer.Portal>
           <Drawer.Content
@@ -44,7 +44,7 @@ export default function Modal({
     );
   }
   return (
-    <Dialog.Root open={showModal} onOpenChange={setShowModal}>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
         <Dialog.Overlay
           // for detecting when there's an active opened modal

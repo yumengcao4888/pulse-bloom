@@ -2,7 +2,7 @@ import Card from "@/components/home/card";
 import { DEPLOY_URL } from "@/lib/constants";
 import { Github, Twitter } from "@/components/shared/icons";
 import WebVitals from "@/components/home/web-vitals";
-import ComponentGrid from "@/components/home/component-grid";
+import DemoGrid from "@/components/home/demo-grid";
 import Image from "next/image";
 import { nFormatter } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
@@ -102,7 +102,7 @@ export default async function Home() {
             description={t(description as MessageKey)}
             demo={
               title === "template.feature.components.title" ? (
-                <ComponentGrid />
+                <DemoGrid />
               ) : (
                 demo
               )

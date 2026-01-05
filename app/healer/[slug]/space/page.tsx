@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
-import HealerProfileImage from "@/components/healer/healer-profile-image";
+import ProfileImage from "@/components/healer/profile-image";
 import ShareLinkButton from "@/components/healer/share-link-button";
 import EditProfileSheet from "@/components/healer/edit-space-sheet";
 import ReflectionCard from "@/components/healer/reflection-card";
@@ -135,7 +135,7 @@ export default async function HealingSpacePage(props: PageProps) {
           <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
             <div className="flex items-center gap-4 sm:items-start">
               <div className="flex flex-col items-center gap-3 sm:items-start">
-                <HealerProfileImage
+                <ProfileImage
                   src={profileImageUrl}
                   alt={t("healer.profile.photoAlt")}
                   width={88}

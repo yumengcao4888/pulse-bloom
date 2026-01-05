@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import WhatWeFeltCard, {
-  type FeltCardData,
-  type WhatWeFeltCardProps,
-} from "@/components/healer/what-we-felt-card";
+import FeltCard, { type FeltCardData, type FeltCardProps } from "@/components/healer/felt-card";
 
 type AnalysisResponse = {
   monthlySentiment: number | null;
@@ -12,14 +9,14 @@ type AnalysisResponse = {
   topWords: string[];
 };
 
-type Props = WhatWeFeltCardProps & {
+type Props = FeltCardProps & {
   slug: string;
 };
 
 const formatSentiment = (value: number | null, fallback: string) =>
   value == null ? fallback : `${value} / 100`;
 
-export default function WhatWeFeltCardAsync({
+export default function FeltCardAsync({
   slug,
   monthly,
   allTime,
@@ -70,7 +67,7 @@ export default function WhatWeFeltCardAsync({
   }, [slug]);
 
   return (
-    <WhatWeFeltCard
+    <FeltCard
       monthly={monthlyData}
       allTime={allTimeData}
       monthlyLabel={monthlyLabel}

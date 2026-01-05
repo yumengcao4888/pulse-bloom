@@ -5,30 +5,30 @@ import { useRouter } from "next/navigation";
 import { SignUpButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 
 type Props = {
-  initialHealerSlug?: string | null;
+  initialSlug?: string | null;
   initialChecked?: boolean;
 };
 
-export default function HealingSpaceCta({
-  initialHealerSlug = null,
+export default function SpaceCta({
+  initialSlug = null,
   initialChecked = false,
 }: Props) {
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [healerSlug, setHealerSlug] = useState<string | null>(initialHealerSlug);
-  const [checkedHealer, setCheckedHealer] = useState(initialChecked);
+  const [loading, setLoading] = useState(false);
+  const [slug, setSlug] = useState<string | null>(initialSlug);
+  const [hasChecked, setHasChecked] = useState(initialChecked);
 
   useEffect(() => {
     let isActive = true;
 
     const checkHealer = async () => {
-      if (checkedHealer) {
+      if (hasChecked) {
         return;
       }
       if (!isLoaded || !isSignedIn) {
         if (isActive) {
-          setCheckedHealer(true);
+          setHasChecked(true);
         }
         return;
       }
@@ -39,13 +39,13 @@ export default function HealingSpaceCta({
         }
         const data = await res.json();
         if (isActive) {
-          setHealerSlug(data?.healer?.slug ?? null);
+          setSlug(data?.healer?.slug ?? null);
         }
       } catch (err) {
         console.error("Failed to check healer status:", err);
       } finally {
         if (isActive) {
-          setCheckedHealer(true);
+          setHasChecked(true);
         }
       }
     };
@@ -55,37 +55,37 @@ export default function HealingSpaceCta({
     return () => {
       isActive = false;
     };
-  }, [checkedHealer, isLoaded, isSignedIn]);
+  }, [hasChecked, isLoaded, isSignedIn]);
 
   const handleClick = async () => {
-    setIsLoading(true);
+    setLoading(true);
     try {
       if (!isLoaded || !isSignedIn) {
         return;
       }
-      if (healerSlug) {
-        router.push(`/healer/${healerSlug}/space`);
+      if (slug) {
+        router.push(`/healer/${slug}/space`);
         return;
       }
       const res = await fetch("/api/healer", { method: "GET" });
       if (res.ok) {
         const data = await res.json();
-        const slug = data?.healer?.slug;
-        if (slug) {
-          setHealerSlug(slug);
+        const nextSlug = data?.healer?.slug;
+        if (nextSlug) {
+          setSlug(nextSlug);
         }
-        router.push(slug ? `/healer/${slug}/space` : "/healer");
+        router.push(nextSlug ? `/healer/${nextSlug}/space` : "/healer");
         return;
       }
     } catch (err) {
       console.error("Failed to resolve healer route:", err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
 
   };
 
-  const showReturnCopy = Boolean(healerSlug) && checkedHealer;
+  const showReturn = Boolean(slug) && hasChecked;
 
   return (
     <section className="flex flex-col gap-4 rounded-2xl border bg-white/80 p-6 shadow-sm md:flex-row md:items-center md:justify-between">
@@ -102,10 +102,10 @@ export default function HealingSpaceCta({
             </SignedOut>
             <SignedIn>
               <h2 className="text-base font-semibold text-gray-900">
-                {showReturnCopy ? "Return to your healing space" : "Begin with a gentle pulse"}
+                {showReturn ? "Return to your healing space" : "Begin with a gentle pulse"}
               </h2>
               <p className="text-sm text-gray-600">
-                {showReturnCopy
+                {showReturn
                   ? "Gently hold space for your next reflection."
                   : "Create a space and invite your first reflection."}
               </p>
@@ -137,12 +137,12 @@ export default function HealingSpaceCta({
                 type="button"
                 className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white md:w-auto"
                 onClick={handleClick}
-                disabled={isLoading}
-                aria-busy={isLoading}
+                disabled={loading}
+                aria-busy={loading}
               >
-                {isLoading
+                {loading
                   ? "Loading..."
-                  : showReturnCopy
+                  : showReturn
                   ? "Enter your healing space"
                   : "Create a healing space"}
               </button>

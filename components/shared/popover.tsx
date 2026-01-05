@@ -9,21 +9,20 @@ export default function Popover({
   children,
   content,
   align = "center",
-  openPopover,
-  setOpenPopover,
+  open,
+  setOpen,
 }: {
   children: ReactNode;
   content: ReactNode | string;
   align?: "center" | "start" | "end";
-  openPopover: boolean;
-  setOpenPopover: Dispatch<SetStateAction<boolean>>;
-  mobileOnly?: boolean;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const { isMobile } = useMediaQuery();
 
   if (isMobile) {
     return (
-      <Drawer.Root open={openPopover} onOpenChange={setOpenPopover}>
+      <Drawer.Root open={open} onOpenChange={setOpen}>
         <div className="sm:hidden">{children}</div>
         <Drawer.Overlay className="fixed inset-0 z-40 bg-gray-100 bg-opacity-10 backdrop-blur" />
         <Drawer.Portal>
@@ -42,7 +41,7 @@ export default function Popover({
   }
 
   return (
-    <PopoverPrimitive.Root open={openPopover} onOpenChange={setOpenPopover}>
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger className="hidden sm:inline-flex" asChild>
         {children}
       </PopoverPrimitive.Trigger>

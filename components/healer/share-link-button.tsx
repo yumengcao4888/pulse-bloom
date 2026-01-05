@@ -19,9 +19,9 @@ export default function ShareLinkButton({
   description,
   buttonClassName,
 }: ShareLinkButtonProps) {
-  const [showModal, setShowModal] = useState(false);
+  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [isQrExpanded, setIsQrExpanded] = useState(false);
+  const [qrExpanded, setQrExpanded] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCopyLink = async () => {
@@ -51,7 +51,7 @@ export default function ShareLinkButton({
     <>
       <button
         type="button"
-        onClick={() => setShowModal(true)}
+        onClick={() => setOpen(true)}
         className={
           buttonClassName ??
           "inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
@@ -59,7 +59,7 @@ export default function ShareLinkButton({
       >
         {buttonLabel}
       </button>
-      <Modal showModal={showModal} setShowModal={setShowModal} className="p-6">
+      <Modal open={open} setOpen={setOpen} className="p-6">
         <div className="space-y-4">
           <div className="space-y-3 text-center">
             <h2 className="text-xl font-semibold">{title}</h2>
@@ -88,20 +88,20 @@ export default function ShareLinkButton({
           <div className="flex justify-center">
             <button
               type="button"
-              onClick={() => setIsQrExpanded((prev) => !prev)}
+              onClick={() => setQrExpanded((prev) => !prev)}
               className={`rounded-lg p-1 transition hover:bg-gray-100 ${
-                isQrExpanded ? "cursor-zoom-out" : "cursor-zoom-in"
+                qrExpanded ? "cursor-zoom-out" : "cursor-zoom-in"
               }`}
-              aria-label={isQrExpanded ? "Shrink QR code" : "Expand QR code"}
-              aria-pressed={isQrExpanded}
+              aria-label={qrExpanded ? "Shrink QR code" : "Expand QR code"}
+              aria-pressed={qrExpanded}
             >
-              <QRCodeCanvas value={link} size={isQrExpanded ? 240 : 140} />
+              <QRCodeCanvas value={link} size={qrExpanded ? 240 : 140} />
             </button>
           </div>
           <div className="border-t border-gray-200" />
           <button
             type="button"
-            onClick={() => setShowModal(false)}
+            onClick={() => setOpen(false)}
             className="mx-auto block rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
           >
             Done

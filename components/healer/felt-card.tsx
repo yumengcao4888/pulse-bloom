@@ -22,7 +22,7 @@ export type FeltCardData = {
   noneLabel: string;
 };
 
-export type WhatWeFeltCardProps = {
+export type FeltCardProps = {
   monthly: FeltCardData;
   allTime: FeltCardData;
   monthlyLabel: string;
@@ -31,23 +31,23 @@ export type WhatWeFeltCardProps = {
   defaultView?: "monthly" | "allTime";
 };
 
-export default function WhatWeFeltCard({
+export default function FeltCard({
   monthly,
   allTime,
   monthlyLabel,
   overTimeLabel,
   showToggle,
   defaultView = "monthly",
-}: WhatWeFeltCardProps) {
+}: FeltCardProps) {
   const [view, setView] = useState<"monthly" | "allTime">(defaultView);
   const data = view === "monthly" ? monthly : allTime;
   const renderTitle = (title: string) => {
-    const splitIndex = title.indexOf(",");
-    if (splitIndex === -1) {
+    const commaIndex = title.indexOf(",");
+    if (commaIndex === -1) {
       return title;
     }
-    const first = title.slice(0, splitIndex + 1);
-    const rest = title.slice(splitIndex + 1).trimStart();
+    const first = title.slice(0, commaIndex + 1);
+    const rest = title.slice(commaIndex + 1).trimStart();
     return (
       <>
         <span className="block md:inline">{first}</span>

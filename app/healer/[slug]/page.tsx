@@ -6,8 +6,8 @@ import {
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import AutoPrint from "@/components/healer/auto-print";
-import HealerProfileImage from "@/components/healer/healer-profile-image";
-import WhatWeFeltCardAsync from "@/components/healer/what-we-felt-card-async";
+import ProfileImage from "@/components/healer/profile-image";
+import FeltCardAsync from "@/components/healer/felt-card-async";
 import { clerkClient } from "@clerk/nextjs/server";
 
 import 'tippy.js/dist/tippy.css';
@@ -129,7 +129,7 @@ export default async function HealerPage(props: PageProps) {
       <AutoPrint />
       <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
         <div className="my-10 mx-auto max-w-xl flex flex-col items-center space-y-6">
-          <HealerProfileImage
+          <ProfileImage
             src={profileImageUrl}
             alt={t("healer.profile.photoAlt")}
             width={200}
@@ -199,7 +199,7 @@ export default async function HealerPage(props: PageProps) {
             </p>
           </div>
           {healer.reflections.length > 0 ? (
-            <WhatWeFeltCardAsync
+            <FeltCardAsync
               slug={slug}
               monthly={monthlyCardData}
               allTime={allTimeCardData}

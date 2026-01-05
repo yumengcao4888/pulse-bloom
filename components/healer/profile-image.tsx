@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
-type HealerProfileImageProps = {
+type ProfileImageProps = {
   src: string;
   alt: string;
   width: number;
@@ -12,26 +12,26 @@ type HealerProfileImageProps = {
   fallbackSrc?: string;
 };
 
-export default function HealerProfileImage({
+export default function ProfileImage({
   src,
   alt,
   width,
   height,
   className,
   fallbackSrc = "/default-healer.jpg",
-}: HealerProfileImageProps) {
-  const [imageSrc, setImageSrc] = useState(src);
+}: ProfileImageProps) {
+  const [currentSrc, setCurrentSrc] = useState(src);
 
   return (
     <Image
-      src={imageSrc}
+      src={currentSrc}
       alt={alt}
       width={width}
       height={height}
       className={className}
       onError={() => {
-        if (imageSrc !== fallbackSrc) {
-          setImageSrc(fallbackSrc);
+        if (currentSrc !== fallbackSrc) {
+          setCurrentSrc(fallbackSrc);
         }
       }}
     />

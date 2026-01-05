@@ -1,4 +1,4 @@
-import HealingSpaceCta from "@/components/home/healing-space-cta";
+import SpaceCta from "@/components/home/space-cta";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
@@ -47,10 +47,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <HealingSpaceCta
-          initialHealerSlug={healer?.slug ?? null}
-          initialChecked={Boolean(userId)}
-        />
+        <SpaceCta initialSlug={healer?.slug ?? null} initialChecked={Boolean(userId)} />
 
       </div>
     </div>
