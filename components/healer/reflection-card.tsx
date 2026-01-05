@@ -52,7 +52,7 @@ function ReflectionsSkeleton() {
   );
 }
 
-type ReflectionsDisclosureProps = {
+type ReflectionCardProps = {
   slug: string;
   reflectionsCount: number;
   allTimeCounts: {
@@ -73,12 +73,12 @@ type ReflectionsDisclosureProps = {
 
 type SectionKey = "trends" | "printout";
 
-export default function ReflectionsDisclosure({
+export default function ReflectionCard({
   slug,
   reflectionsCount,
   allTimeCounts,
   monthlyCounts,
-}: ReflectionsDisclosureProps) {
+}: ReflectionCardProps) {
   const { t, locale } = useLocale();
   const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
   const [data, setData] = useState<ReflectionsPayload | null>(null);

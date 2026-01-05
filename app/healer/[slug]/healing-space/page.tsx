@@ -4,7 +4,7 @@ import { getTranslations } from "@/lib/i18n";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
 import ShareLinkButton from "@/components/healer/share-link-button";
 import EditProfileSheet from "@/components/healer/edit-space-sheet";
-import ReflectionsDisclosure from "@/components/healer/reflections-disclosure";
+import ReflectionCard from "@/components/healer/reflection-card";
 import { clerkClient, auth } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -270,7 +270,7 @@ export default async function HealingSpacePage(props: PageProps) {
       </div>
 
       {reflectionsCount > 0 && (
-        <ReflectionsDisclosure
+        <ReflectionCard
           slug={slug}
           reflectionsCount={reflectionsCount}
           allTimeCounts={{
