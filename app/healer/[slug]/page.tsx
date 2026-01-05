@@ -130,9 +130,9 @@ export default async function HealerPage(props: PageProps) {
   const scores = computeScores(reflectionsWithAnalysis);
   const weeklyTrends = computeWeeklyTrends(reflectionsWithAnalysis);
   const weeklySentiment = computeWeeklySentiment(reflectionsWithAnalysis);
+  const monthlyReflections = getMonthlyReflections(reflectionsWithAnalysis);
   const monthlySentiment = (() => {
-    const recent = getMonthlyReflections(reflectionsWithAnalysis);
-    const sentimentScores = recent
+    const sentimentScores = monthlyReflections
       .map((reflection) => reflection.sentiment?.score)
       .filter((score): score is number => score != null);
     if (sentimentScores.length === 0) return null;
@@ -240,6 +240,9 @@ export default async function HealerPage(props: PageProps) {
     .sort((a, b) => b.value - a.value)
     .slice(0, 3)
     .map((word) => word.text);
+  const monthlyCount = monthlyReflections.length;
+  const totalCount = reflectionsWithAnalysis.length;
+  const showMonthlyToggle = monthlyCount > 0 && monthlyCount !== totalCount;
   const monthlyCardData = {
     title: t("healer.monthly.title"),
     groundedLabel: t("healer.monthly.grounded"),
@@ -359,6 +362,8 @@ export default async function HealerPage(props: PageProps) {
               allTime={allTimeCardData}
               monthlyLabel={t("healer.monthly.toggle.month")}
               allTimeLabel={t("healer.monthly.toggle.allTime")}
+              showToggle={showMonthlyToggle}
+              defaultView={monthlyCount === 0 ? "allTime" : "monthly"}
             />
           ) : null}
         </div>

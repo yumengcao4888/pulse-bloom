@@ -27,6 +27,8 @@ type Props = {
   allTime: FeltCardData;
   monthlyLabel: string;
   allTimeLabel: string;
+  showToggle: boolean;
+  defaultView?: "monthly" | "allTime";
 };
 
 export default function WhatWeFeltCard({
@@ -34,48 +36,40 @@ export default function WhatWeFeltCard({
   allTime,
   monthlyLabel,
   allTimeLabel,
+  showToggle,
+  defaultView = "monthly",
 }: Props) {
-  const [view, setView] = useState<"monthly" | "allTime">("monthly");
+  const [view, setView] = useState<"monthly" | "allTime">(defaultView);
   const data = view === "monthly" ? monthly : allTime;
-  const titleParts = data.title.split(",");
-  const titleMain = titleParts[0] ?? data.title;
-  const titleRemainder = titleParts.slice(1).join(",").trim();
 
   return (
     <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold">
-          {titleRemainder ? (
-            <>
-              {titleMain},
-              <span className="block sm:inline"> {titleRemainder}</span>
-            </>
-          ) : (
-            data.title
-          )}
-        </h2>
-        <div className="flex flex-col overflow-hidden rounded-full border border-gray-200 bg-white/70 text-xs font-semibold uppercase tracking-wide sm:flex-row">
-          <button
-            type="button"
-            className={`px-2.5 py-1 transition ${
-              view === "monthly" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
-            }`}
-            onClick={() => setView("monthly")}
-            aria-pressed={view === "monthly"}
-          >
-            {monthlyLabel}
-          </button>
-          <button
-            type="button"
-            className={`px-2.5 py-1 transition ${
-              view === "allTime" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
-            }`}
-            onClick={() => setView("allTime")}
-            aria-pressed={view === "allTime"}
-          >
-            {allTimeLabel}
-          </button>
-        </div>
+        <h2 className="text-2xl font-semibold whitespace-nowrap">{data.title}</h2>
+        {showToggle ? (
+          <div className="flex flex-col overflow-hidden rounded-full border border-gray-200 bg-white/70 text-xs font-semibold uppercase tracking-wide sm:flex-row">
+            <button
+              type="button"
+              className={`px-2.5 py-1 transition ${
+                view === "monthly" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
+              }`}
+              onClick={() => setView("monthly")}
+              aria-pressed={view === "monthly"}
+            >
+              {monthlyLabel}
+            </button>
+            <button
+              type="button"
+              className={`px-2.5 py-1 transition ${
+                view === "allTime" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
+              }`}
+              onClick={() => setView("allTime")}
+              aria-pressed={view === "allTime"}
+            >
+              {allTimeLabel}
+            </button>
+          </div>
+        ) : null}
       </div>
       <div className="border-t border-gray-200" />
       <div className="text-gray-700">
