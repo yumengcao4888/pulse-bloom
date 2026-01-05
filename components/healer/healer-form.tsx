@@ -174,7 +174,7 @@ export default function HealerForm() {
       if (res.status === 409) {
         const data = await res.json();
         if (data?.healer?.slug) {
-          router.push(`/healer/${data.healer.slug}/healing-space`);
+          router.push(`/healer/${data.healer.slug}/space`);
           return;
         }
       }
@@ -196,7 +196,7 @@ export default function HealerForm() {
 
       setForm(initialForm);
       if (data?.healer?.slug) {
-        router.push(`/healer/${data.healer.slug}/healing-space`);
+        router.push(`/healer/${data.healer.slug}/space`);
       }
     } catch (err) {
       console.error(err);

@@ -23,7 +23,7 @@ export default function HealerRedirect() {
         const data = await res.json();
         const slug = data?.healer?.slug;
         if (isActive && slug) {
-          router.replace(`/healer/${slug}/healing-space`);
+          router.replace(`/healer/${slug}/space`);
         }
       } catch (err) {
         console.error("Failed to resolve healer redirect:", err);

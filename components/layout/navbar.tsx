@@ -80,7 +80,7 @@ export default function NavBar() {
                     <UserButton.Link
                       label={t("nav.healingSpace")}
                       labelIcon={<LayoutDashboard className="h-4 w-4" />}
-                      href={`/healer/${healerSlug}/healing-space`}
+                      href={`/healer/${healerSlug}/space`}
                     />
                   )}
                   {!healerSlug && (

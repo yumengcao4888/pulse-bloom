@@ -17,7 +17,7 @@ export default async function HealerPage() {
       select: { slug: true },
     });
     if (existingHealer?.slug) {
-      redirect(`/healer/${existingHealer.slug}/healing-space`);
+      redirect(`/healer/${existingHealer.slug}/space`);
     }
   }
 

@@ -64,7 +64,7 @@ export default function HealingSpaceCta({
         return;
       }
       if (healerSlug) {
-        router.push(`/healer/${healerSlug}/healing-space`);
+        router.push(`/healer/${healerSlug}/space`);
         return;
       }
       const res = await fetch("/api/healer", { method: "GET" });
@@ -74,7 +74,7 @@ export default function HealingSpaceCta({
         if (slug) {
           setHealerSlug(slug);
         }
-        router.push(slug ? `/healer/${slug}/healing-space` : "/healer");
+        router.push(slug ? `/healer/${slug}/space` : "/healer");
         return;
       }
     } catch (err) {

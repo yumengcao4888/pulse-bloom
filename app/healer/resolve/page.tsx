@@ -28,7 +28,7 @@ export default function HealerResolvePage() {
 
         const data = await res.json();
         const slug = data?.healer?.slug;
-        router.replace(slug ? `/healer/${slug}/healing-space` : "/healer");
+        router.replace(slug ? `/healer/${slug}/space` : "/healer");
       } catch (err) {
         console.error("Failed to resolve healer route:", err);
         router.replace("/healer");
