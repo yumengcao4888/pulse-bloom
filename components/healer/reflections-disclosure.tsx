@@ -95,12 +95,14 @@ type ReflectionsDisclosureProps = {
     grounded: number;
     supported: number;
     connected: number;
+    comments: number;
   };
   monthlyCounts: {
     total: number;
     grounded: number;
     supported: number;
     connected: number;
+    comments: number;
   };
 };
 
@@ -296,6 +298,7 @@ export default function ReflectionsDisclosure({
               grounded: monthlyReflections.filter((r) => r.grounded).length,
               supported: monthlyReflections.filter((r) => r.supported).length,
               connected: monthlyReflections.filter((r) => r.connected).length,
+              comments: monthlyReflections.filter((r) => r.feeling?.trim()).length,
             }
           : monthlyCounts
         : reflections
@@ -303,6 +306,7 @@ export default function ReflectionsDisclosure({
               grounded: reflections.filter((r) => r.grounded).length,
               supported: reflections.filter((r) => r.supported).length,
               connected: reflections.filter((r) => r.connected).length,
+              comments: reflections.filter((r) => r.feeling?.trim()).length,
             }
           : allTimeCounts;
     const formatCount = (count: number) => {
@@ -319,6 +323,7 @@ export default function ReflectionsDisclosure({
       grounded: formatCount(counts.grounded),
       supported: formatCount(counts.supported),
       connected: formatCount(counts.connected),
+      comments: counts.comments,
     };
   }, [allTimeCounts, countRange, data, monthlyCounts]);
 
@@ -374,6 +379,13 @@ export default function ReflectionsDisclosure({
               </p>
             </div>
             <div className="my-2 border-t border-dashed border-gray-200" />
+            <div className="mt-2 flex items-center gap-2 text-sm font-medium leading-6 text-gray-700">
+              <span aria-hidden="true">📝</span>
+              <p>
+                {countDisplay.comments} reflections include notes in their own voice.
+              </p>
+            </div>
+            <div className="my-2 border-t border-dashed border-gray-200" />
             <div className="grid grid-cols-3 gap-3 text-xs font-medium sm:text-sm">
               <div className="flex justify-start">
                 <div className="inline-grid place-items-center gap-0.5">
@@ -406,7 +418,7 @@ export default function ReflectionsDisclosure({
                 </div>
               </div>
             </div>
-            <div className="my-2 border-t border-dashed border-gray-200" />
+            <div className="my-4 border-t border-gray-200" />
             <div className="mt-4 flex flex-wrap gap-2">
               <PrintProfileButton slug={slug} />
               <button

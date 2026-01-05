@@ -93,6 +93,8 @@ export default async function HealingSpacePage(props: PageProps) {
     monthlyGroundedCount,
     monthlySupportedCount,
     monthlyConnectedCount,
+    commentsCount,
+    monthlyCommentsCount,
   ] = await Promise.all([
     prisma.reflection.count({ where: { healerId: healer.id, grounded: true } }),
     prisma.reflection.count({ where: { healerId: healer.id, supported: true } }),
@@ -108,6 +110,21 @@ export default async function HealingSpacePage(props: PageProps) {
     }),
     prisma.reflection.count({
       where: { healerId: healer.id, connected: true, createdAt: { gte: monthlyThreshold } },
+    }),
+    prisma.reflection.count({
+      where: {
+        healerId: healer.id,
+        feeling: { not: null },
+        NOT: { feeling: "" },
+      },
+    }),
+    prisma.reflection.count({
+      where: {
+        healerId: healer.id,
+        feeling: { not: null },
+        NOT: { feeling: "" },
+        createdAt: { gte: monthlyThreshold },
+      },
     }),
   ]);
 
@@ -261,12 +278,14 @@ export default async function HealingSpacePage(props: PageProps) {
             grounded: groundedCount,
             supported: supportedCount,
             connected: connectedCount,
+            comments: commentsCount,
           }}
           monthlyCounts={{
             total: monthlyCount,
             grounded: monthlyGroundedCount,
             supported: monthlySupportedCount,
             connected: monthlyConnectedCount,
+            comments: monthlyCommentsCount,
           }}
         />
       )}
