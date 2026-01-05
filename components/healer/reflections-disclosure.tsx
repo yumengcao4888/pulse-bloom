@@ -6,6 +6,7 @@ import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
 import PrintProfileButton from "@/components/healer/print-profile-button";
 import { useLocale } from "@/components/shared/locale-provider";
+import Tooltip from "@/components/shared/tooltip";
 import { capitalize, fetcher } from "@/lib/utils";
 import type { ScoreSummary, TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
@@ -32,6 +33,12 @@ type ReflectionsPayload = {
   weeklyTrends: TrendPoint[];
   weeklySentiment: Record<string, number | null>;
   wordcloudWords: Word[];
+};
+
+type SentimentSummary = {
+  hfEnabled: boolean;
+  sentimentScore: number | null;
+  topEmotions: { label: string; count: number }[];
 };
 
 type HeatmapCategoryKey = "grounded" | "supported" | "connected" | "sentiment";
@@ -129,6 +136,13 @@ export default function ReflectionsDisclosure({
     "all-time" | "week" | "month" | "year"
   >("all-time");
   const [countRange, setCountRange] = useState<"monthly" | "allTime">("allTime");
+  const [showSentiment, setShowSentiment] = useState(false);
+  const [sentimentSummary, setSentimentSummary] = useState<{
+    monthly?: SentimentSummary;
+    allTime?: SentimentSummary;
+  }>({});
+  const [isSentimentLoading, setIsSentimentLoading] = useState(false);
+  const [sentimentError, setSentimentError] = useState<string | null>(null);
   const pageSize = 10;
 
   const loadReflections = useCallback(async () => {
@@ -147,6 +161,25 @@ export default function ReflectionsDisclosure({
       setIsLoading(false);
     }
   }, [data, isLoading, slug, t]);
+
+  const loadSentimentSummary = useCallback(
+    async (range: "monthly" | "allTime") => {
+      setIsSentimentLoading(true);
+      setSentimentError(null);
+      try {
+        const payload = await fetcher<SentimentSummary>(
+          `/api/healer/${slug}/sentiment-summary?range=${range}`,
+        );
+        setSentimentSummary((prev) => ({ ...prev, [range]: payload }));
+      } catch (err) {
+        console.error("Failed to load sentiment summary", err);
+        setSentimentError(t("reflection.loadError"));
+      } finally {
+        setIsSentimentLoading(false);
+      }
+    },
+    [slug, t],
+  );
 
   const ensureDataLoaded = () => {
     if (!data && !isLoading) {
@@ -234,6 +267,14 @@ export default function ReflectionsDisclosure({
       setPrintoutPage(1);
     }
   }, [printoutRange, activeSection]);
+
+  useEffect(() => {
+    if (!showSentiment) return;
+    if (isSentimentLoading) return;
+    const key = countRange === "monthly" ? "monthly" : "allTime";
+    if (sentimentSummary[key]) return;
+    void loadSentimentSummary(key);
+  }, [countRange, isSentimentLoading, loadSentimentSummary, sentimentSummary, showSentiment]);
 
   const heatmap = useMemo(() => {
     if (!data) {
@@ -329,6 +370,20 @@ export default function ReflectionsDisclosure({
 
   const showMonthlyToggle =
     monthlyCounts.total > 0 && monthlyCounts.total !== reflectionsCount;
+  const sentimentKey = countRange === "monthly" ? "monthly" : "allTime";
+  const sentimentData = sentimentSummary[sentimentKey];
+  const formattedSentimentScore =
+    sentimentData?.sentimentScore == null
+      ? "\u2014 / 100"
+      : `${Math.round(sentimentData.sentimentScore)} / 100`;
+  const topEmotions = sentimentData?.topEmotions ?? [];
+  const primaryEmotion = topEmotions[0] ?? { label: "\u2014", count: 0 };
+  const secondaryEmotion = topEmotions[1] ?? { label: "\u2014", count: 0 };
+  const formatEmotionLabel = (label: string, capitalizeFirst: boolean) => {
+    if (label === "\u2014") return label;
+    const lowered = label.toLowerCase();
+    return capitalizeFirst ? capitalize(lowered) : lowered;
+  };
 
   return (
     <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
@@ -418,6 +473,67 @@ export default function ReflectionsDisclosure({
                 </div>
               </div>
             </div>
+            <div className="my-4 border-t border-gray-200" />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowSentiment((prev) => !prev)}
+                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={isSentimentLoading}
+              >
+                {showSentiment ? "Hide NLP insights" : "Explore NLP insights"}
+              </button>
+            </div>
+            {showSentiment && (
+              <div className="mt-3 space-y-1 text-sm font-medium leading-6 text-gray-700">
+                {sentimentError ? (
+                  <p className="text-sm text-red-600">{sentimentError}</p>
+                ) : isSentimentLoading && !sentimentData ? (
+                  <p className="text-sm text-gray-500">Loading NLP insights...</p>
+                ) : (
+                  <>
+                    <p>
+                      <b>Through the lens of language:</b>
+                    </p>
+                    <div>
+                      <Tooltip content="Based on GoEmotions model by Sam Lowe">
+                        <span>
+                          {"\u2013\u00a0"}
+                          <b>
+                            {formatEmotionLabel(primaryEmotion.label, true)}
+                            {"\u00a0("}
+                            {primaryEmotion.count}
+                            {")"}
+                          </b>
+                          {secondaryEmotion.label !== "\u2014" &&
+                          secondaryEmotion.count > 0 ? (
+                            <>
+                              {"\u00a0and\u00a0"}
+                              <b>
+                                {formatEmotionLabel(secondaryEmotion.label, false)}
+                                {"\u00a0("}
+                                {secondaryEmotion.count}
+                                {")"}
+                              </b>
+                            </>
+                          ) : null}
+                          {"\u00a0"}feelings surfaced most.
+                        </span>
+                      </Tooltip>
+                    </div>
+                    <div>
+                      <Tooltip content="Powered by CardiffNLP's sentiment model">
+                        <span>
+                          {"\u2013\u00a0"}The emotional warmth was measured at
+                          {"\u00a0"}
+                          <b>{formattedSentimentScore}</b>.
+                        </span>
+                      </Tooltip>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
             <div className="my-4 border-t border-gray-200" />
             <div className="mt-4 flex flex-wrap gap-2">
               <PrintProfileButton slug={slug} />
