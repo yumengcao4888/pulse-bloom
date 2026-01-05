@@ -1,20 +1,13 @@
-import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { prisma } from "@/lib/prisma";
 import {
   computeScores,
   getMonthlyReflections,
-  computeWeeklySentiment,
-  computeWeeklyTrends,
-  capitalize,
 } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
-import { TrendChart } from "@/components/healer/trend-chart";
-import MyWordcloud from "@/components/healer/simple-wordcloud";
 import AutoPrint from "@/components/healer/auto-print";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
-import WhatWeFeltCard from "@/components/healer/what-we-felt-card";
-import type { Word } from "react-wordcloud";
+import WhatWeFeltCardAsync from "@/components/healer/what-we-felt-card-async";
 import { clerkClient } from "@clerk/nextjs/server";
 
 import 'tippy.js/dist/tippy.css';
@@ -24,53 +17,12 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-type HeatmapCategoryKey = "grounded" | "supported" | "connected" | "sentiment";
-
-const heatmapCategories: HeatmapCategoryKey[] = [
-  "grounded",
-  "supported",
-  "connected",
-  "sentiment",
-];
-
-const getHeatStyle = (value: number | null | undefined) => {
-  if (value == null) {
-    return {
-      backgroundColor: "#f8fafc",
-      color: "#475569",
-    };
-  }
-
-  const normalized = Math.max(0, Math.min(1, value / 100));
-  const hue = 220 - normalized * 160;
-  const lightness = 65 - normalized * 35;
-  const textColor = lightness < 50 ? "#ffffff" : "#0f172a";
-
-  return {
-    backgroundColor: `hsl(${hue}, 75%, ${lightness}%)`,
-    color: textColor,
-  };
-};
-
-type MetricComparison = {
-  label: string;
-  monthly: string;
-  allTime: string;
-};
-
 export default async function HealerPage(props: PageProps) {
   const { slug } = await props.params;
   const locale = await getLocale();
   const t = getTranslations(locale);
-  const formatDate = (date: string | Date) => new Date(date).toLocaleString(locale);
-  const formatBool = (value: boolean | null | undefined) =>
-    value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
   const formatPercent = (value: number | null | undefined) =>
     value == null ? t("common.none") : `${value}%`;
-  const formatWeekLabel = (week: string) => {
-    const date = new Date(week);
-    return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
-  };
   const contactTypeLabels = {
     email: t("form.healer.contact.type.email"),
     phone: t("form.healer.contact.type.phone"),
@@ -96,6 +48,12 @@ export default async function HealerPage(props: PageProps) {
     include: {
       reflections: {
         orderBy: { createdAt: "desc" },
+        select: {
+          grounded: true,
+          supported: true,
+          connected: true,
+          createdAt: true,
+        },
       },
     },
   });
@@ -117,131 +75,15 @@ export default async function HealerPage(props: PageProps) {
     }
   }
 
-  const hfEnabled = Boolean(process.env.HF_TOKEN);
+  const scores = computeScores(healer.reflections);
+  const monthlyReflections = getMonthlyReflections(healer.reflections);
+  const placeholderToken = "\u2014";
+  const pendingMoodValue = `${placeholderToken} / 100`;
+  const pendingTopWords = Array.from({ length: 3 }, () => placeholderToken);
 
-  const reflectionsWithAnalysis = await Promise.all(
-    healer.reflections.map(async (reflection) => ({
-      ...reflection,
-      sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
-      emotion: hfEnabled ? await classifyEmotion(reflection.feeling) : null,
-    })),
-  );
 
-  const scores = computeScores(reflectionsWithAnalysis);
-  const weeklyTrends = computeWeeklyTrends(reflectionsWithAnalysis);
-  const weeklySentiment = computeWeeklySentiment(reflectionsWithAnalysis);
-  const monthlyReflections = getMonthlyReflections(reflectionsWithAnalysis);
-  const monthlySentiment = (() => {
-    const sentimentScores = monthlyReflections
-      .map((reflection) => reflection.sentiment?.score)
-      .filter((score): score is number => score != null);
-    if (sentimentScores.length === 0) return null;
-    const avg = sentimentScores.reduce((total, value) => total + value, 0) / sentimentScores.length;
-    return Math.round(avg * 100);
-  })();
-  const monthlySentimentDisplay =
-    monthlySentiment == null ? t("common.none") : `${monthlySentiment} / 100`;
-  const allTimeSentimentDisplay = (() => {
-    const sentimentScores = reflectionsWithAnalysis
-      .map((reflection) => reflection.sentiment?.score)
-      .filter((score): score is number => score != null);
-    if (sentimentScores.length === 0) return t("common.none");
-    const avg = sentimentScores.reduce((total, value) => total + value, 0) / sentimentScores.length;
-    return `${Math.round(avg * 100)} / 100`;
-  })();
-
-  const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
-    (acc, reflection) => {
-      const label = reflection.sentiment?.label ?? t("common.unclassified");
-      acc[label] = (acc[label] ?? 0) + 1;
-      return acc;
-    },
-    {},
-  );
-
-  const summaryEntries = Object.entries(sentimentCounts);
-
-  const weeklyTrendMap = Object.fromEntries(
-    weeklyTrends.map((trend) => [trend.date, trend]),
-  ) as Record<string, typeof weeklyTrends[number]>;
-  const heatmapWeeks = weeklyTrends.map((trend) => trend.date);
-  const heatmapRows = heatmapCategories.map((category) => ({
-    label:
-      category === "sentiment"
-        ? t("reflection.sentiment")
-        : category === "grounded"
-        ? t("reflection.grounded")
-        : category === "supported"
-        ? t("reflection.supported")
-        : t("reflection.connected"),
-    values: heatmapWeeks.map((week) => {
-      if (category === "sentiment") {
-        return weeklySentiment[week] ?? null;
-      }
-
-      return weeklyTrendMap[week]?.[category] ?? null;
-    }),
-  }));
-  const hasHeatmapData = heatmapWeeks.length > 0;
-
-  const metricComparisons: MetricComparison[] = [
-    {
-      label: t("healer.metric.grounded"),
-      monthly: formatPercent(scores.monthly.grounded),
-      allTime: formatPercent(scores.allTime.grounded),
-    },
-    {
-      label: t("healer.metric.supported"),
-      monthly: formatPercent(scores.monthly.supported),
-      allTime: formatPercent(scores.allTime.supported),
-    },
-    {
-      label: t("healer.metric.connected"),
-      monthly: formatPercent(scores.monthly.connected),
-      allTime: formatPercent(scores.allTime.connected),
-    },
-  ];
-
-  const metricToWord = (text: string, value: number | null): Word => ({
-    text,
-    value: (value ?? 0),
-  });
-
-  const emotionCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
-    (acc, reflection) => {
-      const label = reflection.emotion?.label;
-      if (!label) return acc;
-      acc[label] = (acc[label] ?? 0) + 1;
-      return acc;
-    },
-    {},
-  );
-  const totalEmotionCount = Object.values(emotionCounts).reduce(
-    (sum, count) => sum + count,
-    0,
-  );
-  const emotionWords: Word[] = Object.entries(emotionCounts).map(([label, count]) => {
-    const percentage = totalEmotionCount === 0 ? 0 : (count / totalEmotionCount) * 100;
-    return metricToWord(label, Math.round(percentage));
-  });
-  const wordcloudWords: Word[] = [
-    metricToWord("grounded", scores.allTime.grounded),
-    metricToWord("supported", scores.allTime.supported),
-    metricToWord("connected", scores.allTime.connected),
-    ...emotionWords,
-  ];
-  const topWords = [
-    metricToWord("grounded", scores.allTime.grounded),
-    metricToWord("supported", scores.allTime.supported),
-    metricToWord("connected", scores.allTime.connected),
-    ...emotionWords,
-  ]
-    .filter((word) => word.value > 0)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 3)
-    .map((word) => word.text);
   const monthlyCount = monthlyReflections.length;
-  const totalCount = reflectionsWithAnalysis.length;
+  const totalCount = healer.reflections.length;
   const showMonthlyToggle = monthlyCount > 0 && monthlyCount !== totalCount;
   const monthlyCardData = {
     title: t("healer.monthly.title"),
@@ -256,10 +98,10 @@ export default async function HealerPage(props: PageProps) {
     connectedValueLabel: t("healer.monthly.connected.value"),
     moodLabel: t("healer.monthly.mood"),
     moodValueLabel: t("healer.monthly.mood.value"),
-    moodValue: monthlySentimentDisplay,
+    moodValue: pendingMoodValue,
     topWordsLabel: t("healer.monthly.topWords"),
     topWordsValueLabel: t("healer.monthly.topWords.value"),
-    topWords,
+    topWords: pendingTopWords,
     noneLabel: t("common.none"),
   };
   const allTimeCardData = {
@@ -275,10 +117,10 @@ export default async function HealerPage(props: PageProps) {
     connectedValueLabel: t("healer.monthly.connected.value"),
     moodLabel: t("healer.monthly.mood"),
     moodValueLabel: t("healer.monthly.mood.value"),
-    moodValue: allTimeSentimentDisplay,
+    moodValue: pendingMoodValue,
     topWordsLabel: t("healer.monthly.topWords"),
     topWordsValueLabel: t("healer.monthly.topWords.value"),
-    topWords,
+    topWords: pendingTopWords,
     noneLabel: t("common.none"),
   };
 
@@ -356,8 +198,9 @@ export default async function HealerPage(props: PageProps) {
               <b>{t("healer.profile.about")}</b> {healer.bio}
             </p>
           </div>
-          {reflectionsWithAnalysis.length > 0 ? (
-            <WhatWeFeltCard
+          {healer.reflections.length > 0 ? (
+            <WhatWeFeltCardAsync
+              slug={slug}
               monthly={monthlyCardData}
               allTime={allTimeCardData}
               monthlyLabel={t("healer.monthly.toggle.month")}

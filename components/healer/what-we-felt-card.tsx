@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type FeltCardData = {
+export type FeltCardData = {
   title: string;
   groundedLabel: string;
   groundedValue: string;
@@ -22,7 +22,7 @@ type FeltCardData = {
   noneLabel: string;
 };
 
-type Props = {
+export type WhatWeFeltCardProps = {
   monthly: FeltCardData;
   allTime: FeltCardData;
   monthlyLabel: string;
@@ -38,7 +38,7 @@ export default function WhatWeFeltCard({
   allTimeLabel,
   showToggle,
   defaultView = "monthly",
-}: Props) {
+}: WhatWeFeltCardProps) {
   const [view, setView] = useState<"monthly" | "allTime">(defaultView);
   const data = view === "monthly" ? monthly : allTime;
 
