@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LoadingCircle from "@/components/shared/icons/loading-circle";
 
 export type FeltCardData = {
   title: string;
@@ -41,6 +42,9 @@ export default function FeltCard({
 }: FeltCardProps) {
   const [view, setView] = useState<"monthly" | "allTime">(defaultView);
   const data = view === "monthly" ? monthly : allTime;
+  const isMoodPending = data.moodValue.includes("—");
+  const isTopWordsPending =
+    data.topWords.length > 0 && data.topWords.every((word) => word.trim() === "—");
   const renderTitle = (title: string) => {
     const commaIndex = title.indexOf(",");
     if (commaIndex === -1) {
@@ -51,7 +55,8 @@ export default function FeltCard({
     return (
       <>
         <span className="block md:inline">{first}</span>
-        <span className="block md:inline md:before:content-[' ']">{rest}</span>
+        <span className="hidden md:inline"> </span>
+        <span className="block md:inline">{rest}</span>
       </>
     );
   };
@@ -99,12 +104,28 @@ export default function FeltCard({
         <p><b>{data.connectedValue}</b> {data.connectedValueLabel}</p>
         <div className="my-2 border-t border-dashed border-gray-200" />
         <p><b>🌤️ {data.moodLabel}</b></p>
-        <p>{data.moodValueLabel} <b>{data.moodValue}</b>.</p>
+        <p>
+          {data.moodValueLabel}{" "}
+          <b>
+            {isMoodPending ? (
+              <span className="inline-flex items-center align-middle">
+                <LoadingCircle />
+              </span>
+            ) : (
+              data.moodValue
+            )}
+          </b>
+          .
+        </p>
         <div className="my-2 border-t border-dashed border-gray-200" />
         <p><b>🗣️ {data.topWordsLabel}</b></p>
         <p>
           {data.topWordsValueLabel}{" "}
-          {data.topWords.length > 0
+          {isTopWordsPending ? (
+            <span className="inline-flex items-center align-middle">
+              <LoadingCircle />
+            </span>
+          ) : data.topWords.length > 0
             ? data.topWords.map((word, index) => (
                 <span key={`${word}-${index}`}>
                   <b>
