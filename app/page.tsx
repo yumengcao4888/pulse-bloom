@@ -1,6 +1,15 @@
 import HealingSpaceCta from "@/components/home/healing-space-cta";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { userId } = await auth();
+  const healer = userId
+    ? await prisma.healer.findUnique({
+        where: { clerkId: userId },
+        select: { slug: true },
+      })
+    : null;
   return (
     <div className="relative z-10 flex w-full items-start px-5 xl:px-0">
       <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -38,7 +47,10 @@ export default function HomePage() {
           </div>
         </section>
 
-        <HealingSpaceCta />
+        <HealingSpaceCta
+          initialHealerSlug={healer?.slug ?? null}
+          initialChecked={Boolean(userId)}
+        />
 
       </div>
     </div>

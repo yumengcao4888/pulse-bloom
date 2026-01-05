@@ -4,17 +4,28 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignUpButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 
-export default function HealingSpaceCta() {
+type Props = {
+  initialHealerSlug?: string | null;
+  initialChecked?: boolean;
+};
+
+export default function HealingSpaceCta({
+  initialHealerSlug = null,
+  initialChecked = false,
+}: Props) {
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [healerSlug, setHealerSlug] = useState<string | null>(null);
-  const [checkedHealer, setCheckedHealer] = useState(false);
+  const [healerSlug, setHealerSlug] = useState<string | null>(initialHealerSlug);
+  const [checkedHealer, setCheckedHealer] = useState(initialChecked);
 
   useEffect(() => {
     let isActive = true;
 
     const checkHealer = async () => {
+      if (checkedHealer) {
+        return;
+      }
       if (!isLoaded || !isSignedIn) {
         if (isActive) {
           setCheckedHealer(true);
@@ -44,7 +55,7 @@ export default function HealingSpaceCta() {
     return () => {
       isActive = false;
     };
-  }, [isLoaded, isSignedIn]);
+  }, [checkedHealer, isLoaded, isSignedIn]);
 
   const handleClick = async () => {
     setIsLoading(true);
