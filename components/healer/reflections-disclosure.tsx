@@ -1,14 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Word } from "react-wordcloud";
 import { TrendChart } from "@/components/healer/trend-chart";
-import MyWordcloud from "@/components/healer/simple-wordcloud";
 import PrintProfileButton from "@/components/healer/print-profile-button";
 import { useLocale } from "@/components/shared/locale-provider";
 import Tooltip from "@/components/shared/tooltip";
 import { capitalize, fetcher } from "@/lib/utils";
-import type { ScoreSummary, TrendPoint } from "@/lib/utils";
+import type { TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
 
 type ReflectionEntry = {
@@ -23,50 +21,14 @@ type ReflectionEntry = {
 };
 
 type ReflectionsPayload = {
-  hfEnabled: boolean;
   reflections: ReflectionEntry[];
-  summaryEntries: { label: string; count: number }[];
-  scores: {
-    allTime: ScoreSummary;
-    monthly: ScoreSummary;
-  };
   weeklyTrends: TrendPoint[];
-  weeklySentiment: Record<string, number | null>;
-  wordcloudWords: Word[];
 };
 
 type SentimentSummary = {
   hfEnabled: boolean;
   sentimentScore: number | null;
   topEmotions: { label: string; count: number }[];
-};
-
-type HeatmapCategoryKey = "grounded" | "supported" | "connected" | "sentiment";
-
-const heatmapCategories: HeatmapCategoryKey[] = [
-  "grounded",
-  "supported",
-  "connected",
-  "sentiment",
-];
-
-const getHeatStyle = (value: number | null | undefined) => {
-  if (value == null) {
-    return {
-      backgroundColor: "#f8fafc",
-      color: "#475569",
-    };
-  }
-
-  const normalized = Math.max(0, Math.min(1, value / 100));
-  const hue = 220 - normalized * 160;
-  const lightness = 65 - normalized * 35;
-  const textColor = lightness < 50 ? "#ffffff" : "#0f172a";
-
-  return {
-    backgroundColor: `hsl(${hue}, 75%, ${lightness}%)`,
-    color: textColor,
-  };
 };
 
 function ReflectionsSkeleton() {
@@ -90,10 +52,6 @@ function ReflectionsSkeleton() {
   );
 }
 
-function formatPercent(value: number | null | undefined, fallback: string) {
-  return value == null ? fallback : `${value}%`;
-}
-
 type ReflectionsDisclosureProps = {
   slug: string;
   reflectionsCount: number;
@@ -113,12 +71,7 @@ type ReflectionsDisclosureProps = {
   };
 };
 
-type SectionKey =
-  | "index-score"
-  | "trends"
-  | "heatmap"
-  | "wordcloud"
-  | "printout";
+type SectionKey = "trends" | "printout";
 
 export default function ReflectionsDisclosure({
   slug,
@@ -204,27 +157,6 @@ export default function ReflectionsDisclosure({
     });
   };
 
-  const metricComparisons = useMemo(() => {
-    if (!data) return [];
-    return [
-      {
-        label: t("healer.metric.grounded"),
-        monthly: formatPercent(data.scores.monthly.grounded, t("common.none")),
-        allTime: formatPercent(data.scores.allTime.grounded, t("common.none")),
-      },
-      {
-        label: t("healer.metric.supported"),
-        monthly: formatPercent(data.scores.monthly.supported, t("common.none")),
-        allTime: formatPercent(data.scores.allTime.supported, t("common.none")),
-      },
-      {
-        label: t("healer.metric.connected"),
-        monthly: formatPercent(data.scores.monthly.connected, t("common.none")),
-        allTime: formatPercent(data.scores.allTime.connected, t("common.none")),
-      },
-    ];
-  }, [data, t]);
-
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
     if (printoutRange === "all-time") return data.reflections;
@@ -275,47 +207,6 @@ export default function ReflectionsDisclosure({
     if (sentimentSummary[key]) return;
     void loadSentimentSummary(key);
   }, [countRange, isSentimentLoading, loadSentimentSummary, sentimentSummary, showSentiment]);
-
-  const heatmap = useMemo(() => {
-    if (!data) {
-      return {
-        heatmapWeeks: [],
-        heatmapRows: [],
-        hasHeatmapData: false,
-      };
-    }
-    const weeklyTrendMap = Object.fromEntries(
-      data.weeklyTrends.map((trend) => [trend.date, trend]),
-    ) as Record<string, TrendPoint>;
-    const heatmapWeeks = data.weeklyTrends.map((trend) => trend.date);
-    const heatmapRows = heatmapCategories.map((category) => ({
-      label:
-        category === "sentiment"
-          ? t("reflection.sentiment")
-          : category === "grounded"
-          ? t("reflection.grounded")
-          : category === "supported"
-          ? t("reflection.supported")
-          : t("reflection.connected"),
-      values: heatmapWeeks.map((week) => {
-        if (category === "sentiment") {
-          return data.weeklySentiment[week] ?? null;
-        }
-        return weeklyTrendMap[week]?.[category] ?? null;
-      }),
-    }));
-
-    return {
-      heatmapWeeks,
-      heatmapRows,
-      hasHeatmapData: heatmapWeeks.length > 0,
-    };
-  }, [data, t]);
-
-  const formatWeekLabel = (week: string) => {
-    const date = new Date(week);
-    return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
-  };
 
   const countDisplay = useMemo(() => {
     const reflections = data?.reflections ?? null;
@@ -604,35 +495,12 @@ export default function ReflectionsDisclosure({
               <PrintProfileButton slug={slug} />
               <button
                 type="button"
-                onClick={() => handleSectionToggle("index-score")}
-                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
-              >
-                {activeSection === "index-score" ? "Hide index & score" : "Index & score"}
-              </button>
-              <button
-                type="button"
                 onClick={() => handleSectionToggle("trends")}
                 className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
               >
                 {activeSection === "trends"
                   ? "Hide all-time weekly trends"
                   : "All-time weekly trends"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSectionToggle("heatmap")}
-                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
-              >
-                {activeSection === "heatmap"
-                  ? "Hide emotional heat map"
-                  : "Emotional heat map"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSectionToggle("wordcloud")}
-                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
-              >
-                {activeSection === "wordcloud" ? "Hide word cloud" : "Word cloud"}
               </button>
               <button
                 type="button"
@@ -660,67 +528,6 @@ export default function ReflectionsDisclosure({
         )}
         {data && (
           <>
-                {activeSection === "index-score" && (
-                  <p className="text-sm text-gray-500">
-                    {data.hfEnabled
-                      ? t("reflection.hf.enabled")
-                      : t("reflection.hf.disabled")}
-                  </p>
-                )}
-
-                {activeSection === "index-score" && data.summaryEntries.length > 0 && (
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {data.summaryEntries.map(({ label, count }) => {
-                      const displayLabel =
-                        label === "Unclassified" ? t("common.unclassified") : label;
-                      return (
-                        <div
-                          key={`${label}-${count}`}
-                          className="rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-center text-sm shadow-sm"
-                        >
-                          <p className="text-xs uppercase tracking-wide text-gray-500">
-                            {displayLabel}
-                          </p>
-                          <p className="text-lg font-semibold text-gray-800">{count}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {activeSection === "index-score" && (
-                  <div className="grid gap-4 md:grid-cols-3">
-                    {metricComparisons.map((metric) => (
-                      <div
-                        key={metric.label}
-                        className="rounded-xl border border-gray-200 bg-white/70 p-4 shadow-sm"
-                      >
-                        <p className="text-sm font-semibold text-gray-700 mb-3">
-                          {metric.label}
-                        </p>
-                        <div className="grid gap-3 text-sm sm:grid-cols-2">
-                          <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">
-                              {t("healer.metric.monthly")}
-                            </p>
-                            <p className="mt-1 text-lg font-semibold text-gray-800">
-                              {metric.monthly}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">
-                              {t("healer.metric.allTime")}
-                            </p>
-                            <p className="mt-1 text-lg font-semibold text-gray-800">
-                              {metric.allTime}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
                 {activeSection === "trends" && (
                   <>
                     {data.weeklyTrends.length > 0 ? (
@@ -733,72 +540,6 @@ export default function ReflectionsDisclosure({
                       </p>
                     )}
                   </>
-                )}
-
-                {activeSection === "heatmap" && (
-                  <>
-                    {heatmap.hasHeatmapData ? (
-                      <div className="mt-6 rounded-2xl border border-gray-200 bg-white/70 p-4 shadow-sm">
-                        <h3 className="mb-3 text-lg font-semibold text-gray-800">
-                          {t("healer.heatmap.title")}
-                        </h3>
-                        <div className="overflow-x-auto">
-                          <table className="min-w-full table-fixed text-sm">
-                            <thead>
-                              <tr>
-                                <th className="border-b px-3 py-2 text-left text-xs uppercase tracking-wide text-gray-500">
-                                  {t("healer.heatmap.metricWeek")}
-                                </th>
-                                {heatmap.heatmapWeeks.map((week) => (
-                                  <th
-                                    key={week}
-                                    className="border-b px-3 py-2 text-center text-xs uppercase tracking-wide text-gray-500"
-                                  >
-                                    {formatWeekLabel(week)}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {heatmap.heatmapRows.map((row) => (
-                                <tr key={row.label}>
-                                  <td className="border-b px-3 py-2 font-medium text-gray-700">
-                                    {row.label}
-                                  </td>
-                                  {row.values.map((value, index) => (
-                                    <td
-                                      key={`${row.label}-${heatmap.heatmapWeeks[index]}`}
-                                      className="border-b px-2 py-1"
-                                    >
-                                      <div
-                                        className="flex h-12 items-center justify-center rounded text-xs font-semibold uppercase tracking-wide"
-                                        style={getHeatStyle(value)}
-                                      >
-                                        {value == null ? t("common.none") : `${value}%`}
-                                      </div>
-                                    </td>
-                                  ))}
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                        <p className="mt-2 text-xs text-gray-500">
-                          {t("healer.heatmap.caption")}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="mt-6 text-sm text-gray-500">
-                        {t("reflection.addHeatmap")}
-                      </p>
-                    )}
-                  </>
-                )}
-
-                {activeSection === "wordcloud" && (
-                  <div className="w-full max-w-md mx-auto rounded-2xl border bg-white/70 p-5 shadow-sm">
-                    <MyWordcloud words={data.wordcloudWords} />
-                  </div>
                 )}
 
                 {activeSection === "printout" && (
