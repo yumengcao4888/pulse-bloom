@@ -44,7 +44,7 @@ export default function WhatWeFeltCard({
   return (
     <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold sm:text-2xl">
+        <h2 className="text-2xl font-semibold">
           {titleRemainder ? (
             <>
               {titleMain},
@@ -54,7 +54,7 @@ export default function WhatWeFeltCard({
             data.title
           )}
         </h2>
-        <div className="flex overflow-hidden rounded-full border border-gray-200 bg-white/70 text-xs font-semibold uppercase tracking-wide">
+        <div className="flex flex-col overflow-hidden rounded-full border border-gray-200 bg-white/70 text-xs font-semibold uppercase tracking-wide sm:flex-row">
           <button
             type="button"
             className={`px-2.5 py-1 transition ${
