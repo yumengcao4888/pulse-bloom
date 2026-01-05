@@ -25,14 +25,25 @@ export default function FeltCardAsync({
   showToggle,
   defaultView = "monthly",
 }: Props) {
+  const [view, setView] = useState<"monthly" | "allTime">(defaultView);
   const [monthlyData, setMonthlyData] = useState<FeltCardData>(monthly);
   const [allTimeData, setAllTimeData] = useState<FeltCardData>(allTime);
+  const [loaded, setLoaded] = useState({ monthly: false, allTime: false });
+
+  useEffect(() => {
+    setMonthlyData(monthly);
+    setAllTimeData(allTime);
+    setLoaded({ monthly: false, allTime: false });
+    setView(defaultView);
+  }, [monthly, allTime, defaultView, slug]);
 
   useEffect(() => {
     const controller = new AbortController();
 
     const loadAnalysis = async () => {
       try {
+        if (view === "monthly" && loaded.monthly) return;
+        if (view === "allTime" && loaded.allTime) return;
         const response = await fetch(`/api/healer/${slug}/analysis`, {
           signal: controller.signal,
         });
@@ -42,17 +53,21 @@ export default function FeltCardAsync({
         const data = (await response.json()) as AnalysisResponse;
         const topWords = Array.isArray(data.topWords) ? data.topWords : [];
 
-        setMonthlyData((prev) => ({
-          ...prev,
-          moodValue: formatSentiment(data.monthlySentiment, prev.noneLabel),
-          topWords,
-        }));
-
-        setAllTimeData((prev) => ({
-          ...prev,
-          moodValue: formatSentiment(data.allTimeSentiment, prev.noneLabel),
-          topWords,
-        }));
+        if (view === "monthly") {
+          setMonthlyData((prev) => ({
+            ...prev,
+            moodValue: formatSentiment(data.monthlySentiment, prev.noneLabel),
+            topWords,
+          }));
+          setLoaded((prev) => ({ ...prev, monthly: true }));
+        } else {
+          setAllTimeData((prev) => ({
+            ...prev,
+            moodValue: formatSentiment(data.allTimeSentiment, prev.noneLabel),
+            topWords,
+          }));
+          setLoaded((prev) => ({ ...prev, allTime: true }));
+        }
       } catch (error) {
         if ((error as Error).name === "AbortError") return;
         console.error("Failed to load healer analysis:", error);
@@ -64,7 +79,7 @@ export default function FeltCardAsync({
     return () => {
       controller.abort();
     };
-  }, [slug]);
+  }, [slug, view, loaded.monthly, loaded.allTime]);
 
   return (
     <FeltCard
@@ -74,6 +89,8 @@ export default function FeltCardAsync({
       overTimeLabel={overTimeLabel}
       showToggle={showToggle}
       defaultView={defaultView}
+      view={view}
+      onViewChange={setView}
     />
   );
 }

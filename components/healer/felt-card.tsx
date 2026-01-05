@@ -30,6 +30,8 @@ export type FeltCardProps = {
   overTimeLabel: string;
   showToggle: boolean;
   defaultView?: "monthly" | "allTime";
+  view?: "monthly" | "allTime";
+  onViewChange?: (view: "monthly" | "allTime") => void;
 };
 
 export default function FeltCard({
@@ -39,12 +41,21 @@ export default function FeltCard({
   overTimeLabel,
   showToggle,
   defaultView = "monthly",
+  view,
+  onViewChange,
 }: FeltCardProps) {
-  const [view, setView] = useState<"monthly" | "allTime">(defaultView);
-  const data = view === "monthly" ? monthly : allTime;
+  const [internalView, setInternalView] = useState<"monthly" | "allTime">(defaultView);
+  const currentView = view ?? internalView;
+  const data = currentView === "monthly" ? monthly : allTime;
   const isMoodPending = data.moodValue.includes("—");
   const isTopWordsPending =
     data.topWords.length > 0 && data.topWords.every((word) => word.trim() === "—");
+  const setView = (nextView: "monthly" | "allTime") => {
+    if (!view) {
+      setInternalView(nextView);
+    }
+    onViewChange?.(nextView);
+  };
   const renderTitle = (title: string) => {
     const commaIndex = title.indexOf(",");
     if (commaIndex === -1) {
@@ -72,20 +83,20 @@ export default function FeltCard({
             <button
               type="button"
               className={`px-2.5 py-1 transition ${
-                view === "monthly" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
+                currentView === "monthly" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
               }`}
               onClick={() => setView("monthly")}
-              aria-pressed={view === "monthly"}
+              aria-pressed={currentView === "monthly"}
             >
               {monthlyLabel}
             </button>
             <button
               type="button"
               className={`px-2.5 py-1 transition ${
-                view === "allTime" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
+                currentView === "allTime" ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
               }`}
               onClick={() => setView("allTime")}
-              aria-pressed={view === "allTime"}
+              aria-pressed={currentView === "allTime"}
             >
               {overTimeLabel}
             </button>
