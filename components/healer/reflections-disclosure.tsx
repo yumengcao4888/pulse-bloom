@@ -293,17 +293,17 @@ export default function ReflectionsDisclosure({
 
   return (
     <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
-      <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="mt-2">
-            <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
-            <p className="text-sm text-gray-500">{t("healer.reflections.subtitle")}</p>
+      <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
+              <p className="text-sm text-gray-600">{t("healer.reflections.subtitle")}</p>
+            </div>
           </div>
-        </div>
-        <div>
-          <div className="border-t border-gray-200" />
-          <div className="mt-2">
-            <div className="flex items-center gap-2 text-sm font-medium leading-6 text-gray-700">
+          <div className="my-4 border-t border-gray-200" />
+          <div className="text-gray-700">
+            <div className="flex items-center gap-2 text-sm font-medium leading-6">
               <span aria-hidden="true">💭</span>
               <p>
                 {reflectionsCount === 1
@@ -312,7 +312,7 @@ export default function ReflectionsDisclosure({
               </p>
             </div>
             <div className="my-2 border-t border-dashed border-gray-200" />
-            <div className="grid grid-cols-3 gap-3 text-xs font-medium text-gray-700 sm:text-sm">
+            <div className="grid grid-cols-3 gap-3 text-xs font-medium sm:text-sm">
               <div className="flex justify-start">
                 <div className="inline-grid place-items-center gap-0.5">
                   <span className="whitespace-nowrap">
@@ -345,8 +345,7 @@ export default function ReflectionsDisclosure({
               </div>
             </div>
           </div>
-        </div>
-        <div className="border-t border-gray-200" />
+          <div className="my-4 border-t border-gray-200" />
         {shouldShowContent && !hasData && isLoading && <ReflectionsSkeleton />}
         {shouldShowContent && error && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -724,6 +723,7 @@ export default function ReflectionsDisclosure({
               ? "Hide reflection printout"
               : "Reflection printout"}
           </button>
+        </div>
         </div>
       </div>
     </div>
