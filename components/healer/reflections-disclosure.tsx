@@ -96,6 +96,12 @@ type ReflectionsDisclosureProps = {
     supported: number;
     connected: number;
   };
+  monthlyCounts: {
+    total: number;
+    grounded: number;
+    supported: number;
+    connected: number;
+  };
 };
 
 type SectionKey =
@@ -109,6 +115,7 @@ export default function ReflectionsDisclosure({
   slug,
   reflectionsCount,
   allTimeCounts,
+  monthlyCounts,
 }: ReflectionsDisclosureProps) {
   const { t, locale } = useLocale();
   const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
@@ -119,6 +126,7 @@ export default function ReflectionsDisclosure({
   const [printoutRange, setPrintoutRange] = useState<
     "all-time" | "week" | "month" | "year"
   >("all-time");
+  const [countRange, setCountRange] = useState<"monthly" | "allTime">("allTime");
   const pageSize = 10;
 
   const loadReflections = useCallback(async () => {
@@ -266,15 +274,37 @@ export default function ReflectionsDisclosure({
     return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
   };
 
-  const allTimeCountDisplay = useMemo(() => {
-    const total = data ? data.reflections.length : allTimeCounts.total;
-    const counts = data
-      ? {
-          grounded: data.reflections.filter((reflection) => reflection.grounded).length,
-          supported: data.reflections.filter((reflection) => reflection.supported).length,
-          connected: data.reflections.filter((reflection) => reflection.connected).length,
-        }
-      : allTimeCounts;
+  const countDisplay = useMemo(() => {
+    const reflections = data?.reflections ?? null;
+    const monthlyReflections = reflections
+      ? (() => {
+          const threshold = new Date();
+          threshold.setDate(threshold.getDate() - 30);
+          return reflections.filter(
+            (reflection) => new Date(reflection.createdAt) >= threshold,
+          );
+        })()
+      : null;
+    const total =
+      countRange === "monthly"
+        ? monthlyReflections?.length ?? monthlyCounts.total
+        : reflections?.length ?? allTimeCounts.total;
+    const counts =
+      countRange === "monthly"
+        ? monthlyReflections
+          ? {
+              grounded: monthlyReflections.filter((r) => r.grounded).length,
+              supported: monthlyReflections.filter((r) => r.supported).length,
+              connected: monthlyReflections.filter((r) => r.connected).length,
+            }
+          : monthlyCounts
+        : reflections
+          ? {
+              grounded: reflections.filter((r) => r.grounded).length,
+              supported: reflections.filter((r) => r.supported).length,
+              connected: reflections.filter((r) => r.connected).length,
+            }
+          : allTimeCounts;
     const formatCount = (count: number) => {
       if (total === 0) {
         return { count: "0", percent: "0%" };
@@ -285,11 +315,15 @@ export default function ReflectionsDisclosure({
       };
     };
     return {
+      total,
       grounded: formatCount(counts.grounded),
       supported: formatCount(counts.supported),
       connected: formatCount(counts.connected),
     };
-  }, [allTimeCounts, data]);
+  }, [allTimeCounts, countRange, data, monthlyCounts]);
+
+  const showMonthlyToggle =
+    monthlyCounts.total > 0 && monthlyCounts.total !== reflectionsCount;
 
   return (
     <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
@@ -300,15 +334,43 @@ export default function ReflectionsDisclosure({
               <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
               <p className="text-sm text-gray-600">{t("healer.reflections.subtitle")}</p>
             </div>
+            {showMonthlyToggle ? (
+              <div className="flex flex-col overflow-hidden rounded-full border border-gray-200 bg-white/70 text-xs font-semibold uppercase tracking-wide sm:flex-row">
+                <button
+                  type="button"
+                  className={`px-2.5 py-1 transition ${
+                    countRange === "monthly"
+                      ? "bg-black text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setCountRange("monthly")}
+                  aria-pressed={countRange === "monthly"}
+                >
+                  {t("healer.monthly.toggle.month")}
+                </button>
+                <button
+                  type="button"
+                  className={`px-2.5 py-1 transition ${
+                    countRange === "allTime"
+                      ? "bg-black text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setCountRange("allTime")}
+                  aria-pressed={countRange === "allTime"}
+                >
+                  {t("healer.monthly.toggle.allTime")}
+                </button>
+              </div>
+            ) : null}
           </div>
           <div className="my-4 border-t border-gray-200" />
           <div className="text-gray-700">
             <div className="flex items-center gap-2 text-sm font-medium leading-6">
               <span aria-hidden="true">💭</span>
               <p>
-                {reflectionsCount === 1
+                {countDisplay.total === 1
                   ? "1 reflection shared in your space."
-                  : `${reflectionsCount} reflections shared in your space.`}
+                  : `${countDisplay.total} reflections shared in your space.`}
               </p>
             </div>
             <div className="my-2 border-t border-dashed border-gray-200" />
@@ -316,30 +378,30 @@ export default function ReflectionsDisclosure({
               <div className="flex justify-start">
                 <div className="inline-grid place-items-center gap-0.5">
                   <span className="whitespace-nowrap">
-                    {"🌱 "}Grounded {allTimeCountDisplay.grounded.count}
+                    {"🌱 "}Grounded {countDisplay.grounded.count}
                   </span>
                   <span className="text-xs font-normal text-gray-500">
-                    {allTimeCountDisplay.grounded.percent}
+                    {countDisplay.grounded.percent}
                   </span>
                 </div>
               </div>
               <div className="flex justify-center">
                 <div className="inline-grid place-items-center gap-0.5">
                   <span className="whitespace-nowrap">
-                    {"💛 "}Supported {allTimeCountDisplay.supported.count}
+                    {"💛 "}Supported {countDisplay.supported.count}
                   </span>
                   <span className="text-xs font-normal text-gray-500">
-                    {allTimeCountDisplay.supported.percent}
+                    {countDisplay.supported.percent}
                   </span>
                 </div>
               </div>
               <div className="flex justify-end">
                 <div className="inline-grid place-items-center gap-0.5">
                   <span className="whitespace-nowrap">
-                    {"🤝 "}Connected {allTimeCountDisplay.connected.count}
+                    {"🤝 "}Connected {countDisplay.connected.count}
                   </span>
                   <span className="text-xs font-normal text-gray-500">
-                    {allTimeCountDisplay.connected.percent}
+                    {countDisplay.connected.percent}
                   </span>
                 </div>
               </div>
