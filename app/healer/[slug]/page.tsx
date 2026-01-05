@@ -13,6 +13,7 @@ import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
 import AutoPrint from "@/components/healer/auto-print";
 import HealerProfileImage from "@/components/healer/healer-profile-image";
+import WhatWeFeltCard from "@/components/healer/what-we-felt-card";
 import type { Word } from "react-wordcloud";
 import { clerkClient } from "@clerk/nextjs/server";
 
@@ -140,6 +141,14 @@ export default async function HealerPage(props: PageProps) {
   })();
   const monthlySentimentDisplay =
     monthlySentiment == null ? t("common.none") : `${monthlySentiment} / 100`;
+  const allTimeSentimentDisplay = (() => {
+    const sentimentScores = reflectionsWithAnalysis
+      .map((reflection) => reflection.sentiment?.score)
+      .filter((score): score is number => score != null);
+    if (sentimentScores.length === 0) return t("common.none");
+    const avg = sentimentScores.reduce((total, value) => total + value, 0) / sentimentScores.length;
+    return `${Math.round(avg * 100)} / 100`;
+  })();
 
   const sentimentCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
     (acc, reflection) => {
@@ -231,6 +240,44 @@ export default async function HealerPage(props: PageProps) {
     .sort((a, b) => b.value - a.value)
     .slice(0, 3)
     .map((word) => word.text);
+  const monthlyCardData = {
+    title: t("healer.monthly.title"),
+    groundedLabel: t("healer.monthly.grounded"),
+    groundedValue: formatPercent(scores.monthly.grounded),
+    groundedValueLabel: t("healer.monthly.grounded.value"),
+    supportedLabel: t("healer.monthly.supported"),
+    supportedValue: formatPercent(scores.monthly.supported),
+    supportedValueLabel: t("healer.monthly.supported.value"),
+    connectedLabel: t("healer.monthly.connected"),
+    connectedValue: formatPercent(scores.monthly.connected),
+    connectedValueLabel: t("healer.monthly.connected.value"),
+    moodLabel: t("healer.monthly.mood"),
+    moodValueLabel: t("healer.monthly.mood.value"),
+    moodValue: monthlySentimentDisplay,
+    topWordsLabel: t("healer.monthly.topWords"),
+    topWordsValueLabel: t("healer.monthly.topWords.value"),
+    topWords,
+    noneLabel: t("common.none"),
+  };
+  const allTimeCardData = {
+    title: t("healer.monthly.titleAllTime"),
+    groundedLabel: t("healer.monthly.grounded"),
+    groundedValue: formatPercent(scores.allTime.grounded),
+    groundedValueLabel: t("healer.monthly.grounded.value"),
+    supportedLabel: t("healer.monthly.supported"),
+    supportedValue: formatPercent(scores.allTime.supported),
+    supportedValueLabel: t("healer.monthly.supported.value"),
+    connectedLabel: t("healer.monthly.connected"),
+    connectedValue: formatPercent(scores.allTime.connected),
+    connectedValueLabel: t("healer.monthly.connected.value"),
+    moodLabel: t("healer.monthly.mood"),
+    moodValueLabel: t("healer.monthly.mood.value"),
+    moodValue: allTimeSentimentDisplay,
+    topWordsLabel: t("healer.monthly.topWords"),
+    topWordsValueLabel: t("healer.monthly.topWords.value"),
+    topWords,
+    noneLabel: t("common.none"),
+  };
 
   return (
     <>
@@ -307,39 +354,12 @@ export default async function HealerPage(props: PageProps) {
             </p>
           </div>
           {reflectionsWithAnalysis.length > 0 ? (
-            <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
-              <h2 className="text-2xl font-semibold">{t("healer.monthly.title")}</h2>
-              <div className="border-t border-gray-200" />
-              <div className="text-gray-700">
-                <p><b>🌱 {t("healer.monthly.grounded")}</b></p>
-                <p><b>{formatPercent(scores.monthly.grounded)}</b> {t("healer.monthly.grounded.value")}</p>
-                <div className="my-2 border-t border-dashed border-gray-200" />
-                <p><b>💛 {t("healer.monthly.supported")}</b></p>
-                <p><b>{formatPercent(scores.monthly.supported)}</b> {t("healer.monthly.supported.value")}</p>
-                <div className="my-2 border-t border-dashed border-gray-200" />
-                <p><b>🤝 {t("healer.monthly.connected")}</b></p>
-                <p><b>{formatPercent(scores.monthly.connected)}</b> {t("healer.monthly.connected.value")}</p>
-                <div className="my-2 border-t border-dashed border-gray-200" />
-                <p><b>🌤️ {t("healer.monthly.mood")}</b></p>
-                <p>{t("healer.monthly.mood.value")} <b>{monthlySentimentDisplay}</b>.</p>
-                <div className="my-2 border-t border-dashed border-gray-200" />
-                <p><b>🗣️ {t("healer.monthly.topWords")}</b></p>
-                <p>
-                  {t("healer.monthly.topWords.value")}{" "}
-                  {topWords.length > 0
-                    ? topWords.map((word, index) => (
-                        <span key={`${word}-${index}`}>
-                          <b>
-                            <i>{word}</i>
-                          </b>
-                          {index < topWords.length - 1 ? ", " : ""}
-                        </span>
-                      ))
-                    : <b>{t("common.none")}</b>}
-                  .
-                </p>
-              </div>
-            </div>
+            <WhatWeFeltCard
+              monthly={monthlyCardData}
+              allTime={allTimeCardData}
+              monthlyLabel={t("healer.monthly.toggle.month")}
+              allTimeLabel={t("healer.monthly.toggle.allTime")}
+            />
           ) : null}
         </div>
       </div>
