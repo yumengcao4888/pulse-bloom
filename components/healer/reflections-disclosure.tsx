@@ -175,6 +175,10 @@ export default function ReflectionsDisclosure({
     ];
   }, [data, t]);
 
+  useEffect(() => {
+    void loadReflections();
+  }, [loadReflections]);
+
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
     if (printoutRange === "all-time") return data.reflections;
@@ -259,65 +263,63 @@ export default function ReflectionsDisclosure({
     return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
   };
 
+  const allTimeCounts = useMemo(() => {
+    if (!data) return null;
+    const total = data.reflections.length;
+    const counts = {
+      grounded: data.reflections.filter((reflection) => reflection.grounded).length,
+      supported: data.reflections.filter((reflection) => reflection.supported).length,
+      connected: data.reflections.filter((reflection) => reflection.connected).length,
+    };
+    const formatCount = (count: number) => {
+      if (total === 0) return "0 (0%)";
+      return `${count} (${Math.round((count / total) * 100)}%)`;
+    };
+    return {
+      grounded: formatCount(counts.grounded),
+      supported: formatCount(counts.supported),
+      connected: formatCount(counts.connected),
+    };
+  }, [data]);
+
   return (
     <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
       <div className="rounded-2xl border bg-white/70 p-6 shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
+          <div className="mt-2">
             <h2 className="text-2xl font-semibold">{t("healer.reflections.title")}</h2>
             <p className="text-sm text-gray-500">{t("healer.reflections.subtitle")}</p>
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center gap-3 text-gray-700">
-          <p>
-            <b>{t("healer.dev.reflectionsCount")}:</b> {reflectionsCount}
-          </p>
-          <PrintProfileButton slug={slug} />
+        <div>
+          <div className="border-t border-gray-200" />
+          <div className="mt-2">
+            <div className="flex items-center gap-2 text-sm font-medium leading-6 text-gray-700">
+              <span aria-hidden="true">💭</span>
+              <p>
+                {reflectionsCount === 1
+                  ? "1 reflection shared in your space."
+                  : `${reflectionsCount} reflections shared in your space.`}
+              </p>
+            </div>
+            <div className="my-2 border-t border-dashed border-gray-200" />
+            <div className="grid grid-cols-3 gap-3 text-xs font-medium leading-6 text-gray-700 sm:text-sm">
+              <span className="text-left">
+                {"🌱 "}Grounded{" "}
+                {allTimeCounts?.grounded ?? t("common.none")}
+              </span>
+              <span className="text-center">
+                {"💛 "}Supported{" "}
+                {allTimeCounts?.supported ?? t("common.none")}
+              </span>
+              <span className="text-right">
+                {"🤝 "}Connected{" "}
+                {allTimeCounts?.connected ?? t("common.none")}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("index-score")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "index-score" ? "Hide index & score" : "Index & score"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("trends")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "trends"
-              ? "Hide all-time weekly trends"
-              : "All-time weekly trends"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("heatmap")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "heatmap"
-              ? "Hide emotional heat map"
-              : "Emotional heat map"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("wordcloud")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "wordcloud" ? "Hide word cloud" : "Word cloud"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("printout")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "printout"
-              ? "Hide reflection printout"
-              : "Reflection printout"}
-          </button>
-        </div>
+        <div className="border-t border-gray-200" />
         {shouldShowContent && !hasData && isLoading && <ReflectionsSkeleton />}
         {shouldShowContent && error && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -652,6 +654,50 @@ export default function ReflectionsDisclosure({
                 )}
           </>
         )}
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <PrintProfileButton slug={slug} />
+          <button
+            type="button"
+            onClick={() => handleSectionToggle("index-score")}
+            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+          >
+            {activeSection === "index-score" ? "Hide index & score" : "Index & score"}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSectionToggle("trends")}
+            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+          >
+            {activeSection === "trends"
+              ? "Hide all-time weekly trends"
+              : "All-time weekly trends"}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSectionToggle("heatmap")}
+            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+          >
+            {activeSection === "heatmap"
+              ? "Hide emotional heat map"
+              : "Emotional heat map"}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSectionToggle("wordcloud")}
+            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+          >
+            {activeSection === "wordcloud" ? "Hide word cloud" : "Word cloud"}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSectionToggle("printout")}
+            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+          >
+            {activeSection === "printout"
+              ? "Hide reflection printout"
+              : "Reflection printout"}
+          </button>
+        </div>
       </div>
     </div>
   );
