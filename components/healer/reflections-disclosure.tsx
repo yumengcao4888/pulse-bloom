@@ -90,6 +90,12 @@ function formatPercent(value: number | null | undefined, fallback: string) {
 type ReflectionsDisclosureProps = {
   slug: string;
   reflectionsCount: number;
+  allTimeCounts: {
+    total: number;
+    grounded: number;
+    supported: number;
+    connected: number;
+  };
 };
 
 type SectionKey =
@@ -102,6 +108,7 @@ type SectionKey =
 export default function ReflectionsDisclosure({
   slug,
   reflectionsCount,
+  allTimeCounts,
 }: ReflectionsDisclosureProps) {
   const { t, locale } = useLocale();
   const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
@@ -174,10 +181,6 @@ export default function ReflectionsDisclosure({
       },
     ];
   }, [data, t]);
-
-  useEffect(() => {
-    void loadReflections();
-  }, [loadReflections]);
 
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
@@ -263,24 +266,30 @@ export default function ReflectionsDisclosure({
     return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
   };
 
-  const allTimeCounts = useMemo(() => {
-    if (!data) return null;
-    const total = data.reflections.length;
-    const counts = {
-      grounded: data.reflections.filter((reflection) => reflection.grounded).length,
-      supported: data.reflections.filter((reflection) => reflection.supported).length,
-      connected: data.reflections.filter((reflection) => reflection.connected).length,
-    };
+  const allTimeCountDisplay = useMemo(() => {
+    const total = data ? data.reflections.length : allTimeCounts.total;
+    const counts = data
+      ? {
+          grounded: data.reflections.filter((reflection) => reflection.grounded).length,
+          supported: data.reflections.filter((reflection) => reflection.supported).length,
+          connected: data.reflections.filter((reflection) => reflection.connected).length,
+        }
+      : allTimeCounts;
     const formatCount = (count: number) => {
-      if (total === 0) return "0 (0%)";
-      return `${count} (${Math.round((count / total) * 100)}%)`;
+      if (total === 0) {
+        return { count: "0", percent: "0%" };
+      }
+      return {
+        count: String(count),
+        percent: `${Math.round((count / total) * 100)}%`,
+      };
     };
     return {
       grounded: formatCount(counts.grounded),
       supported: formatCount(counts.supported),
       connected: formatCount(counts.connected),
     };
-  }, [data]);
+  }, [allTimeCounts, data]);
 
   return (
     <div className="relative z-10 w-full max-w-2xl px-5 xl:px-0 space-y-6">
@@ -303,19 +312,31 @@ export default function ReflectionsDisclosure({
               </p>
             </div>
             <div className="my-2 border-t border-dashed border-gray-200" />
-            <div className="grid grid-cols-3 gap-3 text-xs font-medium leading-6 text-gray-700 sm:text-sm">
-              <span className="text-left">
-                {"🌱 "}Grounded{" "}
-                {allTimeCounts?.grounded ?? t("common.none")}
-              </span>
-              <span className="text-center">
-                {"💛 "}Supported{" "}
-                {allTimeCounts?.supported ?? t("common.none")}
-              </span>
-              <span className="text-right">
-                {"🤝 "}Connected{" "}
-                {allTimeCounts?.connected ?? t("common.none")}
-              </span>
+            <div className="grid grid-cols-3 gap-3 text-xs font-medium text-gray-700 sm:text-sm">
+              <div className="flex justify-start">
+                <div className="inline-flex flex-col items-center gap-0.5">
+                  <span>{"🌱 "}Grounded {allTimeCountDisplay.grounded.count}</span>
+                  <span className="text-xs font-normal text-gray-500">
+                    {allTimeCountDisplay.grounded.percent}
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <div className="inline-flex flex-col items-center gap-0.5">
+                  <span>{"💛 "}Supported {allTimeCountDisplay.supported.count}</span>
+                  <span className="text-xs font-normal text-gray-500">
+                    {allTimeCountDisplay.supported.percent}
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <div className="inline-flex flex-col items-center gap-0.5">
+                  <span>{"🤝 "}Connected {allTimeCountDisplay.connected.count}</span>
+                  <span className="text-xs font-normal text-gray-500">
+                    {allTimeCountDisplay.connected.percent}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

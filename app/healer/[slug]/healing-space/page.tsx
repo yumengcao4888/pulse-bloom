@@ -83,6 +83,11 @@ export default async function HealingSpacePage(props: PageProps) {
   const reflectionLink = `${baseUrl}/reflection/${slug}`;
   const sharableLink = `${baseUrl}/healer/${slug}`;
   const reflectionsCount = healer._count?.reflections ?? 0;
+  const [groundedCount, supportedCount, connectedCount] = await Promise.all([
+    prisma.reflection.count({ where: { healerId: healer.id, grounded: true } }),
+    prisma.reflection.count({ where: { healerId: healer.id, supported: true } }),
+    prisma.reflection.count({ where: { healerId: healer.id, connected: true } }),
+  ]);
 
   return (
     <>
@@ -226,7 +231,16 @@ export default async function HealingSpacePage(props: PageProps) {
       </div>
 
       {reflectionsCount > 0 && (
-        <ReflectionsDisclosure slug={slug} reflectionsCount={reflectionsCount} />
+        <ReflectionsDisclosure
+          slug={slug}
+          reflectionsCount={reflectionsCount}
+          allTimeCounts={{
+            total: reflectionsCount,
+            grounded: groundedCount,
+            supported: supportedCount,
+            connected: connectedCount,
+          }}
+        />
       )}
     </>
   );
