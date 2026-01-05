@@ -585,7 +585,13 @@ export default function ReflectionsDisclosure({
                           >
                             Hugging Face
                           </a>
-                          . Hover over scores for more details.
+                          .{" "}
+                          <span className="hidden md:inline">
+                            Hover over scores for more details.
+                          </span>
+                          <span className="md:hidden">
+                            Click scores for more details.
+                          </span>
                         </sub>
                       </p>
                     </div>
