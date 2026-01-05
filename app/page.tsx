@@ -22,7 +22,7 @@ export default async function HomePage() {
             PulseBloom lets you invite clients to gently reflect and share the feeling of your space.
           </p>
           <p className="mt-2 text-sm text-gray-500">
-            No metrics. No judgment. Just presence.
+            Let the atmosphere of your care speak for itself.
           </p>
         </section>
 
@@ -43,7 +43,7 @@ export default async function HomePage() {
             <span className="block text-xs uppercase tracking-[0.2em] text-gray-400">
               Share
             </span>
-            A soft snapshot of your space.
+            The atmosphere your care creates.
           </div>
         </section>
 
