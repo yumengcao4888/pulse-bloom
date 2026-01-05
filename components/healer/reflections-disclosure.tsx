@@ -530,6 +530,32 @@ export default function ReflectionsDisclosure({
                         </span>
                       </Tooltip>
                     </div>
+                    <div className="my-3 border-gray-200" />
+                    <div className="text-xs text-gray-500 text-left">
+                      <p>
+                        <sub>
+                          ✨ These insights were generated using{" "}
+                          <a
+                            href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
+                            className="underline"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            CardiffNLP's sentiment model
+                          </a>{" "}
+                          and{" "}
+                          <a
+                            href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
+                            className="underline"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            SamLowe's GoEmotions model
+                          </a>
+                          . Hover over scores for more details.
+                        </sub>
+                      </p>
+                    </div>
                   </>
                 )}
               </div>
