@@ -406,8 +406,52 @@ export default function ReflectionsDisclosure({
                 </div>
               </div>
             </div>
+            <div className="my-2 border-t border-dashed border-gray-200" />
+            <div className="mt-4 flex flex-wrap gap-2">
+              <PrintProfileButton slug={slug} />
+              <button
+                type="button"
+                onClick={() => handleSectionToggle("index-score")}
+                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
+              >
+                {activeSection === "index-score" ? "Hide index & score" : "Index & score"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSectionToggle("trends")}
+                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
+              >
+                {activeSection === "trends"
+                  ? "Hide all-time weekly trends"
+                  : "All-time weekly trends"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSectionToggle("heatmap")}
+                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
+              >
+                {activeSection === "heatmap"
+                  ? "Hide emotional heat map"
+                  : "Emotional heat map"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSectionToggle("wordcloud")}
+                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
+              >
+                {activeSection === "wordcloud" ? "Hide word cloud" : "Word cloud"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSectionToggle("printout")}
+                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
+              >
+                {activeSection === "printout"
+                  ? "Hide reflection printout"
+                  : "Reflection printout"}
+              </button>
+            </div>
           </div>
-          <div className="my-4 border-t border-gray-200" />
         {shouldShowContent && !hasData && isLoading && <ReflectionsSkeleton />}
         {shouldShowContent && error && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -742,50 +786,6 @@ export default function ReflectionsDisclosure({
                 )}
           </>
         )}
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <PrintProfileButton slug={slug} />
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("index-score")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "index-score" ? "Hide index & score" : "Index & score"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("trends")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "trends"
-              ? "Hide all-time weekly trends"
-              : "All-time weekly trends"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("heatmap")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "heatmap"
-              ? "Hide emotional heat map"
-              : "Emotional heat map"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("wordcloud")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "wordcloud" ? "Hide word cloud" : "Word cloud"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSectionToggle("printout")}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            {activeSection === "printout"
-              ? "Hide reflection printout"
-              : "Reflection printout"}
-          </button>
-        </div>
         </div>
       </div>
     </div>
