@@ -37,11 +37,23 @@ export default function WhatWeFeltCard({
 }: Props) {
   const [view, setView] = useState<"monthly" | "allTime">("monthly");
   const data = view === "monthly" ? monthly : allTime;
+  const titleParts = data.title.split(",");
+  const titleMain = titleParts[0] ?? data.title;
+  const titleRemainder = titleParts.slice(1).join(",").trim();
 
   return (
     <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold">{data.title}</h2>
+        <h2 className="text-2xl font-semibold">
+          {titleRemainder ? (
+            <>
+              {titleMain},
+              <span className="block sm:inline"> {titleRemainder}</span>
+            </>
+          ) : (
+            data.title
+          )}
+        </h2>
         <div className="flex overflow-hidden rounded-full border border-gray-200 bg-white/70 text-xs font-semibold uppercase tracking-wide">
           <button
             type="button"
