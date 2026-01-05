@@ -10,8 +10,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "pulse-bloom": "var(--pulse-bloom)",
-        "pulse-bloom-soft": "var(--pulse-bloom-soft)",
+        "pulse-bloom": "rgb(var(--pulse-bloom) / <alpha-value>)",
+        "pulse-bloom-soft": "rgb(var(--pulse-bloom-soft) / <alpha-value>)",
+        "pulse-bloom-soft-hover": "rgb(var(--pulse-bloom-soft-hover) / <alpha-value>)",
+        "pulse-bloom-deep": "rgb(var(--pulse-bloom-deep) / <alpha-value>)",
       },
       fontFamily: {
         display: ["var(--font-sf)", "system-ui", "sans-serif"],

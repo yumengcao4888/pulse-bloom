@@ -296,7 +296,7 @@ export default async function HealerPage(props: PageProps) {
           />
           <div className="mb-5 flex min-w-0 w-full flex-col items-center gap-1 text-3xl font-semibold">
             <h1
-              className="line-clamp-2 min-w-0 max-w-[60%] w-full break-words text-center"
+              className="line-clamp-2 min-w-0 max-w-[60%] w-full break-words text-center leading-tight pb-1"
               title={healer.name}
               aria-label={healer.name}
             >

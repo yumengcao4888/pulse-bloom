@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --pulse-bloom: #959ad7;
-  --pulse-bloom-soft: #b3b7e5;
+  --pulse-bloom: 149 154 215;
+  --pulse-bloom-soft: 163 168 221;
+  --pulse-bloom-soft-hover: 177 182 227;
+  --pulse-bloom-deep: 95 100 184;
 }
