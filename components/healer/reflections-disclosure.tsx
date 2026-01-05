@@ -314,24 +314,30 @@ export default function ReflectionsDisclosure({
             <div className="my-2 border-t border-dashed border-gray-200" />
             <div className="grid grid-cols-3 gap-3 text-xs font-medium text-gray-700 sm:text-sm">
               <div className="flex justify-start">
-                <div className="inline-flex flex-col items-center gap-0.5">
-                  <span>{"🌱 "}Grounded {allTimeCountDisplay.grounded.count}</span>
+                <div className="inline-grid place-items-center gap-0.5">
+                  <span className="whitespace-nowrap">
+                    {"🌱 "}Grounded {allTimeCountDisplay.grounded.count}
+                  </span>
                   <span className="text-xs font-normal text-gray-500">
                     {allTimeCountDisplay.grounded.percent}
                   </span>
                 </div>
               </div>
               <div className="flex justify-center">
-                <div className="inline-flex flex-col items-center gap-0.5">
-                  <span>{"💛 "}Supported {allTimeCountDisplay.supported.count}</span>
+                <div className="inline-grid place-items-center gap-0.5">
+                  <span className="whitespace-nowrap">
+                    {"💛 "}Supported {allTimeCountDisplay.supported.count}
+                  </span>
                   <span className="text-xs font-normal text-gray-500">
                     {allTimeCountDisplay.supported.percent}
                   </span>
                 </div>
               </div>
               <div className="flex justify-end">
-                <div className="inline-flex flex-col items-center gap-0.5">
-                  <span>{"🤝 "}Connected {allTimeCountDisplay.connected.count}</span>
+                <div className="inline-grid place-items-center gap-0.5">
+                  <span className="whitespace-nowrap">
+                    {"🤝 "}Connected {allTimeCountDisplay.connected.count}
+                  </span>
                   <span className="text-xs font-normal text-gray-500">
                     {allTimeCountDisplay.connected.percent}
                   </span>
