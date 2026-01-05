@@ -496,7 +496,27 @@ export default function ReflectionsDisclosure({
                       <b>Through the lens of language:</b>
                     </p>
                     <div className="text-left">
-                      <Tooltip content="Based on GoEmotions model by Sam Lowe">
+                      <Tooltip
+                        content={
+                          <div className="space-y-1 text-left text-xs text-gray-700">
+                            <p>
+                              Emotion Label reflects the emotional nuance identified in the text.
+                            </p>
+                            <p>
+                              Based on{" "}
+                              <a
+                                href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
+                                className="underline"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                GoEmotions model by Sam Lowe
+                              </a>
+                              .
+                            </p>
+                          </div>
+                        }
+                      >
                         <span className="text-left">
                           {"\u2013\u00a0"}
                           <b>
@@ -522,7 +542,29 @@ export default function ReflectionsDisclosure({
                       </Tooltip>
                     </div>
                     <div className="text-left">
-                      <Tooltip content="Powered by CardiffNLP's sentiment model">
+                      <Tooltip
+                        content={
+                          <div className="space-y-1 text-left text-xs text-gray-700">
+                            <p>Sentiment Score reflects the emotional tone.</p>
+                            <p>
+                              Lower scores suggest heavier or more difficult reflections,
+                            </p>
+                            <p>higher scores suggest lighter or more positive tones.</p>
+                            <p>
+                              Powered by{" "}
+                              <a
+                                href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
+                                className="underline"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                CardiffNLP's sentiment model
+                              </a>
+                              .
+                            </p>
+                          </div>
+                        }
+                      >
                         <span className="text-left">
                           {"\u2013\u00a0"}The emotional warmth was measured at
                           {"\u00a0"}
@@ -534,23 +576,14 @@ export default function ReflectionsDisclosure({
                     <div className="text-xs text-gray-500 text-left">
                       <p>
                         <sub>
-                          ✨ These insights were generated using{" "}
+                          ✨These insights were gently generated using natural language models from{" "}
                           <a
-                            href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
+                            href="https://huggingface.co/"
                             className="underline"
                             target="_blank"
                             rel="noreferrer"
                           >
-                            CardiffNLP's sentiment model
-                          </a>{" "}
-                          and{" "}
-                          <a
-                            href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
-                            className="underline"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            SamLowe's GoEmotions model
+                            Hugging Face
                           </a>
                           . Hover over scores for more details.
                         </sub>
