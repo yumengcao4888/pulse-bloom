@@ -44,7 +44,7 @@ export default function WhatWeFeltCard({
   return (
     <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold">
+        <h2 className="text-xl font-semibold sm:text-2xl">
           {titleRemainder ? (
             <>
               {titleMain},
