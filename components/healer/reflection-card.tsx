@@ -725,13 +725,34 @@ export default function ReflectionCard({
                           key={reflection.id}
                           className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
                         >
-                          <p className="mb-1">
-                            <b>{t("reflection.grounded")}:</b>{" "}
-                            {formatBool(reflection.grounded)}{" "}
-                            <b className="ml-3">{t("reflection.supported")}:</b>{" "}
-                            {formatBool(reflection.supported)}{" "}
-                            <b className="ml-3">{t("reflection.connected")}:</b>{" "}
-                            {formatBool(reflection.connected)}
+                          <p className="mb-1 flex flex-wrap items-center gap-3">
+                            <span
+                              className={
+                                reflection.grounded
+                                  ? "rounded-full bg-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                                  : "rounded-full border border-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+                              }
+                            >
+                              {t("reflection.grounded")}
+                            </span>
+                            <span
+                              className={
+                                reflection.supported
+                                  ? "rounded-full bg-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                                  : "rounded-full border border-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+                              }
+                            >
+                              {t("reflection.supported")}
+                            </span>
+                            <span
+                              className={
+                                reflection.connected
+                                  ? "rounded-full bg-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                                  : "rounded-full border border-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+                              }
+                            >
+                              {t("reflection.connected")}
+                            </span>
                           </p>
                           {hasFeeling && (
                             <>
