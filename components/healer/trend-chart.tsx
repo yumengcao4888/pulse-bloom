@@ -24,6 +24,7 @@ function TrendTooltip({
   active,
   payload,
   label,
+  formatLabel,
 }: {
   active?: boolean;
   payload?: Array<{
@@ -33,11 +34,13 @@ function TrendTooltip({
     color?: string;
   }>;
   label?: string;
+  formatLabel?: (label?: string) => string;
 }) {
   if (!active || !payload?.length) {
     return null;
   }
 
+  const displayLabel = formatLabel ? formatLabel(label) : label;
   const order = ["connected", "grounded", "supported"];
   const items = order
     .map((key) => payload.find((entry) => entry.dataKey === key))
@@ -45,9 +48,12 @@ function TrendTooltip({
 
   return (
     <div className="recharts-default-tooltip" style={tooltipStyle}>
-      {label ? (
-        <p className="recharts-tooltip-label" style={{ margin: 0 }}>
-          {label}
+      {displayLabel ? (
+        <p
+          className="recharts-tooltip-label"
+          style={{ margin: 0, whiteSpace: "pre-line" }}
+        >
+          {displayLabel}
         </p>
       ) : null}
       <div style={{ display: "grid", rowGap: 0, marginTop: 4 }}>
@@ -70,8 +76,29 @@ function TrendTooltip({
   );
 }
 
-export function TrendChart({ data }: { data: TrendPoint[] }) {
+function formatWeekRangeLabel(label?: string) {
+  if (!label) return "";
+  const startLabel = label.slice(0, 10);
+  const startDate = new Date(`${startLabel}T00:00:00Z`);
+  if (Number.isNaN(startDate.getTime())) {
+    return label;
+  }
+  const endDate = new Date(startDate);
+  endDate.setUTCDate(endDate.getUTCDate() + 6);
+  const endLabel = endDate.toISOString().slice(0, 10);
+  return `${startLabel} -\n${endLabel}`;
+}
+
+export function TrendChart({
+  data,
+  tooltipLabelMode,
+}: {
+  data: TrendPoint[];
+  tooltipLabelMode?: "weekRange";
+}) {
   const { t } = useLocale();
+  const tooltipFormatter =
+    tooltipLabelMode === "weekRange" ? formatWeekRangeLabel : undefined;
 
   return (
     <div className="h-64 w-full">
@@ -79,7 +106,7 @@ export function TrendChart({ data }: { data: TrendPoint[] }) {
         <LineChart data={data}>
           <XAxis dataKey="date" tick={{ fontSize: 12 }} />
           <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-          <Tooltip content={<TrendTooltip />} />
+          <Tooltip content={<TrendTooltip formatLabel={tooltipFormatter} />} />
           <Legend />
 
           <Line

@@ -491,8 +491,13 @@ export default function ReflectionCard({
                 {trendData[trendRange] && (
                   <>
                     {trendData[trendRange]?.length ? (
-                      <div className="mt-4 -mx-6 w-[calc(100%+3rem)]">
-                        <TrendChart data={trendData[trendRange] ?? []} />
+                      <div className="mt-4 -mx-6 w-[calc(100%+3rem)] px-[5%]">
+                        <TrendChart
+                          data={trendData[trendRange] ?? []}
+                          tooltipLabelMode={
+                            trendRange === "monthly" ? "weekRange" : undefined
+                          }
+                        />
                       </div>
                     ) : (
                       <p className="mt-6 text-sm text-gray-500">
