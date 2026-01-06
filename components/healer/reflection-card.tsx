@@ -4,12 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import { useLocale } from "@/components/shared/locale-provider";
 import Tooltip from "@/components/shared/tooltip";
-import {
-  capitalize,
-  computeMonthlyTrends,
-  computeWeeklyTrends,
-  fetcher,
-} from "@/lib/utils";
+import { capitalize, fetcher } from "@/lib/utils";
 import type { TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
 
@@ -26,7 +21,10 @@ type ReflectionEntry = {
 
 type ReflectionsPayload = {
   reflections: ReflectionEntry[];
-  weeklyTrends: TrendPoint[];
+};
+
+type TrendsPayload = {
+  trends: TrendPoint[];
 };
 
 type SentimentSummary = {
@@ -88,6 +86,12 @@ export default function ReflectionCard({
   const [data, setData] = useState<ReflectionsPayload | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [trendData, setTrendData] = useState<{
+    monthly?: TrendPoint[];
+    allTime?: TrendPoint[];
+  }>({});
+  const [isTrendLoading, setIsTrendLoading] = useState(false);
+  const [trendError, setTrendError] = useState<string | null>(null);
   const [printoutPage, setPrintoutPage] = useState(1);
   const [printoutRange, setPrintoutRange] = useState<
     "all-time" | "week" | "month" | "year"
@@ -119,6 +123,26 @@ export default function ReflectionCard({
     }
   }, [data, isLoading, slug, t]);
 
+  const loadTrends = useCallback(
+    async (range: "monthly" | "allTime") => {
+      if (isTrendLoading || trendData[range]) return;
+      setIsTrendLoading(true);
+      setTrendError(null);
+      try {
+        const payload = await fetcher<TrendsPayload>(
+          `/api/healer/${slug}/trends?range=${range}`,
+        );
+        setTrendData((prev) => ({ ...prev, [range]: payload.trends }));
+      } catch (err) {
+        console.error("Failed to load trends", err);
+        setTrendError(t("reflection.loadError"));
+      } finally {
+        setIsTrendLoading(false);
+      }
+    },
+    [isTrendLoading, slug, t, trendData],
+  );
+
   const loadSentimentSummary = useCallback(
     async (range: "monthly" | "allTime") => {
       setIsSentimentLoading(true);
@@ -144,6 +168,12 @@ export default function ReflectionCard({
     }
   };
 
+  const ensureTrendsLoaded = (range: "monthly" | "allTime") => {
+    if (!trendData[range] && !isTrendLoading) {
+      void loadTrends(range);
+    }
+  };
+
   const formatDate = (date: string) => new Date(date).toLocaleString(locale);
   const formatBool = (value: boolean | null | undefined) =>
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
@@ -154,7 +184,8 @@ export default function ReflectionCard({
   const handleSectionToggle = (section: SectionKey) => {
     setActiveSection((prev) => {
       const next = prev === section ? null : section;
-      if (next) ensureDataLoaded();
+      if (next === "printout") ensureDataLoaded();
+      if (next === "trends") ensureTrendsLoaded(countRange);
       if (next === "printout") {
         setPrintoutRange("all-time");
       }
@@ -275,19 +306,13 @@ export default function ReflectionCard({
     };
   }, [allTimeCounts, countRange, data, monthlyCounts]);
 
-  const trendData = useMemo(() => {
-    if (!data?.reflections) return [];
-    const reflections = data.reflections;
-    if (countRange === "monthly") {
-      const threshold = new Date();
-      threshold.setDate(threshold.getDate() - 30);
-      const recent = reflections.filter(
-        (reflection) => new Date(reflection.createdAt) >= threshold,
-      );
-      return computeWeeklyTrends(recent);
-    }
-    return computeMonthlyTrends(reflections);
-  }, [countRange, data]);
+  const trendRange = countRange === "monthly" ? "monthly" : "allTime";
+
+  useEffect(() => {
+    if (!showTrends) return;
+    if (trendData[trendRange]) return;
+    void loadTrends(trendRange);
+  }, [loadTrends, showTrends, trendData, trendRange]);
 
   const showMonthlyToggle =
     monthlyCounts.total > 0 && monthlyCounts.total !== reflectionsCount;
@@ -402,25 +427,42 @@ export default function ReflectionCard({
                 className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={isSentimentLoading}
               >
-                {showSentiment ? "✨ Hide NLP insights" : "✨ Explore NLP insights"}
-                {showSentiment && isSentimentLoading && !sentimentData && (
-                  <span className="ml-1 inline-flex items-center">
-                    <span
-                      aria-hidden="true"
-                      className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
-                    />
-                    <span className="sr-only">Loading NLP insights...</span>
+                <span className="flex flex-col items-center">
+                  <span>
+                    {showSentiment ? "✨ Hide NLP insights" : "✨ Explore NLP insights"}
                   </span>
-                )}
+                  {showSentiment && isSentimentLoading && !sentimentData && (
+                    <span className="mt-1 flex w-full justify-center">
+                      <span
+                        aria-hidden="true"
+                        className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
+                      />
+                      <span className="sr-only">Loading NLP insights...</span>
+                    </span>
+                  )}
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSectionToggle("trends")}
                 className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-center"
               >
-                {activeSection === "trends"
-                  ? "📈 Hide feeling trends"
-                  : "📈 View feeling trends"}
+                <span className="flex flex-col items-center">
+                  <span>
+                    {activeSection === "trends"
+                      ? "📈 Hide feeling trends"
+                      : "📈 View feeling trends"}
+                  </span>
+                  {showTrends && isTrendLoading && (
+                    <span className="mt-1 flex w-full justify-center">
+                      <span
+                        aria-hidden="true"
+                        className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
+                      />
+                      <span className="sr-only">Loading feeling trends...</span>
+                    </span>
+                  )}
+                </span>
               </button>
               <button
                 type="button"
@@ -434,24 +476,23 @@ export default function ReflectionCard({
             </div>
             {showTrends && (
               <div className="mt-4">
-                {!hasData && isLoading && <ReflectionsSkeleton />}
-                {error && (
+                {trendError && (
                   <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                    <p>{error}</p>
+                    <p>{trendError}</p>
                     <button
                       type="button"
-                      onClick={loadReflections}
+                      onClick={() => loadTrends(trendRange)}
                       className="mt-3 rounded-full border border-red-200 bg-white px-3 py-1 text-xs font-semibold text-red-700 shadow-sm transition hover:bg-red-100"
                     >
                       {t("healer.reflections.retry")}
                     </button>
                   </div>
                 )}
-                {data && (
+                {trendData[trendRange] && (
                   <>
-                    {trendData.length > 0 ? (
+                    {trendData[trendRange]?.length ? (
                       <div className="mt-4 -mx-6 w-[calc(100%+3rem)]">
-                        <TrendChart data={trendData} />
+                        <TrendChart data={trendData[trendRange] ?? []} />
                       </div>
                     ) : (
                       <p className="mt-6 text-sm text-gray-500">
