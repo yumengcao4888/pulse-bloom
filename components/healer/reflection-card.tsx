@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
-import PrintProfileButton from "@/components/healer/print-profile-button";
 import { useLocale } from "@/components/shared/locale-provider";
 import Tooltip from "@/components/shared/tooltip";
 import { capitalize, fetcher } from "@/lib/utils";
@@ -492,7 +491,6 @@ export default function ReflectionCard({
             )}
             <div className="my-4 border-t border-gray-200" />
             <div className="mt-4 flex flex-wrap gap-2">
-              <PrintProfileButton slug={slug} />
               <button
                 type="button"
                 onClick={() => handleSectionToggle("trends")}
