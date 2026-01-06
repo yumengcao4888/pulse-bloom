@@ -91,9 +91,6 @@ export default function ReflectionCard({
     monthly?: TrendPoint[];
     allTime?: TrendPoint[];
   }>({});
-  const [hasNlpInsights, setHasNlpInsights] = useState(false);
-  const [isNlpLoading, setIsNlpLoading] = useState(false);
-  const [nlpError, setNlpError] = useState<string | null>(null);
   const [printoutSort, setPrintoutSort] = useState<"desc" | "asc">("desc");
   const [isTrendLoading, setIsTrendLoading] = useState(false);
   const [trendError, setTrendError] = useState<string | null>(null);
@@ -116,8 +113,6 @@ export default function ReflectionCard({
     if (isLoading || data) return;
     setIsLoading(true);
     setError(null);
-    setHasNlpInsights(false);
-    setNlpError(null);
     try {
       const payload = await fetcher<ReflectionsPayload>(
         `/api/healer/${slug}/reflections?tz=${encodeURIComponent(timeZone)}`,
@@ -130,40 +125,6 @@ export default function ReflectionCard({
       setIsLoading(false);
     }
   }, [data, isLoading, slug, t, timeZone]);
-
-  const loadNlpInsights = useCallback(async () => {
-    if (isNlpLoading || hasNlpInsights || !data) return;
-    setIsNlpLoading(true);
-    setNlpError(null);
-    try {
-      const payload = await fetcher<ReflectionsPayload>(
-        `/api/healer/${slug}/reflections-nlp`,
-      );
-      const reflectionMap = new Map(
-        payload.reflections.map((reflection) => [reflection.id, reflection]),
-      );
-      setData((prev) => {
-        if (!prev) return prev;
-        return {
-          reflections: prev.reflections.map((reflection) => {
-            const match = reflectionMap.get(reflection.id);
-            if (!match) return reflection;
-            return {
-              ...reflection,
-              sentiment: match.sentiment,
-              emotion: match.emotion,
-            };
-          }),
-        };
-      });
-      setHasNlpInsights(true);
-    } catch (err) {
-      console.error("Failed to load NLP insights", err);
-      setNlpError(t("reflection.loadError"));
-    } finally {
-      setIsNlpLoading(false);
-    }
-  }, [data, hasNlpInsights, isNlpLoading, slug, t]);
 
   const loadTrends = useCallback(
     async (range: "monthly" | "allTime") => {
@@ -697,20 +658,6 @@ export default function ReflectionCard({
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={loadNlpInsights}
-                className={
-                  hasNlpInsights
-                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90 disabled:cursor-not-allowed disabled:opacity-60"
-                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10 disabled:cursor-not-allowed disabled:opacity-60"
-                }
-                aria-pressed={hasNlpInsights}
-                aria-busy={isNlpLoading}
-                disabled={isLoading || isNlpLoading || !data || hasNlpInsights}
-              >
-                Include NLP insights
-              </button>
-              <button
-                type="button"
                 onClick={() =>
                   setPrintoutSort((prev) => (prev === "desc" ? "asc" : "desc"))
                 }
@@ -720,7 +667,6 @@ export default function ReflectionCard({
                 {printoutSort === "desc" ? "Desc" : "Asc"}
               </button>
             </div>
-            {nlpError && <p className="text-xs text-red-600">{nlpError}</p>}
             {sortedPrintout.length === 0 ? (
               <p className="text-sm text-gray-500">{t("reflection.none")}</p>
             ) : (
@@ -789,24 +735,6 @@ export default function ReflectionCard({
                                     {reflection.feeling}
                                   </span>
                                 </p>
-                                {hasNlpInsights && (
-                                  <>
-                                    <p className="text-gray-500">
-                                      {t("reflection.sentiment")}:{" "}
-                                      {reflection.sentiment
-                                        ? `${capitalize(reflection.sentiment.label)} (${Math.round(
-                                            reflection.sentiment.score * 100,
-                                          )} / 100)`
-                                        : t("common.unavailable")}
-                                    </p>
-                                    <p className="text-gray-500">
-                                      {t("reflection.emotion")}:{" "}
-                                      {reflection.emotion?.label
-                                        ? capitalize(reflection.emotion.label)
-                                        : t("common.unavailable")}
-                                    </p>
-                                  </>
-                                )}
                               </>
                             )}
                           </div>
