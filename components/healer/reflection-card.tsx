@@ -508,9 +508,22 @@ export default function ReflectionCard({
                 onClick={() => handleSectionToggle("printout")}
                 className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-end"
               >
-                {activeSection === "printout"
-                  ? "🔍 Hide full reflection"
-                  : "🔍 View full reflection"}
+                <span className="flex flex-col items-center">
+                  <span>
+                    {activeSection === "printout"
+                      ? "🔍 Hide full reflection"
+                      : "🔍 View full reflection"}
+                  </span>
+                  {showPrintout && isLoading && !data && (
+                    <span className="mt-1 flex w-full justify-center">
+                      <span
+                        aria-hidden="true"
+                        className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
+                      />
+                      <span className="sr-only">Loading reflections...</span>
+                    </span>
+                  )}
+                </span>
               </button>
             </div>
             {showTrends && (
@@ -661,7 +674,6 @@ export default function ReflectionCard({
               </div>
             )}
           </div>
-        {showPrintout && !hasData && isLoading && <ReflectionsSkeleton />}
         {showPrintout && error && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             <p>{error}</p>
