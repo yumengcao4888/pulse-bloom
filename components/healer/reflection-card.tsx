@@ -211,7 +211,20 @@ export default function ReflectionCard({
     }
   };
 
-  const formatDate = (date: string) => new Date(date).toLocaleString(locale);
+  const formatDate = (date: string) => {
+    const dateValue = new Date(date);
+    const datePart = dateValue.toLocaleDateString(locale, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const timePart = dateValue.toLocaleTimeString(locale, {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+
+    return `${datePart} at ${timePart}`;
+  };
   const formatBool = (value: boolean | null | undefined) =>
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
 
@@ -725,6 +738,12 @@ export default function ReflectionCard({
                           key={reflection.id}
                           className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
                         >
+                          <p className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-900">
+                            <span className="rounded-full bg-[#D9C29F] px-3 py-0.5 text-xs font-semibold text-gray-900">
+                              Reflected on
+                            </span>
+                            <span>{formatDate(reflection.createdAt)}</span>
+                          </p>
                           <p className="mb-1 flex flex-wrap items-center gap-3">
                             <span
                               className={
@@ -782,12 +801,6 @@ export default function ReflectionCard({
                               )}
                             </>
                           )}
-                          <p className="flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-900">
-                            <span className="rounded-full bg-[#D9C29F] px-3 py-0.5 text-xs font-semibold text-gray-900">
-                              {t("reflection.created")}
-                            </span>
-                            <span>{formatDate(reflection.createdAt)}</span>
-                          </p>
                         </div>
                       );
                     })}
