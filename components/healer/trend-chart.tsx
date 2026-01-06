@@ -13,6 +13,63 @@ import {
 import { type TrendPoint } from "@/lib/utils";
 import { useLocale } from "@/components/shared/locale-provider";
 
+const tooltipStyle = {
+  backgroundColor: "rgb(255, 255, 255)",
+  border: "1px solid rgb(204, 204, 204)",
+  padding: "10px",
+  whiteSpace: "nowrap",
+} as const;
+
+function TrendTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{
+    dataKey?: string;
+    name?: string;
+    value?: number | string;
+    color?: string;
+  }>;
+  label?: string;
+}) {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  const order = ["connected", "grounded", "supported"];
+  const items = order
+    .map((key) => payload.find((entry) => entry.dataKey === key))
+    .filter(Boolean);
+
+  return (
+    <div className="recharts-default-tooltip" style={tooltipStyle}>
+      {label ? (
+        <p className="recharts-tooltip-label" style={{ margin: 0 }}>
+          {label}
+        </p>
+      ) : null}
+      <div style={{ display: "grid", rowGap: 0, marginTop: 4 }}>
+        {items.map((entry) => (
+          <div
+            key={entry?.dataKey}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr auto",
+              columnGap: 12,
+              alignItems: "baseline",
+            }}
+          >
+            <span style={{ color: entry?.color }}>{entry?.name}</span>
+            <span style={{ textAlign: "right" }}>{`${entry?.value}%`}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function TrendChart({ data }: { data: TrendPoint[] }) {
   const { t } = useLocale();
 
@@ -22,7 +79,7 @@ export function TrendChart({ data }: { data: TrendPoint[] }) {
         <LineChart data={data}>
           <XAxis dataKey="date" tick={{ fontSize: 12 }} />
           <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-          <Tooltip />
+          <Tooltip content={<TrendTooltip />} />
           <Legend />
 
           <Line
