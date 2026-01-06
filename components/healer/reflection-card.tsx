@@ -364,11 +364,11 @@ export default function ReflectionCard({
               </div>
             </div>
             <div className="my-4 border-t border-gray-200" />
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="mt-3 grid w-full grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center">
               <button
                 type="button"
                 onClick={() => setShowSentiment((prev) => !prev)}
-                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
+                className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={isSentimentLoading}
               >
                 {showSentiment ? "Hide NLP insights" : "Explore NLP insights"}
@@ -381,6 +381,24 @@ export default function ReflectionCard({
                     <span className="sr-only">Loading NLP insights...</span>
                   </span>
                 )}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSectionToggle("trends")}
+                className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-center"
+              >
+                {activeSection === "trends"
+                  ? "Hide over time weekly trends"
+                  : "Over time weekly trends"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSectionToggle("printout")}
+                className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-end"
+              >
+                {activeSection === "printout"
+                  ? "Hide reflection printout"
+                  : "Reflection printout"}
               </button>
             </div>
             {showSentiment && (
@@ -496,27 +514,6 @@ export default function ReflectionCard({
                 )}
               </div>
             )}
-            <div className="my-4 border-t border-gray-200" />
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => handleSectionToggle("trends")}
-                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
-              >
-                {activeSection === "trends"
-                  ? "Hide over time weekly trends"
-                  : "Over time weekly trends"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSectionToggle("printout")}
-                className="rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover"
-              >
-                {activeSection === "printout"
-                  ? "Hide reflection printout"
-                  : "Reflection printout"}
-              </button>
-            </div>
           </div>
         {shouldShowContent && !hasData && isLoading && <ReflectionsSkeleton />}
         {shouldShowContent && error && (
