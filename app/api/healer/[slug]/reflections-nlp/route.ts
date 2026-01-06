@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { computeWeeklyTrends } from "@/lib/utils";
+import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 
 export const dynamic = "force-dynamic";
 
@@ -26,16 +26,14 @@ export async function GET(
     return NextResponse.json({ error: "Healer not found" }, { status: 404 });
   }
 
-  const reflections = healer.reflections.map((reflection) => ({
-    ...reflection,
-    sentiment: null,
-    emotion: null,
-  }));
+  const hfEnabled = Boolean(process.env.HF_TOKEN);
+  const reflections = await Promise.all(
+    healer.reflections.map(async (reflection) => ({
+      ...reflection,
+      sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
+      emotion: hfEnabled ? await classifyEmotion(reflection.feeling) : null,
+    })),
+  );
 
-  const weeklyTrends = computeWeeklyTrends(reflections);
-
-  return NextResponse.json({
-    reflections,
-    weeklyTrends,
-  });
+  return NextResponse.json({ reflections });
 }

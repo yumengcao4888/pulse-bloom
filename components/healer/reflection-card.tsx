@@ -90,6 +90,9 @@ export default function ReflectionCard({
     monthly?: TrendPoint[];
     allTime?: TrendPoint[];
   }>({});
+  const [hasNlpInsights, setHasNlpInsights] = useState(false);
+  const [isNlpLoading, setIsNlpLoading] = useState(false);
+  const [nlpError, setNlpError] = useState<string | null>(null);
   const [isTrendLoading, setIsTrendLoading] = useState(false);
   const [trendError, setTrendError] = useState<string | null>(null);
   const [printoutPage, setPrintoutPage] = useState(1);
@@ -110,6 +113,8 @@ export default function ReflectionCard({
     if (isLoading || data) return;
     setIsLoading(true);
     setError(null);
+    setHasNlpInsights(false);
+    setNlpError(null);
     try {
       const payload = await fetcher<ReflectionsPayload>(
         `/api/healer/${slug}/reflections`,
@@ -122,6 +127,40 @@ export default function ReflectionCard({
       setIsLoading(false);
     }
   }, [data, isLoading, slug, t]);
+
+  const loadNlpInsights = useCallback(async () => {
+    if (isNlpLoading || hasNlpInsights || !data) return;
+    setIsNlpLoading(true);
+    setNlpError(null);
+    try {
+      const payload = await fetcher<ReflectionsPayload>(
+        `/api/healer/${slug}/reflections-nlp`,
+      );
+      const reflectionMap = new Map(
+        payload.reflections.map((reflection) => [reflection.id, reflection]),
+      );
+      setData((prev) => {
+        if (!prev) return prev;
+        return {
+          reflections: prev.reflections.map((reflection) => {
+            const match = reflectionMap.get(reflection.id);
+            if (!match) return reflection;
+            return {
+              ...reflection,
+              sentiment: match.sentiment,
+              emotion: match.emotion,
+            };
+          }),
+        };
+      });
+      setHasNlpInsights(true);
+    } catch (err) {
+      console.error("Failed to load NLP insights", err);
+      setNlpError(t("reflection.loadError"));
+    } finally {
+      setIsNlpLoading(false);
+    }
+  }, [data, hasNlpInsights, isNlpLoading, slug, t]);
 
   const loadTrends = useCallback(
     async (range: "monthly" | "allTime") => {
@@ -491,7 +530,7 @@ export default function ReflectionCard({
                 {trendData[trendRange] && (
                   <>
                     {trendData[trendRange]?.length ? (
-                      <div className="mt-4 -mx-6 w-[calc(100%+3rem)] px-[5%]">
+                      <div className="mt-4 -mx-6 w-[calc(100%+3rem)] px-[1%]">
                         <TrendChart
                           data={trendData[trendRange] ?? []}
                           tooltipLabelMode={
@@ -637,48 +676,6 @@ export default function ReflectionCard({
         )}
         {showPrintout && data && (
           <div className="space-y-4">
-            <div className="text-sm text-gray-600">
-              <h3 className="text-base font-semibold text-gray-800">
-                About the Sentiment and Emotion Scores
-              </h3>
-              <p className="mt-2">
-                Each reflection includes a sentiment score (0-100) and a suggested
-                emotion, estimated by trusted open-source NLP models.
-              </p>
-              <p className="mt-2">
-                <b>Sentiment Score</b> reflects the emotional tone - lower scores
-                suggest heavier or more difficult reflections, higher scores suggest
-                lighter or more positive tones.
-                <br />
-                {"-> "}Powered by{" "}
-                <a
-                  href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
-                  className="text-blue-600 underline"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  CardiffNLP&apos;s sentiment model
-                </a>
-              </p>
-              <p className="mt-2">
-                <b>Emotion Label</b> reflects the emotional nuance identified in the
-                text.
-                <br />
-                {"-> "}Based on{" "}
-                <a
-                  href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
-                  className="text-blue-600 underline"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  GoEmotions model by Sam Lowe
-                </a>
-              </p>
-              <p className="mt-2">
-                These tools are here to help you notice gentle patterns - there&apos;s
-                no right or wrong way to feel.
-              </p>
-            </div>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -724,7 +721,24 @@ export default function ReflectionCard({
               >
                 This year
               </button>
+              <button
+                type="button"
+                onClick={loadNlpInsights}
+                className={
+                  hasNlpInsights
+                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90 disabled:cursor-not-allowed disabled:opacity-60"
+                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10 disabled:cursor-not-allowed disabled:opacity-60"
+                }
+                aria-pressed={hasNlpInsights}
+                aria-busy={isNlpLoading}
+                disabled={isLoading || isNlpLoading || !data || hasNlpInsights}
+              >
+                Include NLP insights
+              </button>
             </div>
+            {nlpError && (
+              <p className="text-xs text-red-600">{nlpError}</p>
+            )}
             {filteredPrintout.length === 0 ? (
               <p className="text-sm text-gray-500">{t("reflection.none")}</p>
             ) : (
@@ -741,42 +755,54 @@ export default function ReflectionCard({
 
                 return (
                   <>
-                    {pageItems.map((reflection) => (
-                      <div
-                        key={reflection.id}
-                        className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
-                      >
-                        <p className="mb-1">
-                          <b>{t("reflection.grounded")}:</b>{" "}
-                          {formatBool(reflection.grounded)}{" "}
-                          <b className="ml-3">{t("reflection.supported")}:</b>{" "}
-                          {formatBool(reflection.supported)}{" "}
-                          <b className="ml-3">{t("reflection.connected")}:</b>{" "}
-                          {formatBool(reflection.connected)}
-                        </p>
-                        <p className="mb-2 text-base text-gray-800">
-                          <b>{t("reflection.feeling")}:</b>{" "}
-                          {reflection.feeling ?? t("common.na")}
-                        </p>
-                        <p className="text-gray-500">
-                          {t("reflection.sentiment")}:{" "}
-                          {reflection.sentiment
-                            ? `${capitalize(reflection.sentiment.label)} (${Math.round(
-                                reflection.sentiment.score * 100,
-                              )} / 100)`
-                            : t("common.unavailable")}
-                        </p>
-                        <p className="text-gray-500">
-                          {t("reflection.emotion")}:{" "}
-                          {reflection.emotion?.label
-                            ? capitalize(reflection.emotion.label)
-                            : t("common.unavailable")}
-                        </p>
-                        <p className="text-gray-500">
-                          {t("reflection.created")}: {formatDate(reflection.createdAt)}
-                        </p>
-                      </div>
-                    ))}
+                    {pageItems.map((reflection) => {
+                      const hasFeeling = Boolean(reflection.feeling?.trim());
+
+                      return (
+                        <div
+                          key={reflection.id}
+                          className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
+                        >
+                          <p className="mb-1">
+                            <b>{t("reflection.grounded")}:</b>{" "}
+                            {formatBool(reflection.grounded)}{" "}
+                            <b className="ml-3">{t("reflection.supported")}:</b>{" "}
+                            {formatBool(reflection.supported)}{" "}
+                            <b className="ml-3">{t("reflection.connected")}:</b>{" "}
+                            {formatBool(reflection.connected)}
+                          </p>
+                          {hasFeeling && (
+                            <>
+                              <p className="mb-2 text-base text-gray-800">
+                                <b>{t("reflection.feeling")}:</b>{" "}
+                                {reflection.feeling}
+                              </p>
+                              {hasNlpInsights && (
+                                <>
+                                  <p className="text-gray-500">
+                                    {t("reflection.sentiment")}:{" "}
+                                    {reflection.sentiment
+                                      ? `${capitalize(reflection.sentiment.label)} (${Math.round(
+                                          reflection.sentiment.score * 100,
+                                        )} / 100)`
+                                      : t("common.unavailable")}
+                                  </p>
+                                  <p className="text-gray-500">
+                                    {t("reflection.emotion")}:{" "}
+                                    {reflection.emotion?.label
+                                      ? capitalize(reflection.emotion.label)
+                                      : t("common.unavailable")}
+                                  </p>
+                                </>
+                              )}
+                            </>
+                          )}
+                          <p className="text-gray-500">
+                            {t("reflection.created")}: {formatDate(reflection.createdAt)}
+                          </p>
+                        </div>
+                      );
+                    })}
                     {totalPages > 1 && (
                       <div className="flex flex-wrap items-center justify-center gap-2">
                         <button
