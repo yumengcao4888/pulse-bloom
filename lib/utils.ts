@@ -193,6 +193,13 @@ function getWeekStartKey(dateInput: string | Date) {
   return startOfWeek.toISOString().slice(0, 10);
 }
 
+function getMonthStartKey(dateInput: string | Date) {
+  const date = new Date(dateInput);
+  const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  startOfMonth.setHours(0, 0, 0, 0);
+  return startOfMonth.toISOString().slice(0, 7);
+}
+
 export function computeWeeklyTrends(reflections: Reflection[]): TrendPoint[] {
   const byWeek: Record<
     string,
@@ -220,6 +227,42 @@ export function computeWeeklyTrends(reflections: Reflection[]): TrendPoint[] {
   });
 
   return Object.entries(byWeek)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, stats]) => ({
+      date,
+      grounded: averagePercentage(stats.grounded),
+      supported: averagePercentage(stats.supported),
+      connected: averagePercentage(stats.connected),
+    }));
+}
+
+export function computeMonthlyTrends(reflections: Reflection[]): TrendPoint[] {
+  const byMonth: Record<
+    string,
+    {
+      grounded: boolean[];
+      supported: boolean[];
+      connected: boolean[];
+    }
+  > = {};
+
+  reflections.forEach((reflection) => {
+    const month = getMonthStartKey(reflection.createdAt);
+
+    const bucket =
+      byMonth[month] ??
+      (byMonth[month] = {
+        grounded: [],
+        supported: [],
+        connected: [],
+      });
+
+    if (reflection.grounded !== null) bucket.grounded.push(reflection.grounded);
+    if (reflection.supported !== null) bucket.supported.push(reflection.supported);
+    if (reflection.connected !== null) bucket.connected.push(reflection.connected);
+  });
+
+  return Object.entries(byMonth)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, stats]) => ({
       date,

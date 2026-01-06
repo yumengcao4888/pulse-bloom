@@ -4,7 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import { useLocale } from "@/components/shared/locale-provider";
 import Tooltip from "@/components/shared/tooltip";
-import { capitalize, fetcher } from "@/lib/utils";
+import {
+  capitalize,
+  computeMonthlyTrends,
+  computeWeeklyTrends,
+  fetcher,
+} from "@/lib/utils";
 import type { TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
 
@@ -270,6 +275,20 @@ export default function ReflectionCard({
     };
   }, [allTimeCounts, countRange, data, monthlyCounts]);
 
+  const trendData = useMemo(() => {
+    if (!data?.reflections) return [];
+    const reflections = data.reflections;
+    if (countRange === "monthly") {
+      const threshold = new Date();
+      threshold.setDate(threshold.getDate() - 30);
+      const recent = reflections.filter(
+        (reflection) => new Date(reflection.createdAt) >= threshold,
+      );
+      return computeWeeklyTrends(recent);
+    }
+    return computeMonthlyTrends(reflections);
+  }, [countRange, data]);
+
   const showMonthlyToggle =
     monthlyCounts.total > 0 && monthlyCounts.total !== reflectionsCount;
   const sentimentKey = countRange === "monthly" ? "monthly" : "allTime";
@@ -430,9 +449,9 @@ export default function ReflectionCard({
                 )}
                 {data && (
                   <>
-                    {data.weeklyTrends.length > 0 ? (
+                    {trendData.length > 0 ? (
                       <div className="mt-4 -mx-6 w-[calc(100%+3rem)]">
-                        <TrendChart data={data.weeklyTrends} />
+                        <TrendChart data={trendData} />
                       </div>
                     ) : (
                       <p className="mt-6 text-sm text-gray-500">
