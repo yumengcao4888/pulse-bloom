@@ -756,9 +756,11 @@ export default function ReflectionCard({
                           </p>
                           {hasFeeling && (
                             <>
-                              <p className="mb-2 text-base text-gray-800">
-                                <b>{t("reflection.feeling")}:</b>{" "}
-                                {reflection.feeling}
+                              <p className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-900">
+                                <span className="rounded-full bg-pulse-bloom px-3 py-0.5 text-xs font-semibold text-white">
+                                  {t("reflection.feeling")}
+                                </span>
+                                <span>{reflection.feeling}</span>
                               </p>
                               {hasNlpInsights && (
                                 <>
@@ -780,8 +782,11 @@ export default function ReflectionCard({
                               )}
                             </>
                           )}
-                          <p className="text-gray-500">
-                            {t("reflection.created")}: {formatDate(reflection.createdAt)}
+                          <p className="flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-900">
+                            <span className="rounded-full bg-[#D9C29F] px-3 py-0.5 text-xs font-semibold text-gray-900">
+                              {t("reflection.created")}
+                            </span>
+                            <span>{formatDate(reflection.createdAt)}</span>
                           </p>
                         </div>
                       );
