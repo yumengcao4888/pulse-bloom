@@ -586,11 +586,13 @@ export default function ReflectionCard({
                       <Tooltip
                         content={
                           <div className="space-y-1 text-left text-xs text-gray-700">
-                            <p>Sentiment Score reflects the emotional tone.</p>
                             <p>
-                              Lower scores suggest heavier or more difficult reflections,
+                              Emotional warmth captures the feeling tone of the reflection.
                             </p>
-                            <p>higher scores suggest lighter or more positive tones.</p>
+                            <p>
+                              Lower scores suggest heavier or more difficult reflections.
+                            </p>
+                            <p>Higher scores suggest lighter or more positive tones.</p>
                             <p>
                               Powered by{" "}
                               <a
