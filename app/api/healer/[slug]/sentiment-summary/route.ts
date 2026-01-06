@@ -90,8 +90,48 @@ export async function GET(
     },
     {},
   );
+  const emotionPriority = [
+    "gratitude",
+    "love",
+    "admiration",
+    "joy",
+    "caring",
+    "approval",
+    "optimism",
+    "pride",
+    "relief",
+    "excitement",
+    "amusement",
+    "desire",
+    "curiosity",
+    "surprise",
+    "realization",
+    "confusion",
+    "neutral",
+    "sadness",
+    "nervousness",
+    "fear",
+    "disappointment",
+    "remorse",
+    "embarrassment",
+    "grief",
+    "annoyance",
+    "disapproval",
+    "anger",
+    "disgust",
+  ];
+  const priorityIndex = new Map(
+    emotionPriority.map((label, index) => [label, index]),
+  );
+
   const topEmotions = Object.entries(emotionCounts)
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => {
+      const countDiff = b[1] - a[1];
+      if (countDiff !== 0) return countDiff;
+      const aIndex = priorityIndex.get(a[0].toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      const bIndex = priorityIndex.get(b[0].toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex;
+    })
     .slice(0, 2)
     .map(([label, count]) => ({ label, count }));
 
