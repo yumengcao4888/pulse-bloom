@@ -76,17 +76,22 @@ function TrendTooltip({
   );
 }
 
-function formatWeekRangeLabel(label?: string) {
+function formatWeekRangeLabel(label: string | undefined, locale: string) {
   if (!label) return "";
   const startLabel = label.slice(0, 10);
-  const startDate = new Date(`${startLabel}T00:00:00Z`);
+  const startDate = new Date(`${startLabel}T00:00:00`);
   if (Number.isNaN(startDate.getTime())) {
     return label;
   }
   const endDate = new Date(startDate);
-  endDate.setUTCDate(endDate.getUTCDate() + 6);
-  const endLabel = endDate.toISOString().slice(0, 10);
-  return `${startLabel} -\n${endLabel}`;
+  endDate.setDate(endDate.getDate() + 6);
+  const formatter = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+  });
+  const startDisplay = formatter.format(startDate);
+  const endDisplay = formatter.format(endDate);
+  return `${startDisplay} -\n${endDisplay}`;
 }
 
 export function TrendChart({
@@ -96,9 +101,11 @@ export function TrendChart({
   data: TrendPoint[];
   tooltipLabelMode?: "weekRange";
 }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const tooltipFormatter =
-    tooltipLabelMode === "weekRange" ? formatWeekRangeLabel : undefined;
+    tooltipLabelMode === "weekRange"
+      ? (label?: string) => formatWeekRangeLabel(label, locale)
+      : undefined;
 
   return (
     <div className="h-64 w-full">

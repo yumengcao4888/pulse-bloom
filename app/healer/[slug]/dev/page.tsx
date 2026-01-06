@@ -12,6 +12,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import { TrendChart } from "@/components/healer/trend-chart";
 import MyWordcloud from "@/components/healer/simple-wordcloud";
+import { LocalizedDateTime } from "@/components/shared/localized-date-time";
 import type { Word } from "react-wordcloud";
 
 import 'tippy.js/dist/tippy.css';
@@ -65,15 +66,10 @@ export default async function HealerDevPage(props: PageProps) {
     website: t("form.healer.contact.type.website"),
     social: t("form.healer.contact.type.social"),
   } as const;
-  const formatDate = (date: string | Date) => new Date(date).toLocaleString(locale);
   const formatBool = (value: boolean | null | undefined) =>
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
   const formatPercent = (value: number | null | undefined) =>
     value == null ? t("common.none") : `${value}%`;
-  const formatWeekLabel = (week: string) => {
-    const date = new Date(week);
-    return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
-  };
 
   const healer = await prisma.healer.findUnique({
     where: { slug },
@@ -297,7 +293,11 @@ export default async function HealerDevPage(props: PageProps) {
                           key={week}
                           className="border-b px-3 py-2 text-center text-xs uppercase tracking-wide text-gray-500"
                         >
-                          {formatWeekLabel(week)}
+                          <LocalizedDateTime
+                            value={week}
+                            locale={locale}
+                            options={{ month: "short", day: "numeric" }}
+                          />
                         </th>
                       ))}
                     </tr>
@@ -373,7 +373,8 @@ export default async function HealerDevPage(props: PageProps) {
                       : t("common.unavailable")}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {t("reflection.created")}: {formatDate(reflection.createdAt)}
+                    {t("reflection.created")}:{" "}
+                    <LocalizedDateTime value={reflection.createdAt} locale={locale} />
                   </p>
                 </div>
               ))}

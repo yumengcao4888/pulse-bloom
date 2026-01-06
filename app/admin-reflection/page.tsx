@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
+import { LocalizedDateTime } from "@/components/shared/localized-date-time";
 
 export const dynamic = "force-dynamic"
 
@@ -38,7 +39,7 @@ export default async function ReflectionListPage() {
               <td className="border px-4 py-2">{r.feeling}</td>
               <td className="border px-4 py-2">{r.healerId}</td>
               <td className="border px-4 py-2">
-                {new Date(r.createdAt).toLocaleString(locale)}
+                <LocalizedDateTime value={r.createdAt} locale={locale} />
               </td>
             </tr>
           ))}

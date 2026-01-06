@@ -149,7 +149,70 @@ function averageNumber(values: number[]) {
   return sum / values.length;
 }
 
-export function computeDailyTrends(reflections: Reflection[]): TrendPoint[] {
+const WEEKDAY_INDEX: Record<string, number> = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+};
+
+function getDateParts(dateInput: string | Date, timeZone?: string) {
+  if (!timeZone) {
+    const date = new Date(dateInput);
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+      weekday: date.getDay(),
+    };
+  }
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  });
+  const parts = formatter.formatToParts(new Date(dateInput));
+  const partMap = Object.fromEntries(
+    parts.map((part) => [part.type, part.value]),
+  );
+  const weekday = WEEKDAY_INDEX[partMap.weekday ?? ""] ?? 0;
+
+  return {
+    year: Number(partMap.year),
+    month: Number(partMap.month),
+    day: Number(partMap.day),
+    weekday,
+  };
+}
+
+function formatDateKey(dateInput: string | Date, timeZone?: string) {
+  const { year, month, day } = getDateParts(dateInput, timeZone);
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function getWeekStartKey(dateInput: string | Date, timeZone?: string) {
+  const { year, month, day, weekday } = getDateParts(dateInput, timeZone);
+  const offset = (weekday + 6) % 7;
+  const baseDate = new Date(Date.UTC(year, month - 1, day));
+  baseDate.setUTCDate(baseDate.getUTCDate() - offset);
+  return baseDate.toISOString().slice(0, 10);
+}
+
+function getMonthStartKey(dateInput: string | Date, timeZone?: string) {
+  const { year, month } = getDateParts(dateInput, timeZone);
+  return `${year}-${String(month).padStart(2, "0")}`;
+}
+
+export function computeDailyTrends(
+  reflections: Reflection[],
+  timeZone?: string,
+): TrendPoint[] {
   const byDay: Record<
     string,
     {
@@ -160,7 +223,7 @@ export function computeDailyTrends(reflections: Reflection[]): TrendPoint[] {
   > = {};
 
   reflections.forEach((reflection) => {
-    const day = new Date(reflection.createdAt).toISOString().slice(0, 10);
+    const day = formatDateKey(reflection.createdAt, timeZone);
 
     const bucket =
       byDay[day] ??
@@ -185,24 +248,10 @@ export function computeDailyTrends(reflections: Reflection[]): TrendPoint[] {
     }));
 }
 
-function getWeekStartKey(dateInput: string | Date) {
-  const date = new Date(dateInput);
-  const day = date.getDay();
-  const offset = (day + 6) % 7;
-  const startOfWeek = new Date(date);
-  startOfWeek.setDate(startOfWeek.getDate() - offset);
-  startOfWeek.setHours(0, 0, 0, 0);
-  return startOfWeek.toISOString().slice(0, 10);
-}
-
-function getMonthStartKey(dateInput: string | Date) {
-  const date = new Date(dateInput);
-  const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-  startOfMonth.setHours(0, 0, 0, 0);
-  return startOfMonth.toISOString().slice(0, 7);
-}
-
-export function computeWeeklyTrends(reflections: Reflection[]): TrendPoint[] {
+export function computeWeeklyTrends(
+  reflections: Reflection[],
+  timeZone?: string,
+): TrendPoint[] {
   const byWeek: Record<
     string,
     {
@@ -213,7 +262,7 @@ export function computeWeeklyTrends(reflections: Reflection[]): TrendPoint[] {
   > = {};
 
   reflections.forEach((reflection) => {
-    const week = getWeekStartKey(reflection.createdAt);
+    const week = getWeekStartKey(reflection.createdAt, timeZone);
 
     const bucket =
       byWeek[week] ??
@@ -238,7 +287,10 @@ export function computeWeeklyTrends(reflections: Reflection[]): TrendPoint[] {
     }));
 }
 
-export function computeMonthlyTrends(reflections: Reflection[]): TrendPoint[] {
+export function computeMonthlyTrends(
+  reflections: Reflection[],
+  timeZone?: string,
+): TrendPoint[] {
   const byMonth: Record<
     string,
     {
@@ -249,7 +301,7 @@ export function computeMonthlyTrends(reflections: Reflection[]): TrendPoint[] {
   > = {};
 
   reflections.forEach((reflection) => {
-    const month = getMonthStartKey(reflection.createdAt);
+    const month = getMonthStartKey(reflection.createdAt, timeZone);
 
     const bucket =
       byMonth[month] ??
@@ -274,13 +326,16 @@ export function computeMonthlyTrends(reflections: Reflection[]): TrendPoint[] {
     }));
 }
 
-export function computeWeeklySentiment(reflections: Reflection[]): Record<string, number | null> {
+export function computeWeeklySentiment(
+  reflections: Reflection[],
+  timeZone?: string,
+): Record<string, number | null> {
   const buckets: Record<string, number[]> = {};
 
   reflections.forEach((reflection) => {
     const score = reflection.sentiment?.score;
     if (score == null) return;
-    const week = getWeekStartKey(reflection.createdAt);
+    const week = getWeekStartKey(reflection.createdAt, timeZone);
     const bucket = buckets[week] ?? (buckets[week] = []);
     bucket.push(score);
   });

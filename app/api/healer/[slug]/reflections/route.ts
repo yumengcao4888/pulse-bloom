@@ -4,13 +4,27 @@ import { computeWeeklyTrends } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+function isValidTimeZone(timeZone: string) {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone }).format(new Date());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
   if (!slug || typeof slug !== "string") {
     return NextResponse.json({ error: "Missing slug" }, { status: 400 });
+  }
+  const { searchParams } = new URL(req.url);
+  const timeZone = searchParams.get("tz") ?? undefined;
+  if (timeZone && !isValidTimeZone(timeZone)) {
+    return NextResponse.json({ error: "Invalid time zone" }, { status: 400 });
   }
 
   const healer = await prisma.healer.findUnique({
@@ -32,7 +46,7 @@ export async function GET(
     emotion: null,
   }));
 
-  const weeklyTrends = computeWeeklyTrends(reflections);
+  const weeklyTrends = computeWeeklyTrends(reflections, timeZone);
 
   return NextResponse.json({
     reflections,

@@ -106,6 +106,10 @@ export default function ReflectionCard({
   const [isSentimentLoading, setIsSentimentLoading] = useState(false);
   const [sentimentError, setSentimentError] = useState<string | null>(null);
   const pageSize = 10;
+  const timeZone = useMemo(
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
+    [],
+  );
 
   const loadReflections = useCallback(async () => {
     if (isLoading || data) return;
@@ -115,7 +119,7 @@ export default function ReflectionCard({
     setNlpError(null);
     try {
       const payload = await fetcher<ReflectionsPayload>(
-        `/api/healer/${slug}/reflections`,
+        `/api/healer/${slug}/reflections?tz=${encodeURIComponent(timeZone)}`,
       );
       setData(payload);
     } catch (err) {
@@ -124,7 +128,7 @@ export default function ReflectionCard({
     } finally {
       setIsLoading(false);
     }
-  }, [data, isLoading, slug, t]);
+  }, [data, isLoading, slug, t, timeZone]);
 
   const loadNlpInsights = useCallback(async () => {
     if (isNlpLoading || hasNlpInsights || !data) return;
@@ -167,7 +171,9 @@ export default function ReflectionCard({
       setTrendError(null);
       try {
         const payload = await fetcher<TrendsPayload>(
-          `/api/healer/${slug}/trends?range=${range}`,
+          `/api/healer/${slug}/trends?range=${range}&tz=${encodeURIComponent(
+            timeZone,
+          )}`,
         );
         setTrendData((prev) => ({ ...prev, [range]: payload.trends }));
       } catch (err) {
@@ -177,7 +183,7 @@ export default function ReflectionCard({
         setIsTrendLoading(false);
       }
     },
-    [isTrendLoading, slug, t, trendData],
+    [isTrendLoading, slug, t, timeZone, trendData],
   );
 
   const loadSentimentSummary = useCallback(

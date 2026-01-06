@@ -8,6 +8,15 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function isValidTimeZone(timeZone: string) {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone }).format(new Date());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
@@ -20,6 +29,10 @@ export async function GET(
   const { searchParams } = new URL(req.url);
   const rangeParam = searchParams.get("range");
   const range = rangeParam === "monthly" ? "monthly" : "allTime";
+  const timeZone = searchParams.get("tz") ?? undefined;
+  if (timeZone && !isValidTimeZone(timeZone)) {
+    return NextResponse.json({ error: "Invalid time zone" }, { status: 400 });
+  }
 
   const healer = await prisma.healer.findUnique({
     where: { slug },
@@ -42,10 +55,10 @@ export async function GET(
 
   if (range === "monthly") {
     const monthlyReflections = getMonthlyReflections(healer.reflections);
-    const trends = computeWeeklyTrends(monthlyReflections);
+    const trends = computeWeeklyTrends(monthlyReflections, timeZone);
     return NextResponse.json({ trends });
   }
 
-  const trends = computeMonthlyTrends(healer.reflections);
+  const trends = computeMonthlyTrends(healer.reflections, timeZone);
   return NextResponse.json({ trends });
 }
