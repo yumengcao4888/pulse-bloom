@@ -383,7 +383,7 @@ export default function ReflectionCard({
                 className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={isSentimentLoading}
               >
-                {showSentiment ? "Hide NLP insights" : "Explore NLP insights"}
+                {showSentiment ? "✨ Hide NLP insights" : "✨ Explore NLP insights"}
                 {showSentiment && isSentimentLoading && !sentimentData && (
                   <span className="ml-1 inline-flex items-center">
                     <span
@@ -400,8 +400,8 @@ export default function ReflectionCard({
                 className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-center"
               >
                 {activeSection === "trends"
-                  ? "Hide over time weekly trends"
-                  : "Over time weekly trends"}
+                  ? "📈 Hide feeling trends"
+                  : "📈 View feeling trends"}
               </button>
               <button
                 type="button"
@@ -409,8 +409,8 @@ export default function ReflectionCard({
                 className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-end"
               >
                 {activeSection === "printout"
-                  ? "Hide reflection printout"
-                  : "Reflection printout"}
+                  ? "🔍 Hide full reflection"
+                  : "🔍 View full reflection"}
               </button>
             </div>
             {showTrends && (
@@ -431,7 +431,7 @@ export default function ReflectionCard({
                 {data && (
                   <>
                     {data.weeklyTrends.length > 0 ? (
-                      <div className="mt-4 w-full -mx-6">
+                      <div className="mt-4 -mx-6 w-[calc(100%+3rem)]">
                         <TrendChart data={data.weeklyTrends} />
                       </div>
                     ) : (
