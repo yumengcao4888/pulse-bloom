@@ -372,15 +372,22 @@ export default function ReflectionCard({
                 disabled={isSentimentLoading}
               >
                 {showSentiment ? "Hide NLP insights" : "Explore NLP insights"}
+                {showSentiment && isSentimentLoading && !sentimentData && (
+                  <span className="ml-1 inline-flex items-center">
+                    <span
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
+                    />
+                    <span className="sr-only">Loading NLP insights...</span>
+                  </span>
+                )}
               </button>
             </div>
             {showSentiment && (
               <div className="mt-3 space-y-1 text-sm font-medium leading-6 text-gray-700">
                 {sentimentError ? (
                   <p className="text-sm text-red-600">{sentimentError}</p>
-                ) : isSentimentLoading && !sentimentData ? (
-                  <p className="text-sm text-gray-500">Loading NLP insights...</p>
-                ) : (
+                ) : isSentimentLoading && !sentimentData ? null : (
                   <>
                     <p>
                       <b>Through the lens of language:</b>
