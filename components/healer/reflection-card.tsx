@@ -103,6 +103,21 @@ export default function ReflectionCard({
   }>({});
   const [isSentimentLoading, setIsSentimentLoading] = useState(false);
   const [sentimentError, setSentimentError] = useState<string | null>(null);
+  const [emotionPrintouts, setEmotionPrintouts] = useState<
+    Record<string, ReflectionsPayload>
+  >({});
+  const [emotionLoading, setEmotionLoading] = useState<Record<string, boolean>>({});
+  const [emotionErrors, setEmotionErrors] = useState<Record<string, string | null>>(
+    {},
+  );
+  const [selectedEmotion, setSelectedEmotion] = useState<{
+    label: string;
+    count: number;
+  } | null>(null);
+  const [emotionPrintoutSort, setEmotionPrintoutSort] = useState<"desc" | "asc">(
+    "desc",
+  );
+  const [emotionPrintoutPage, setEmotionPrintoutPage] = useState(1);
   const pageSize = 5;
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
@@ -219,6 +234,36 @@ export default function ReflectionCard({
     });
   };
 
+  const loadEmotionPrintout = useCallback(
+    async (label: string, range: "monthly" | "allTime") => {
+      const key = `${range}:${label.toLowerCase()}`;
+      if (emotionLoading[key] || emotionPrintouts[key]) return;
+      setEmotionLoading((prev) => ({ ...prev, [key]: true }));
+      setEmotionErrors((prev) => ({ ...prev, [key]: null }));
+      try {
+        const payload = await fetcher<ReflectionsPayload>(
+          `/api/healer/${slug}/reflections-nlp-emotion?emotion=${encodeURIComponent(
+            label,
+          )}&range=${range}`,
+        );
+        setEmotionPrintouts((prev) => ({ ...prev, [key]: payload }));
+      } catch (err) {
+        console.error("Failed to load emotion reflections", err);
+        setEmotionErrors((prev) => ({ ...prev, [key]: t("reflection.loadError") }));
+      } finally {
+        setEmotionLoading((prev) => ({ ...prev, [key]: false }));
+      }
+    },
+    [emotionLoading, emotionPrintouts, slug, t],
+  );
+
+  const handleEmotionSelect = (label: string, count: number) => {
+    if (label === "\u2014" || count <= 0) return;
+    setSelectedEmotion({ label, count });
+    setEmotionPrintoutPage(1);
+    void loadEmotionPrintout(label, countRange);
+  };
+
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
     if (countRange === "allTime") return data.reflections;
@@ -242,6 +287,17 @@ export default function ReflectionCard({
   }, [activeSection]);
 
   useEffect(() => {
+    if (showSentiment) return;
+    setSelectedEmotion(null);
+    setEmotionPrintoutPage(1);
+  }, [showSentiment]);
+
+  useEffect(() => {
+    if (!selectedEmotion) return;
+    void loadEmotionPrintout(selectedEmotion.label, countRange);
+  }, [countRange, loadEmotionPrintout, selectedEmotion]);
+
+  useEffect(() => {
     if (!data) return;
     const totalPages = Math.max(1, Math.ceil(sortedPrintout.length / pageSize));
     setPrintoutPage((prev) => Math.min(Math.max(1, prev), totalPages));
@@ -252,6 +308,37 @@ export default function ReflectionCard({
       setPrintoutPage(1);
     }
   }, [countRange, activeSection]);
+
+  const emotionKey = selectedEmotion
+    ? `${countRange}:${selectedEmotion.label.toLowerCase()}`
+    : null;
+  const emotionData = emotionKey ? emotionPrintouts[emotionKey] : null;
+  const filteredEmotionPrintout = useMemo(
+    () => (emotionData?.reflections ?? []) as ReflectionEntry[],
+    [emotionData],
+  );
+
+  const sortedEmotionPrintout = useMemo(() => {
+    const items = [...filteredEmotionPrintout];
+    items.sort((a, b) => {
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+      return emotionPrintoutSort === "asc" ? aTime - bTime : bTime - aTime;
+    });
+    return items;
+  }, [emotionPrintoutSort, filteredEmotionPrintout]);
+
+  const emotionPageItems = useMemo(() => {
+    if (!selectedEmotion) return [];
+    const startIndex = (emotionPrintoutPage - 1) * pageSize;
+    return sortedEmotionPrintout.slice(startIndex, startIndex + pageSize);
+  }, [emotionPrintoutPage, selectedEmotion, sortedEmotionPrintout]);
+
+  useEffect(() => {
+    if (!selectedEmotion) return;
+    const totalPages = Math.max(1, Math.ceil(sortedEmotionPrintout.length / pageSize));
+    setEmotionPrintoutPage((prev) => Math.min(Math.max(1, prev), totalPages));
+  }, [selectedEmotion, sortedEmotionPrintout.length]);
 
   useEffect(() => {
     if (!showSentiment) return;
@@ -335,6 +422,59 @@ export default function ReflectionCard({
     if (label === "\u2014") return label;
     const lowered = label.toLowerCase();
     return capitalizeFirst ? capitalize(lowered) : lowered;
+  };
+
+  const renderReflectionItem = (reflection: ReflectionEntry) => {
+    const hasFeeling = Boolean(reflection.feeling?.trim());
+
+    return (
+      <div
+        key={reflection.id}
+        className="border-x border-b border-pulse-bloom px-4 py-2 text-sm text-gray-700 first:rounded-t-xl first:border-t last:rounded-b-xl"
+      >
+        <p
+          className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500`}
+        >
+          {formatDate(reflection.createdAt)}
+        </p>
+        <p className="mb-1 flex flex-wrap items-center gap-3">
+          <span
+            className={
+              reflection.grounded
+                ? "rounded-full bg-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                : "rounded-full border border-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+            }
+          >
+            {t("reflection.grounded")}
+          </span>
+          <span
+            className={
+              reflection.supported
+                ? "rounded-full bg-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                : "rounded-full border border-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+            }
+          >
+            {t("reflection.supported")}
+          </span>
+          <span
+            className={
+              reflection.connected
+                ? "rounded-full bg-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                : "rounded-full border border-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+            }
+          >
+            {t("reflection.connected")}
+          </span>
+        </p>
+        {hasFeeling && (
+          <p className="mb-1 pl-3 text-xs text-gray-900">
+            <span className={`${delius.className} font-normal tracking-wider not-italic`}>
+              {reflection.feeling}
+            </span>
+          </p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -560,22 +700,56 @@ export default function ReflectionCard({
                       >
                         <span className="text-left">
                           {"\u2013\u00a0"}
-                          <b>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleEmotionSelect(primaryEmotion.label, primaryEmotion.count)
+                            }
+                            className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
+                              selectedEmotion?.label.toLowerCase() ===
+                              primaryEmotion.label.toLowerCase()
+                                ? "text-pulse-bloom-deep"
+                                : "text-gray-800 hover:text-pulse-bloom-deep"
+                            }`}
+                            aria-pressed={
+                              selectedEmotion?.label.toLowerCase() ===
+                              primaryEmotion.label.toLowerCase()
+                            }
+                            disabled={primaryEmotion.label === "\u2014" || primaryEmotion.count <= 0}
+                          >
                             {formatEmotionLabel(primaryEmotion.label, true)}
-                            {"\u00a0("}
-                            {primaryEmotion.count}
-                            {")"}
-                          </b>
+                          </button>
+                          {"\u00a0("}
+                          {primaryEmotion.count}
+                          {")"}
                           {secondaryEmotion.label !== "\u2014" &&
                           secondaryEmotion.count > 0 ? (
                             <>
                               {"\u00a0and\u00a0"}
-                              <b>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleEmotionSelect(
+                                    secondaryEmotion.label,
+                                    secondaryEmotion.count,
+                                  )
+                                }
+                                className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
+                                  selectedEmotion?.label.toLowerCase() ===
+                                  secondaryEmotion.label.toLowerCase()
+                                    ? "text-pulse-bloom-deep"
+                                    : "text-gray-800 hover:text-pulse-bloom-deep"
+                                }`}
+                                aria-pressed={
+                                  selectedEmotion?.label.toLowerCase() ===
+                                  secondaryEmotion.label.toLowerCase()
+                                }
+                              >
                                 {formatEmotionLabel(secondaryEmotion.label, false)}
-                                {"\u00a0("}
-                                {secondaryEmotion.count}
-                                {")"}
-                              </b>
+                              </button>
+                              {"\u00a0("}
+                              {secondaryEmotion.count}
+                              {")"}
                             </>
                           ) : null}
                           {"\u00a0"}feelings surfaced most.
@@ -638,6 +812,85 @@ export default function ReflectionCard({
                         </sub>
                       </p>
                     </div>
+                    {selectedEmotion && (
+                      <div className="mt-3 space-y-4 text-left">
+                        <div className="border-t border-dashed border-gray-200" />
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setEmotionPrintoutSort((prev) =>
+                                prev === "desc" ? "asc" : "desc",
+                              )
+                            }
+                            className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                            aria-pressed={emotionPrintoutSort === "asc"}
+                          >
+                            {emotionPrintoutSort === "desc" ? "Desc" : "Asc"}
+                          </button>
+                        </div>
+                        {emotionKey && emotionErrors[emotionKey] ? (
+                          <p className="text-sm text-red-600">
+                            {emotionErrors[emotionKey]}
+                          </p>
+                        ) : emotionKey && emotionLoading[emotionKey] ? (
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <span
+                              aria-hidden="true"
+                              className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
+                            />
+                            <span>Loading reflections...</span>
+                          </div>
+                        ) : sortedEmotionPrintout.length === 0 ? (
+                          <p className="text-sm text-gray-500">{t("reflection.none")}</p>
+                        ) : (
+                          (() => {
+                            const totalPages = Math.max(
+                              1,
+                              Math.ceil(sortedEmotionPrintout.length / pageSize),
+                            );
+
+                            return (
+                              <>
+                                <div className="space-y-0">
+                                  {emotionPageItems.map((reflection) =>
+                                    renderReflectionItem(reflection),
+                                  )}
+                                </div>
+                                {totalPages > 1 && (
+                                  <div className="flex flex-wrap items-center justify-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEmotionPrintoutPage((prev) =>
+                                          Math.max(1, prev - 1),
+                                        )
+                                      }
+                                      className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                      disabled={emotionPrintoutPage <= 1}
+                                    >
+                                      Last page
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEmotionPrintoutPage((prev) =>
+                                          Math.min(totalPages, prev + 1),
+                                        )
+                                      }
+                                      className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                      disabled={emotionPrintoutPage >= totalPages}
+                                    >
+                                      Next page
+                                    </button>
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()
+                        )}
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -686,62 +939,7 @@ export default function ReflectionCard({
                 return (
                   <>
                     <div className="space-y-0">
-                      {pageItems.map((reflection) => {
-                        const hasFeeling = Boolean(reflection.feeling?.trim());
-
-                        return (
-                          <div
-                            key={reflection.id}
-                            className="border-x border-b border-pulse-bloom px-4 py-2 text-sm text-gray-700 first:rounded-t-xl first:border-t last:rounded-b-xl"
-                          >
-                            <p
-                              className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500`}
-                            >
-                              {formatDate(reflection.createdAt)}
-                            </p>
-                            <p className="mb-1 flex flex-wrap items-center gap-3">
-                              <span
-                                className={
-                                  reflection.grounded
-                                    ? "rounded-full bg-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-900"
-                                    : "rounded-full border border-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
-                                }
-                              >
-                                {t("reflection.grounded")}
-                              </span>
-                              <span
-                                className={
-                                  reflection.supported
-                                    ? "rounded-full bg-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-900"
-                                    : "rounded-full border border-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
-                                }
-                              >
-                                {t("reflection.supported")}
-                              </span>
-                              <span
-                                className={
-                                  reflection.connected
-                                    ? "rounded-full bg-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-900"
-                                    : "rounded-full border border-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
-                                }
-                              >
-                                {t("reflection.connected")}
-                              </span>
-                            </p>
-                            {hasFeeling && (
-                              <>
-                                <p className="mb-1 pl-3 text-xs text-gray-900">
-                                  <span
-                                    className={`${delius.className} font-normal tracking-wider not-italic`}
-                                  >
-                                    {reflection.feeling}
-                                  </span>
-                                </p>
-                              </>
-                            )}
-                          </div>
-                        );
-                      })}
+                      {pageItems.map((reflection) => renderReflectionItem(reflection))}
                     </div>
                     {totalPages > 1 && (
                       <div className="flex flex-wrap items-center justify-center gap-2">
