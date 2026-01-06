@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { Inter, Italianno, Sriracha, Yellowtail } from "next/font/google";
+import { Inter, Italianno, Roboto, Sriracha, Yellowtail } from "next/font/google";
 
 export const sfPro = localFont({
   src: "./SF-Pro-Display-Medium.otf",
@@ -9,6 +9,13 @@ export const sfPro = localFont({
 export const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+export const roboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin"],
+  weight: "300",
+  style: "italic",
 });
 
 export const italianno = Italianno({

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import { useLocale } from "@/components/shared/locale-provider";
 import Tooltip from "@/components/shared/tooltip";
+import { roboto } from "@/app/fonts";
 import { capitalize, fetcher, getMonthlyReflections } from "@/lib/utils";
 import type { TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
@@ -745,7 +746,9 @@ export default function ReflectionCard({
                             key={reflection.id}
                             className="border-x border-b border-pulse-bloom px-4 py-2 text-sm text-gray-700 first:rounded-t-xl first:border-t last:rounded-b-xl"
                           >
-                            <p className="mb-1 pl-3 text-xs font-semibold italic text-gray-900">
+                            <p
+                              className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500`}
+                            >
                               Reflected on {formatDate(reflection.createdAt)}
                             </p>
                             <p className="mb-1 flex flex-wrap items-center gap-3">
