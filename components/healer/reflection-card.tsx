@@ -736,14 +736,14 @@ export default function ReflectionCard({
 
                 return (
                   <>
-                    <div className="space-y-1">
+                    <div className="space-y-0">
                       {pageItems.map((reflection) => {
                         const hasFeeling = Boolean(reflection.feeling?.trim());
 
                         return (
                           <div
                             key={reflection.id}
-                            className="rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            className="border-x border-b border-pulse-bloom px-4 py-2 text-sm text-gray-700 first:rounded-t-xl first:border-t last:rounded-b-xl"
                           >
                             <p className="mb-1 pl-3 text-xs font-semibold italic text-gray-900">
                               Reflected on {formatDate(reflection.createdAt)}
