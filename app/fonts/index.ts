@@ -1,5 +1,12 @@
 import localFont from "next/font/local";
-import { Inter, Italianno, Roboto, Sriracha, Yellowtail } from "next/font/google";
+import {
+  Delius,
+  Inter,
+  Italianno,
+  Roboto,
+  Sriracha,
+  Yellowtail,
+} from "next/font/google";
 
 export const sfPro = localFont({
   src: "./SF-Pro-Display-Medium.otf",
@@ -14,8 +21,14 @@ export const inter = Inter({
 export const roboto = Roboto({
   variable: "--font-roboto",
   subsets: ["latin"],
-  weight: "300",
-  style: "italic",
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+});
+
+export const delius = Delius({
+  variable: "--font-delius",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const italianno = Italianno({

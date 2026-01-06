@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import { useLocale } from "@/components/shared/locale-provider";
 import Tooltip from "@/components/shared/tooltip";
-import { roboto } from "@/app/fonts";
+import { delius, roboto } from "@/app/fonts";
 import { capitalize, fetcher, getMonthlyReflections } from "@/lib/utils";
 import type { TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
@@ -106,7 +106,7 @@ export default function ReflectionCard({
   }>({});
   const [isSentimentLoading, setIsSentimentLoading] = useState(false);
   const [sentimentError, setSentimentError] = useState<string | null>(null);
-  const pageSize = 10;
+  const pageSize = 5;
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
     [],
@@ -782,11 +782,12 @@ export default function ReflectionCard({
                             </p>
                             {hasFeeling && (
                               <>
-                                <p className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-900">
-                                  <span className="rounded-full bg-pulse-bloom px-3 py-0.5 text-xs font-semibold text-white">
-                                    {t("reflection.feeling")}
+                                <p className="mb-1 pl-3 text-xs text-gray-900">
+                                  <span
+                                    className={`${delius.className} font-normal tracking-wider not-italic`}
+                                  >
+                                    {reflection.feeling}
                                   </span>
-                                  <span>{reflection.feeling}</span>
                                 </p>
                                 {hasNlpInsights && (
                                   <>
