@@ -144,7 +144,8 @@ export default function ReflectionCard({
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
 
   const hasData = Boolean(data);
-  const shouldShowContent = activeSection !== null;
+  const showTrends = activeSection === "trends";
+  const showPrintout = activeSection === "printout";
   const handleSectionToggle = (section: SectionKey) => {
     setActiveSection((prev) => {
       const next = prev === section ? null : section;
@@ -412,6 +413,36 @@ export default function ReflectionCard({
                   : "Reflection printout"}
               </button>
             </div>
+            {showTrends && (
+              <div className="mt-4">
+                {!hasData && isLoading && <ReflectionsSkeleton />}
+                {error && (
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    <p>{error}</p>
+                    <button
+                      type="button"
+                      onClick={loadReflections}
+                      className="mt-3 rounded-full border border-red-200 bg-white px-3 py-1 text-xs font-semibold text-red-700 shadow-sm transition hover:bg-red-100"
+                    >
+                      {t("healer.reflections.retry")}
+                    </button>
+                  </div>
+                )}
+                {data && (
+                  <>
+                    {data.weeklyTrends.length > 0 ? (
+                      <div className="mt-4 w-full -mx-6">
+                        <TrendChart data={data.weeklyTrends} />
+                      </div>
+                    ) : (
+                      <p className="mt-6 text-sm text-gray-500">
+                        {t("reflection.addPrompt")}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
             {showSentiment && (
               <div className="mt-3 space-y-1 text-sm font-medium leading-6 text-gray-700">
                 {sentimentError ? (
@@ -526,8 +557,8 @@ export default function ReflectionCard({
               </div>
             )}
           </div>
-        {shouldShowContent && !hasData && isLoading && <ReflectionsSkeleton />}
-        {shouldShowContent && error && (
+        {showPrintout && !hasData && isLoading && <ReflectionsSkeleton />}
+        {showPrintout && error && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             <p>{error}</p>
             <button
@@ -539,199 +570,177 @@ export default function ReflectionCard({
             </button>
           </div>
         )}
-        {data && (
-          <>
-                {activeSection === "trends" && (
+        {showPrintout && data && (
+          <div className="space-y-4">
+            <div className="text-sm text-gray-600">
+              <h3 className="text-base font-semibold text-gray-800">
+                About the Sentiment and Emotion Scores
+              </h3>
+              <p className="mt-2">
+                Each reflection includes a sentiment score (0-100) and a suggested
+                emotion, estimated by trusted open-source NLP models.
+              </p>
+              <p className="mt-2">
+                <b>Sentiment Score</b> reflects the emotional tone - lower scores
+                suggest heavier or more difficult reflections, higher scores suggest
+                lighter or more positive tones.
+                <br />
+                {"-> "}Powered by{" "}
+                <a
+                  href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
+                  className="text-blue-600 underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  CardiffNLP&apos;s sentiment model
+                </a>
+              </p>
+              <p className="mt-2">
+                <b>Emotion Label</b> reflects the emotional nuance identified in the
+                text.
+                <br />
+                {"-> "}Based on{" "}
+                <a
+                  href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
+                  className="text-blue-600 underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  GoEmotions model by Sam Lowe
+                </a>
+              </p>
+              <p className="mt-2">
+                These tools are here to help you notice gentle patterns - there&apos;s
+                no right or wrong way to feel.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setPrintoutRange("all-time")}
+                className={
+                  printoutRange === "all-time"
+                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                }
+              >
+                Over time
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrintoutRange("week")}
+                className={
+                  printoutRange === "week"
+                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                }
+              >
+                This week
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrintoutRange("month")}
+                className={
+                  printoutRange === "month"
+                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                }
+              >
+                This month
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrintoutRange("year")}
+                className={
+                  printoutRange === "year"
+                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
+                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                }
+              >
+                This year
+              </button>
+            </div>
+            {filteredPrintout.length === 0 ? (
+              <p className="text-sm text-gray-500">{t("reflection.none")}</p>
+            ) : (
+              (() => {
+                const totalPages = Math.max(
+                  1,
+                  Math.ceil(filteredPrintout.length / pageSize),
+                );
+                const startIndex = (printoutPage - 1) * pageSize;
+                const pageItems = filteredPrintout.slice(
+                  startIndex,
+                  startIndex + pageSize,
+                );
+
+                return (
                   <>
-                    {data.weeklyTrends.length > 0 ? (
-                      <div className="mt-6">
-                        <TrendChart data={data.weeklyTrends} />
+                    {pageItems.map((reflection) => (
+                      <div
+                        key={reflection.id}
+                        className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
+                      >
+                        <p className="mb-1">
+                          <b>{t("reflection.grounded")}:</b>{" "}
+                          {formatBool(reflection.grounded)}{" "}
+                          <b className="ml-3">{t("reflection.supported")}:</b>{" "}
+                          {formatBool(reflection.supported)}{" "}
+                          <b className="ml-3">{t("reflection.connected")}:</b>{" "}
+                          {formatBool(reflection.connected)}
+                        </p>
+                        <p className="mb-2 text-base text-gray-800">
+                          <b>{t("reflection.feeling")}:</b>{" "}
+                          {reflection.feeling ?? t("common.na")}
+                        </p>
+                        <p className="text-gray-500">
+                          {t("reflection.sentiment")}:{" "}
+                          {reflection.sentiment
+                            ? `${capitalize(reflection.sentiment.label)} (${Math.round(
+                                reflection.sentiment.score * 100,
+                              )} / 100)`
+                            : t("common.unavailable")}
+                        </p>
+                        <p className="text-gray-500">
+                          {t("reflection.emotion")}:{" "}
+                          {reflection.emotion?.label
+                            ? capitalize(reflection.emotion.label)
+                            : t("common.unavailable")}
+                        </p>
+                        <p className="text-gray-500">
+                          {t("reflection.created")}: {formatDate(reflection.createdAt)}
+                        </p>
                       </div>
-                    ) : (
-                      <p className="mt-6 text-sm text-gray-500">
-                        {t("reflection.addPrompt")}
-                      </p>
+                    ))}
+                    {totalPages > 1 && (
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setPrintoutPage((prev) => Math.max(1, prev - 1))
+                          }
+                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          disabled={printoutPage <= 1}
+                        >
+                          Last page
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setPrintoutPage((prev) => Math.min(totalPages, prev + 1))
+                          }
+                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          disabled={printoutPage >= totalPages}
+                        >
+                          Next page
+                        </button>
+                      </div>
                     )}
                   </>
-                )}
-
-                {activeSection === "printout" && (
-                  <div className="space-y-4">
-                    <div className="text-sm text-gray-600">
-                      <h3 className="text-base font-semibold text-gray-800">
-                        About the Sentiment and Emotion Scores
-                      </h3>
-                      <p className="mt-2">
-                        Each reflection includes a sentiment score (0-100) and a
-                        suggested emotion, estimated by trusted open-source NLP
-                        models.
-                      </p>
-                      <p className="mt-2">
-                        <b>Sentiment Score</b> reflects the emotional tone - lower
-                        scores suggest heavier or more difficult reflections, higher
-                        scores suggest lighter or more positive tones.
-                        <br />
-                        {"-> "}Powered by{" "}
-                        <a
-                          href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
-                          className="text-blue-600 underline"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          CardiffNLP&apos;s sentiment model
-                        </a>
-                      </p>
-                      <p className="mt-2">
-                        <b>Emotion Label</b> reflects the emotional nuance
-                        identified in the text.
-                        <br />
-                        {"-> "}Based on{" "}
-                        <a
-                          href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
-                          className="text-blue-600 underline"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          GoEmotions model by Sam Lowe
-                        </a>
-                      </p>
-                      <p className="mt-2">
-                        These tools are here to help you notice gentle patterns -
-                        there&apos;s no right or wrong way to feel.
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setPrintoutRange("all-time")}
-                        className={
-                          printoutRange === "all-time"
-                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                        }
-                      >
-                        Over time
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPrintoutRange("week")}
-                        className={
-                          printoutRange === "week"
-                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                        }
-                      >
-                        This week
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPrintoutRange("month")}
-                        className={
-                          printoutRange === "month"
-                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                        }
-                      >
-                        This month
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPrintoutRange("year")}
-                        className={
-                          printoutRange === "year"
-                            ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                            : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                        }
-                      >
-                        This year
-                      </button>
-                    </div>
-                    {filteredPrintout.length === 0 ? (
-                      <p className="text-sm text-gray-500">{t("reflection.none")}</p>
-                    ) : (
-                      (() => {
-                        const totalPages = Math.max(
-                          1,
-                          Math.ceil(filteredPrintout.length / pageSize),
-                        );
-                        const startIndex = (printoutPage - 1) * pageSize;
-                        const pageItems = filteredPrintout.slice(
-                          startIndex,
-                          startIndex + pageSize,
-                        );
-
-                        return (
-                          <>
-                            {pageItems.map((reflection) => (
-                              <div
-                                key={reflection.id}
-                                className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
-                              >
-                                <p className="mb-1">
-                                  <b>{t("reflection.grounded")}:</b>{" "}
-                                  {formatBool(reflection.grounded)}{" "}
-                                  <b className="ml-3">{t("reflection.supported")}:</b>{" "}
-                                  {formatBool(reflection.supported)}{" "}
-                                  <b className="ml-3">{t("reflection.connected")}:</b>{" "}
-                                  {formatBool(reflection.connected)}
-                                </p>
-                                <p className="mb-2 text-base text-gray-800">
-                                  <b>{t("reflection.feeling")}:</b>{" "}
-                                  {reflection.feeling ?? t("common.na")}
-                                </p>
-                                <p className="text-gray-500">
-                                  {t("reflection.sentiment")}:{" "}
-                                  {reflection.sentiment
-                                    ? `${capitalize(reflection.sentiment.label)} (${Math.round(
-                                        reflection.sentiment.score * 100,
-                                      )} / 100)`
-                                    : t("common.unavailable")}
-                                </p>
-                                <p className="text-gray-500">
-                                  {t("reflection.emotion")}:{" "}
-                                  {reflection.emotion?.label
-                                    ? capitalize(reflection.emotion.label)
-                                    : t("common.unavailable")}
-                                </p>
-                                <p className="text-gray-500">
-                                  {t("reflection.created")}:{" "}
-                                  {formatDate(reflection.createdAt)}
-                                </p>
-                              </div>
-                            ))}
-                            {totalPages > 1 && (
-                              <div className="flex flex-wrap items-center justify-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setPrintoutPage((prev) => Math.max(1, prev - 1))
-                                  }
-                                  className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                                  disabled={printoutPage <= 1}
-                                >
-                                  Last page
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setPrintoutPage((prev) =>
-                                      Math.min(totalPages, prev + 1),
-                                    )
-                                  }
-                                  className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                                  disabled={printoutPage >= totalPages}
-                                >
-                                  Next page
-                                </button>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()
-                    )}
-                  </div>
-                )}
-          </>
+                );
+              })()
+            )}
+          </div>
         )}
         </div>
       </div>
