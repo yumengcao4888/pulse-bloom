@@ -103,7 +103,7 @@ function aggregate(reflections: Reflection[]): ScoreSummary {
   };
 }
 
-function isAfterThreshold(reflection: Reflection, threshold: Date) {
+function isAfterThreshold(reflection: { createdAt: string | Date }, threshold: Date) {
   return new Date(reflection.createdAt) >= threshold;
 }
 
@@ -114,7 +114,9 @@ function getMonthlyThreshold() {
   return monthlyThreshold;
 }
 
-export function getMonthlyReflections(reflections: Reflection[]) {
+export function getMonthlyReflections<T extends { createdAt: string | Date }>(
+  reflections: T[],
+) {
   return reflections.filter((reflection) =>
     isAfterThreshold(reflection, getMonthlyThreshold()),
   );
