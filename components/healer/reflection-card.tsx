@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import { useLocale } from "@/components/shared/locale-provider";
 import Tooltip from "@/components/shared/tooltip";
-import { capitalize, fetcher } from "@/lib/utils";
+import { capitalize, fetcher, getMonthlyReflections } from "@/lib/utils";
 import type { TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
 
@@ -93,12 +93,10 @@ export default function ReflectionCard({
   const [hasNlpInsights, setHasNlpInsights] = useState(false);
   const [isNlpLoading, setIsNlpLoading] = useState(false);
   const [nlpError, setNlpError] = useState<string | null>(null);
+  const [printoutSort, setPrintoutSort] = useState<"desc" | "asc">("desc");
   const [isTrendLoading, setIsTrendLoading] = useState(false);
   const [trendError, setTrendError] = useState<string | null>(null);
   const [printoutPage, setPrintoutPage] = useState(1);
-  const [printoutRange, setPrintoutRange] = useState<
-    "all-time" | "week" | "month" | "year"
-  >("all-time");
   const [countRange, setCountRange] = useState<"monthly" | "allTime">("allTime");
   const [showSentiment, setShowSentiment] = useState(false);
   const [sentimentSummary, setSentimentSummary] = useState<{
@@ -225,9 +223,6 @@ export default function ReflectionCard({
       const next = prev === section ? null : section;
       if (next === "printout") ensureDataLoaded();
       if (next === "trends") ensureTrendsLoaded(countRange);
-      if (next === "printout") {
-        setPrintoutRange("all-time");
-      }
       return next;
     });
     setShowSentiment(false);
@@ -245,28 +240,19 @@ export default function ReflectionCard({
 
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
-    if (printoutRange === "all-time") return data.reflections;
+    if (countRange === "allTime") return data.reflections;
+    return getMonthlyReflections(data.reflections);
+  }, [countRange, data]);
 
-    const now = new Date();
-    let startDate = new Date(0);
-
-    if (printoutRange === "week") {
-      startDate = new Date(now);
-      startDate.setDate(now.getDate() - now.getDay());
-      startDate.setHours(0, 0, 0, 0);
-    } else if (printoutRange === "month") {
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      startDate.setHours(0, 0, 0, 0);
-    } else if (printoutRange === "year") {
-      startDate = new Date(now.getFullYear(), 0, 1);
-      startDate.setHours(0, 0, 0, 0);
-    }
-
-    return data.reflections.filter((reflection) => {
-      const createdAt = new Date(reflection.createdAt);
-      return createdAt >= startDate;
+  const sortedPrintout = useMemo(() => {
+    const items = [...filteredPrintout];
+    items.sort((a, b) => {
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+      return printoutSort === "asc" ? aTime - bTime : bTime - aTime;
     });
-  }, [data, printoutRange]);
+    return items;
+  }, [filteredPrintout, printoutSort]);
 
   useEffect(() => {
     if (activeSection !== "printout") {
@@ -276,15 +262,15 @@ export default function ReflectionCard({
 
   useEffect(() => {
     if (!data) return;
-    const totalPages = Math.max(1, Math.ceil(filteredPrintout.length / pageSize));
+    const totalPages = Math.max(1, Math.ceil(sortedPrintout.length / pageSize));
     setPrintoutPage((prev) => Math.min(Math.max(1, prev), totalPages));
-  }, [data, filteredPrintout.length]);
+  }, [data, sortedPrintout.length]);
 
   useEffect(() => {
     if (activeSection === "printout") {
       setPrintoutPage(1);
     }
-  }, [printoutRange, activeSection]);
+  }, [countRange, activeSection]);
 
   useEffect(() => {
     if (!showSentiment) return;
@@ -691,50 +677,6 @@ export default function ReflectionCard({
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => setPrintoutRange("all-time")}
-                className={
-                  printoutRange === "all-time"
-                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                }
-              >
-                Over time
-              </button>
-              <button
-                type="button"
-                onClick={() => setPrintoutRange("week")}
-                className={
-                  printoutRange === "week"
-                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                }
-              >
-                This week
-              </button>
-              <button
-                type="button"
-                onClick={() => setPrintoutRange("month")}
-                className={
-                  printoutRange === "month"
-                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                }
-              >
-                This month
-              </button>
-              <button
-                type="button"
-                onClick={() => setPrintoutRange("year")}
-                className={
-                  printoutRange === "year"
-                    ? "rounded-full border border-pulse-bloom bg-pulse-bloom px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-pulse-bloom/90"
-                    : "rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                }
-              >
-                This year
-              </button>
-              <button
-                type="button"
                 onClick={loadNlpInsights}
                 className={
                   hasNlpInsights
@@ -747,20 +689,28 @@ export default function ReflectionCard({
               >
                 Include NLP insights
               </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setPrintoutSort((prev) => (prev === "desc" ? "asc" : "desc"))
+                }
+                className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                aria-pressed={printoutSort === "asc"}
+              >
+                {printoutSort === "desc" ? "Desc" : "Asc"}
+              </button>
             </div>
-            {nlpError && (
-              <p className="text-xs text-red-600">{nlpError}</p>
-            )}
-            {filteredPrintout.length === 0 ? (
+            {nlpError && <p className="text-xs text-red-600">{nlpError}</p>}
+            {sortedPrintout.length === 0 ? (
               <p className="text-sm text-gray-500">{t("reflection.none")}</p>
             ) : (
               (() => {
                 const totalPages = Math.max(
                   1,
-                  Math.ceil(filteredPrintout.length / pageSize),
+                  Math.ceil(sortedPrintout.length / pageSize),
                 );
                 const startIndex = (printoutPage - 1) * pageSize;
-                const pageItems = filteredPrintout.slice(
+                const pageItems = sortedPrintout.slice(
                   startIndex,
                   startIndex + pageSize,
                 );
