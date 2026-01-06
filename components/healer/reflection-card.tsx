@@ -154,6 +154,17 @@ export default function ReflectionCard({
       }
       return next;
     });
+    setShowSentiment(false);
+  };
+
+  const handleSentimentToggle = () => {
+    setShowSentiment((prev) => {
+      const next = !prev;
+      if (next) {
+        setActiveSection(null);
+      }
+      return next;
+    });
   };
 
   const filteredPrintout = useMemo(() => {
@@ -367,7 +378,7 @@ export default function ReflectionCard({
             <div className="mt-3 grid w-full grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center">
               <button
                 type="button"
-                onClick={() => setShowSentiment((prev) => !prev)}
+                onClick={handleSentimentToggle}
                 className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={isSentimentLoading}
               >
