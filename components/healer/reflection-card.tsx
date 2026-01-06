@@ -749,7 +749,7 @@ export default function ReflectionCard({
                             <p
                               className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500`}
                             >
-                              Reflected on {formatDate(reflection.createdAt)}
+                              {formatDate(reflection.createdAt)}
                             </p>
                             <p className="mb-1 flex flex-wrap items-center gap-3">
                               <span
