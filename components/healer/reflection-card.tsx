@@ -730,77 +730,79 @@ export default function ReflectionCard({
 
                 return (
                   <>
-                    {pageItems.map((reflection) => {
-                      const hasFeeling = Boolean(reflection.feeling?.trim());
+                    <div className="space-y-1">
+                      {pageItems.map((reflection) => {
+                        const hasFeeling = Boolean(reflection.feeling?.trim());
 
-                      return (
-                        <div
-                          key={reflection.id}
-                          className="rounded-xl border border-gray-200 p-4 text-sm text-gray-700"
-                        >
-                          <p className="mb-1 pl-3 text-xs font-semibold italic text-gray-900">
-                            Reflected on {formatDate(reflection.createdAt)}
-                          </p>
-                          <p className="mb-1 flex flex-wrap items-center gap-3">
-                            <span
-                              className={
-                                reflection.grounded
-                                  ? "rounded-full bg-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-900"
-                                  : "rounded-full border border-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
-                              }
-                            >
-                              {t("reflection.grounded")}
-                            </span>
-                            <span
-                              className={
-                                reflection.supported
-                                  ? "rounded-full bg-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-900"
-                                  : "rounded-full border border-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
-                              }
-                            >
-                              {t("reflection.supported")}
-                            </span>
-                            <span
-                              className={
-                                reflection.connected
-                                  ? "rounded-full bg-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-900"
-                                  : "rounded-full border border-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
-                              }
-                            >
-                              {t("reflection.connected")}
-                            </span>
-                          </p>
-                          {hasFeeling && (
-                            <>
-                              <p className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-900">
-                                <span className="rounded-full bg-pulse-bloom px-3 py-0.5 text-xs font-semibold text-white">
-                                  {t("reflection.feeling")}
-                                </span>
-                                <span>{reflection.feeling}</span>
-                              </p>
-                              {hasNlpInsights && (
-                                <>
-                                  <p className="text-gray-500">
-                                    {t("reflection.sentiment")}:{" "}
-                                    {reflection.sentiment
-                                      ? `${capitalize(reflection.sentiment.label)} (${Math.round(
-                                          reflection.sentiment.score * 100,
-                                        )} / 100)`
-                                      : t("common.unavailable")}
-                                  </p>
-                                  <p className="text-gray-500">
-                                    {t("reflection.emotion")}:{" "}
-                                    {reflection.emotion?.label
-                                      ? capitalize(reflection.emotion.label)
-                                      : t("common.unavailable")}
-                                  </p>
-                                </>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      );
-                    })}
+                        return (
+                          <div
+                            key={reflection.id}
+                            className="rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                          >
+                            <p className="mb-1 pl-3 text-xs font-semibold italic text-gray-900">
+                              Reflected on {formatDate(reflection.createdAt)}
+                            </p>
+                            <p className="mb-1 flex flex-wrap items-center gap-3">
+                              <span
+                                className={
+                                  reflection.grounded
+                                    ? "rounded-full bg-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                                    : "rounded-full border border-[#F4C430] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+                                }
+                              >
+                                {t("reflection.grounded")}
+                              </span>
+                              <span
+                                className={
+                                  reflection.supported
+                                    ? "rounded-full bg-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                                    : "rounded-full border border-[#BAA1DD] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+                                }
+                              >
+                                {t("reflection.supported")}
+                              </span>
+                              <span
+                                className={
+                                  reflection.connected
+                                    ? "rounded-full bg-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-900"
+                                    : "rounded-full border border-[#4FC3F7] px-3 py-0.5 text-xs font-semibold text-gray-700 opacity-30"
+                                }
+                              >
+                                {t("reflection.connected")}
+                              </span>
+                            </p>
+                            {hasFeeling && (
+                              <>
+                                <p className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-900">
+                                  <span className="rounded-full bg-pulse-bloom px-3 py-0.5 text-xs font-semibold text-white">
+                                    {t("reflection.feeling")}
+                                  </span>
+                                  <span>{reflection.feeling}</span>
+                                </p>
+                                {hasNlpInsights && (
+                                  <>
+                                    <p className="text-gray-500">
+                                      {t("reflection.sentiment")}:{" "}
+                                      {reflection.sentiment
+                                        ? `${capitalize(reflection.sentiment.label)} (${Math.round(
+                                            reflection.sentiment.score * 100,
+                                          )} / 100)`
+                                        : t("common.unavailable")}
+                                    </p>
+                                    <p className="text-gray-500">
+                                      {t("reflection.emotion")}:{" "}
+                                      {reflection.emotion?.label
+                                        ? capitalize(reflection.emotion.label)
+                                        : t("common.unavailable")}
+                                    </p>
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                     {totalPages > 1 && (
                       <div className="flex flex-wrap items-center justify-center gap-2">
                         <button
