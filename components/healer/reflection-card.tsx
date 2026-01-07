@@ -259,9 +259,12 @@ export default function ReflectionCard({
 
   const handleEmotionSelect = (label: string, count: number) => {
     if (label === "\u2014" || count <= 0) return;
-    setSelectedEmotion({ label, count });
+    const isSameEmotion = selectedEmotion?.label.toLowerCase() === label.toLowerCase();
+    setSelectedEmotion(isSameEmotion ? null : { label, count });
     setEmotionPrintoutPage(1);
-    void loadEmotionPrintout(label, countRange);
+    if (!isSameEmotion) {
+      void loadEmotionPrintout(label, countRange);
+    }
   };
 
   const filteredPrintout = useMemo(() => {
@@ -776,9 +779,9 @@ export default function ReflectionCard({
                 {sentimentError ? (
                   <p className="text-sm text-red-600">{sentimentError}</p>
                 ) : isSentimentLoading && !sentimentData ? null : !hasNlpInsights ? (
-                  <div className="space-y-2 text-left">
+                  <div className="space-y-1 text-left">
                     <p>No reflections to read yet.</p>
-                    <p>
+                    <p className="text-xs font-normal italic text-gray-500">
                       Insights will bloom here once your clients share a few thoughts in
                       their own words.
                     </p>
