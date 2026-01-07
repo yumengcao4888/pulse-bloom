@@ -196,7 +196,7 @@ function formatDateKey(dateInput: string | Date, timeZone?: string) {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-function getWeekStartKey(dateInput: string | Date, timeZone?: string) {
+export function getWeekStartKey(dateInput: string | Date, timeZone?: string) {
   const { year, month, day, weekday } = getDateParts(dateInput, timeZone);
   const offset = (weekday + 6) % 7;
   const baseDate = new Date(Date.UTC(year, month - 1, day));
@@ -204,7 +204,7 @@ function getWeekStartKey(dateInput: string | Date, timeZone?: string) {
   return baseDate.toISOString().slice(0, 10);
 }
 
-function getMonthStartKey(dateInput: string | Date, timeZone?: string) {
+export function getMonthStartKey(dateInput: string | Date, timeZone?: string) {
   const { year, month } = getDateParts(dateInput, timeZone);
   return `${year}-${String(month).padStart(2, "0")}`;
 }

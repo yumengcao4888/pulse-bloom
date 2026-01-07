@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -25,6 +26,9 @@ function TrendTooltip({
   payload,
   label,
   formatLabel,
+  onSelectPoint,
+  selectedLabel,
+  isCoarsePointer,
 }: {
   active?: boolean;
   payload?: Array<{
@@ -35,6 +39,9 @@ function TrendTooltip({
   }>;
   label?: string;
   formatLabel?: (label?: string) => string;
+  onSelectPoint?: (label?: string) => void;
+  selectedLabel?: string | null;
+  isCoarsePointer?: boolean;
 }) {
   if (!active || !payload?.length) {
     return null;
@@ -45,9 +52,42 @@ function TrendTooltip({
   const items = order
     .map((key) => payload.find((entry) => entry.dataKey === key))
     .filter(Boolean);
+  const isClickable = Boolean(onSelectPoint);
+  const isSelected = Boolean(selectedLabel && label && selectedLabel === label);
+  const ctaVerb = isSelected ? "hide" : "view";
+  const ctaLabel = isCoarsePointer
+    ? `Tap to ${ctaVerb}`
+    : `Click to ${ctaVerb}`;
+  const allowContainerClick = isClickable && isCoarsePointer;
 
   return (
-    <div className="recharts-default-tooltip" style={tooltipStyle}>
+    <div
+      className="recharts-default-tooltip"
+      style={{
+        ...tooltipStyle,
+        cursor: allowContainerClick ? "pointer" : "default",
+      }}
+      onClick={
+        allowContainerClick ? () => onSelectPoint?.(label) : undefined
+      }
+      onKeyDown={
+        allowContainerClick
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSelectPoint?.(label);
+              }
+            }
+          : undefined
+      }
+      role={allowContainerClick ? "button" : undefined}
+      tabIndex={allowContainerClick ? 0 : undefined}
+      aria-label={
+        allowContainerClick && displayLabel
+          ? `View reflections for ${displayLabel}`
+          : undefined
+      }
+    >
       {displayLabel ? (
         <p
           className="recharts-tooltip-label"
@@ -72,6 +112,17 @@ function TrendTooltip({
           </div>
         ))}
       </div>
+      {isClickable ? (
+        <div className="mt-2 flex justify-center">
+          <button
+            type="button"
+            onClick={() => onSelectPoint?.(label)}
+            className="rounded-full bg-pulse-bloom-soft/30 px-3 py-1 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition hover:bg-pulse-bloom-soft/50"
+          >
+            {ctaLabel}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -94,14 +145,38 @@ function formatWeekRangeLabel(label: string | undefined, locale: string) {
   return `${startDisplay} -\n${endDisplay}`;
 }
 
+function useCoarsePointer() {
+  const [isCoarse, setIsCoarse] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const media = window.matchMedia("(pointer: coarse)");
+    const update = () => setIsCoarse(media.matches);
+    update();
+    if (media.addEventListener) {
+      media.addEventListener("change", update);
+      return () => media.removeEventListener("change", update);
+    }
+    media.addListener(update);
+    return () => media.removeListener(update);
+  }, []);
+
+  return isCoarse;
+}
+
 export function TrendChart({
   data,
   tooltipLabelMode,
+  onSelectPoint,
+  selectedLabel,
 }: {
   data: TrendPoint[];
   tooltipLabelMode?: "weekRange";
+  onSelectPoint?: (label?: string) => void;
+  selectedLabel?: string | null;
 }) {
   const { t, locale } = useLocale();
+  const isCoarsePointer = useCoarsePointer();
   const tooltipFormatter =
     tooltipLabelMode === "weekRange"
       ? (label?: string) => formatWeekRangeLabel(label, locale)
@@ -113,7 +188,17 @@ export function TrendChart({
         <LineChart data={data}>
           <XAxis dataKey="date" tick={{ fontSize: 12 }} />
           <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-          <Tooltip content={<TrendTooltip formatLabel={tooltipFormatter} />} />
+          <Tooltip
+            wrapperStyle={{ pointerEvents: "auto" }}
+            content={
+              <TrendTooltip
+                formatLabel={tooltipFormatter}
+                onSelectPoint={onSelectPoint}
+                selectedLabel={selectedLabel}
+                isCoarsePointer={isCoarsePointer}
+              />
+            }
+          />
           <Legend />
 
           <Line

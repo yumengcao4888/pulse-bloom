@@ -4,7 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import { useLocale } from "@/components/shared/locale-provider";
 import { delius, roboto } from "@/app/fonts";
-import { capitalize, fetcher, getMonthlyReflections } from "@/lib/utils";
+import {
+  capitalize,
+  fetcher,
+  getMonthStartKey,
+  getMonthlyReflections,
+  getWeekStartKey,
+} from "@/lib/utils";
 import type { TrendPoint } from "@/lib/utils";
 import type { EmotionPrediction, SentimentPrediction } from "@/lib/huggingface";
 
@@ -91,6 +97,9 @@ export default function ReflectionCard({
     monthly?: TrendPoint[];
     allTime?: TrendPoint[];
   }>({});
+  const [selectedTrendLabel, setSelectedTrendLabel] = useState<string | null>(null);
+  const [trendPrintoutSort, setTrendPrintoutSort] = useState<"desc" | "asc">("desc");
+  const [trendPrintoutPage, setTrendPrintoutPage] = useState(1);
   const [printoutSort, setPrintoutSort] = useState<"desc" | "asc">("desc");
   const [isTrendLoading, setIsTrendLoading] = useState(false);
   const [trendError, setTrendError] = useState<string | null>(null);
@@ -194,6 +203,27 @@ export default function ReflectionCard({
     }
   };
 
+  const formatTrendLabel = (label: string) => {
+    if (countRange === "monthly") {
+      const startDate = new Date(`${label}T00:00:00`);
+      if (Number.isNaN(startDate.getTime())) return label;
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 6);
+      const formatter = new Intl.DateTimeFormat(locale, {
+        month: "short",
+        day: "numeric",
+      });
+      return `${formatter.format(startDate)} - ${formatter.format(endDate)}`;
+    }
+
+    const monthDate = new Date(`${label}-01T00:00:00`);
+    if (Number.isNaN(monthDate.getTime())) return label;
+    return new Intl.DateTimeFormat(locale, {
+      month: "long",
+      year: "numeric",
+    }).format(monthDate);
+  };
+
   const formatDate = (date: string) => {
     const dateValue = new Date(date);
     const datePart = dateValue.toLocaleDateString(locale, {
@@ -223,6 +253,21 @@ export default function ReflectionCard({
     });
     setShowSentiment(false);
   };
+
+  const handleTrendPointSelect = useCallback(
+    (label?: string) => {
+      if (!label) return;
+      setSelectedTrendLabel((prev) => {
+        const next = prev === label ? null : label;
+        if (next && !data && !isLoading) {
+          void loadReflections();
+        }
+        return next;
+      });
+      setTrendPrintoutPage(1);
+    },
+    [data, isLoading, loadReflections],
+  );
 
   const handleSentimentToggle = () => {
     setShowSentiment((prev) => {
@@ -283,6 +328,33 @@ export default function ReflectionCard({
     return items;
   }, [filteredPrintout, printoutSort]);
 
+  const trendReflections = useMemo(() => {
+    if (!data || !selectedTrendLabel) return [];
+    return data.reflections.filter((reflection) => {
+      const bucketKey =
+        countRange === "monthly"
+          ? getWeekStartKey(reflection.createdAt, timeZone)
+          : getMonthStartKey(reflection.createdAt, timeZone);
+      return bucketKey === selectedTrendLabel;
+    });
+  }, [countRange, data, selectedTrendLabel, timeZone]);
+
+  const sortedTrendReflections = useMemo(() => {
+    const items = [...trendReflections];
+    items.sort((a, b) => {
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+      return trendPrintoutSort === "asc" ? aTime - bTime : bTime - aTime;
+    });
+    return items;
+  }, [trendPrintoutSort, trendReflections]);
+
+  const trendPageItems = useMemo(() => {
+    if (!selectedTrendLabel) return [];
+    const startIndex = (trendPrintoutPage - 1) * pageSize;
+    return sortedTrendReflections.slice(startIndex, startIndex + pageSize);
+  }, [selectedTrendLabel, sortedTrendReflections, trendPrintoutPage]);
+
   useEffect(() => {
     if (activeSection !== "printout") {
       setPrintoutPage(1);
@@ -307,10 +379,31 @@ export default function ReflectionCard({
   }, [data, sortedPrintout.length]);
 
   useEffect(() => {
+    if (!selectedTrendLabel) return;
+    const totalPages = Math.max(
+      1,
+      Math.ceil(sortedTrendReflections.length / pageSize),
+    );
+    setTrendPrintoutPage((prev) => Math.min(Math.max(1, prev), totalPages));
+  }, [selectedTrendLabel, sortedTrendReflections.length]);
+
+  useEffect(() => {
     if (activeSection === "printout") {
       setPrintoutPage(1);
     }
   }, [countRange, activeSection]);
+
+  useEffect(() => {
+    if (!showTrends) {
+      setSelectedTrendLabel(null);
+      setTrendPrintoutPage(1);
+    }
+  }, [showTrends]);
+
+  useEffect(() => {
+    setSelectedTrendLabel(null);
+    setTrendPrintoutPage(1);
+  }, [countRange]);
 
   const emotionKey = selectedEmotion
     ? `${countRange}:${selectedEmotion.label.toLowerCase()}`
@@ -757,14 +850,109 @@ export default function ReflectionCard({
                 {trendData[trendRange] && (
                   <>
                     {trendData[trendRange]?.length ? (
-                      <div className="mt-4 -mx-6 w-[calc(100%+3rem)] px-[1%]">
-                        <TrendChart
-                          data={trendData[trendRange] ?? []}
-                          tooltipLabelMode={
-                            trendRange === "monthly" ? "weekRange" : undefined
-                          }
-                        />
-                      </div>
+                      <>
+                        <div className="mt-4 -mx-6 w-[calc(100%+3rem)] px-[1%]">
+                          <TrendChart
+                            data={trendData[trendRange] ?? []}
+                            tooltipLabelMode={
+                              trendRange === "monthly" ? "weekRange" : undefined
+                            }
+                            onSelectPoint={handleTrendPointSelect}
+                            selectedLabel={selectedTrendLabel}
+                          />
+                        </div>
+                        {selectedTrendLabel && (
+                          <div className="mt-4 space-y-4">
+                            <div className="border-t border-dashed border-gray-200" />
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <p className="text-sm font-semibold text-gray-700">
+                                Reflections from {formatTrendLabel(selectedTrendLabel)}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setTrendPrintoutSort((prev) =>
+                                    prev === "desc" ? "asc" : "desc",
+                                  )
+                                }
+                                className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                                aria-pressed={trendPrintoutSort === "asc"}
+                              >
+                                {trendPrintoutSort === "desc" ? "Desc" : "Asc"}
+                              </button>
+                            </div>
+                            {error ? (
+                              <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                                <p>{error}</p>
+                                <button
+                                  type="button"
+                                  onClick={loadReflections}
+                                  className="mt-3 rounded-full border border-red-200 bg-white px-3 py-1 text-xs font-semibold text-red-700 shadow-sm transition hover:bg-red-100"
+                                >
+                                  {t("healer.reflections.retry")}
+                                </button>
+                              </div>
+                            ) : isLoading && !data ? (
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <span
+                                  aria-hidden="true"
+                                  className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
+                                />
+                                <span>Loading reflections...</span>
+                              </div>
+                            ) : sortedTrendReflections.length === 0 ? (
+                              <p className="text-sm text-gray-500">
+                                {t("reflection.none")}
+                              </p>
+                            ) : (
+                              (() => {
+                                const totalPages = Math.max(
+                                  1,
+                                  Math.ceil(sortedTrendReflections.length / pageSize),
+                                );
+
+                                return (
+                                  <>
+                                    <div className="space-y-0">
+                                      {trendPageItems.map((reflection) =>
+                                        renderReflectionItem(reflection),
+                                      )}
+                                    </div>
+                                    {totalPages > 1 && (
+                                      <div className="flex flex-wrap items-center justify-center gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            setTrendPrintoutPage((prev) =>
+                                              Math.max(1, prev - 1),
+                                            )
+                                          }
+                                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                          disabled={trendPrintoutPage <= 1}
+                                        >
+                                          Last page
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            setTrendPrintoutPage((prev) =>
+                                              Math.min(totalPages, prev + 1),
+                                            )
+                                          }
+                                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                          disabled={trendPrintoutPage >= totalPages}
+                                        >
+                                          Next page
+                                        </button>
+                                      </div>
+                                    )}
+                                  </>
+                                );
+                              })()
+                            )}
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <p className="mt-6 text-sm text-gray-500">
                         {t("reflection.addPrompt")}
