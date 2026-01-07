@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignUpButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 
@@ -14,10 +14,24 @@ export default function SpaceCta({
   initialChecked = false,
 }: Props) {
   const router = useRouter();
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, userId } = useAuth();
   const [loading, setLoading] = useState(false);
   const [slug, setSlug] = useState<string | null>(initialSlug);
   const [hasChecked, setHasChecked] = useState(initialChecked);
+  const lastUserId = useRef<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (lastUserId.current === userId) return;
+    lastUserId.current = userId;
+    if (!userId) {
+      setSlug(null);
+      setHasChecked(true);
+      return;
+    }
+    setSlug(null);
+    setHasChecked(false);
+  }, [isLoaded, userId]);
 
   useEffect(() => {
     let isActive = true;

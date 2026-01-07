@@ -411,6 +411,11 @@ export default function ReflectionCard({
     monthlyCounts.total > 0 && monthlyCounts.total !== reflectionsCount;
   const sentimentKey = countRange === "monthly" ? "monthly" : "allTime";
   const sentimentData = sentimentSummary[sentimentKey];
+  const hasNlpInsights = Boolean(
+    sentimentData &&
+      ((sentimentData.emotionCounts?.length ?? 0) > 0 ||
+        sentimentData.sentimentScore != null),
+  );
   const formattedSentimentScore =
     sentimentData?.sentimentScore == null
       ? "\u2014 / 100"
@@ -770,7 +775,15 @@ export default function ReflectionCard({
               <div className="mt-3 space-y-1 text-sm font-medium leading-6 text-gray-700">
                 {sentimentError ? (
                   <p className="text-sm text-red-600">{sentimentError}</p>
-                ) : isSentimentLoading && !sentimentData ? null : (
+                ) : isSentimentLoading && !sentimentData ? null : !hasNlpInsights ? (
+                  <div className="space-y-2 text-left">
+                    <p>No reflections to read yet.</p>
+                    <p>
+                      Insights will bloom here once your clients share a few thoughts in
+                      their own words.
+                    </p>
+                  </div>
+                ) : (
                   <>
                     <p>
                       <b>{"\u00a0\u00a0"}Through the lens of language:</b>
@@ -848,7 +861,7 @@ export default function ReflectionCard({
                       </div>
                     </div>
                     <div className="my-3 border-gray-200" />
-                    <div className="text-xs text-gray-500 text-left">
+                    <div className="mb-3 text-xs text-gray-500 text-left">
                       <p>
                         <sub>
                           ✨These insights were gently generated using two NLP models:{" "}
@@ -874,7 +887,7 @@ export default function ReflectionCard({
                       </p>
                     </div>
                     {selectedEmotion && (
-                      <div className="mt-3 space-y-4 text-left">
+                      <div className="pt-4 space-y-4 text-left">
                         <div className="border-t border-dashed border-gray-200" />
                         <div className="flex flex-wrap gap-2">
                           <button
