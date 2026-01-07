@@ -1539,6 +1539,7 @@ export default function ReflectionCard({
               open={isPrintoutTimeOpen}
               setOpen={setIsPrintoutTimeOpen}
               title="Change time range"
+              className="mt-0 h-[100dvh] max-h-none overflow-y-auto sm:mt-24 sm:h-auto sm:max-h-fit sm:overflow-visible"
             >
               <div className="w-full bg-white p-6">
                 <div className="space-y-1">

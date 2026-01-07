@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { cn } from "@/lib/utils";
 import { Drawer } from "vaul";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -20,30 +20,6 @@ export default function Modal({
   title?: string;
 }) {
   const { isMobile } = useMediaQuery();
-  const [keyboardOffset, setKeyboardOffset] = useState(0);
-
-  useEffect(() => {
-    if (!isMobile || typeof window === "undefined") return;
-    const viewport = window.visualViewport;
-    if (!viewport) return;
-
-    const updateOffset = () => {
-      const offset = Math.max(
-        0,
-        window.innerHeight - viewport.height - viewport.offsetTop,
-      );
-      setKeyboardOffset(offset);
-    };
-
-    updateOffset();
-    viewport.addEventListener("resize", updateOffset);
-    viewport.addEventListener("scroll", updateOffset);
-    return () => {
-      viewport.removeEventListener("resize", updateOffset);
-      viewport.removeEventListener("scroll", updateOffset);
-    };
-  }, [isMobile]);
-
   if (isMobile) {
     return (
       <Drawer.Root open={open} onOpenChange={setOpen}>
@@ -54,9 +30,6 @@ export default function Modal({
               "fixed bottom-0 left-0 right-0 z-50 mt-24 max-h-[85dvh] overflow-y-auto rounded-t-[10px] border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]",
               className,
             )}
-            style={
-              keyboardOffset > 0 ? { bottom: `${keyboardOffset}px` } : undefined
-            }
           >
             <Drawer.Title className="sr-only">{title}</Drawer.Title>
             <div className="sticky top-0 z-20 flex w-full items-center justify-center rounded-t-[10px] bg-inherit">
