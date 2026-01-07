@@ -677,138 +677,89 @@ export default function ReflectionCard({
                       <b>Through the lens of language:</b>
                     </p>
                     <div className="text-left">
-                      <Tooltip
-                        content={
-                          <div className="space-y-1 text-left text-xs text-gray-700">
-                            <p>
-                              Emotion Label reflects the emotional nuance identified in the text.
-                            </p>
-                            <p>
-                              Based on{" "}
-                              <a
-                                href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
-                                className="underline"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                GoEmotions model by Sam Lowe
-                              </a>
-                              .
-                            </p>
-                          </div>
-                        }
-                      >
-                        <span className="text-left">
-                          {"\u2013\u00a0"}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleEmotionSelect(primaryEmotion.label, primaryEmotion.count)
-                            }
-                            className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
-                              selectedEmotion?.label.toLowerCase() ===
-                              primaryEmotion.label.toLowerCase()
-                                ? "text-pulse-bloom-deep"
-                                : "text-gray-800 hover:text-pulse-bloom-deep"
-                            }`}
-                            aria-pressed={
-                              selectedEmotion?.label.toLowerCase() ===
-                              primaryEmotion.label.toLowerCase()
-                            }
-                            disabled={primaryEmotion.label === "\u2014" || primaryEmotion.count <= 0}
-                          >
-                            {formatEmotionLabel(primaryEmotion.label, true)}
-                          </button>
-                          {"\u00a0("}
-                          {primaryEmotion.count}
-                          {")"}
-                          {secondaryEmotion.label !== "\u2014" &&
-                          secondaryEmotion.count > 0 ? (
-                            <>
-                              {"\u00a0and\u00a0"}
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleEmotionSelect(
-                                    secondaryEmotion.label,
-                                    secondaryEmotion.count,
-                                  )
-                                }
-                                className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
-                                  selectedEmotion?.label.toLowerCase() ===
-                                  secondaryEmotion.label.toLowerCase()
-                                    ? "text-pulse-bloom-deep"
-                                    : "text-gray-800 hover:text-pulse-bloom-deep"
-                                }`}
-                                aria-pressed={
-                                  selectedEmotion?.label.toLowerCase() ===
-                                  secondaryEmotion.label.toLowerCase()
-                                }
-                              >
-                                {formatEmotionLabel(secondaryEmotion.label, false)}
-                              </button>
-                              {"\u00a0("}
-                              {secondaryEmotion.count}
-                              {")"}
-                            </>
-                          ) : null}
-                          {"\u00a0"}feelings surfaced most.
-                        </span>
-                      </Tooltip>
+                      <span className="text-left">
+                        {"\u2013\u00a0"}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleEmotionSelect(primaryEmotion.label, primaryEmotion.count)
+                          }
+                          className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
+                            selectedEmotion?.label.toLowerCase() ===
+                            primaryEmotion.label.toLowerCase()
+                              ? "text-pulse-bloom-deep"
+                              : "text-gray-800 hover:text-pulse-bloom-deep"
+                          }`}
+                          aria-pressed={
+                            selectedEmotion?.label.toLowerCase() ===
+                            primaryEmotion.label.toLowerCase()
+                          }
+                          disabled={primaryEmotion.label === "\u2014" || primaryEmotion.count <= 0}
+                        >
+                          {formatEmotionLabel(primaryEmotion.label, true)}
+                        </button>
+                        {"\u00a0("}
+                        {primaryEmotion.count}
+                        {")"}
+                        {secondaryEmotion.label !== "\u2014" &&
+                        secondaryEmotion.count > 0 ? (
+                          <>
+                            {"\u00a0and\u00a0"}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleEmotionSelect(secondaryEmotion.label, secondaryEmotion.count)
+                              }
+                              className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
+                                selectedEmotion?.label.toLowerCase() ===
+                                secondaryEmotion.label.toLowerCase()
+                                  ? "text-pulse-bloom-deep"
+                                  : "text-gray-800 hover:text-pulse-bloom-deep"
+                              }`}
+                              aria-pressed={
+                                selectedEmotion?.label.toLowerCase() ===
+                                secondaryEmotion.label.toLowerCase()
+                              }
+                            >
+                              {formatEmotionLabel(secondaryEmotion.label, false)}
+                            </button>
+                            {"\u00a0("}
+                            {secondaryEmotion.count}
+                            {")"}
+                          </>
+                        ) : null}
+                        {"\u00a0"}feelings surfaced most.
+                      </span>
                     </div>
                     <div className="text-left">
-                      <Tooltip
-                        content={
-                          <div className="space-y-1 text-left text-xs text-gray-700">
-                            <p>
-                              Emotional warmth captures the feeling tone of the reflection.
-                            </p>
-                            <p>
-                              Lower scores suggest heavier or more difficult reflections.
-                            </p>
-                            <p>Higher scores suggest lighter or more positive tones.</p>
-                            <p>
-                              Powered by{" "}
-                              <a
-                                href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
-                                className="underline"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                CardiffNLP&apos;s sentiment model
-                              </a>
-                              .
-                            </p>
-                          </div>
-                        }
-                      >
-                        <span className="text-left">
-                          {"\u2013\u00a0"}The emotional warmth was measured at
-                          {"\u00a0"}
-                          <b>{formattedSentimentScore}</b>.
-                        </span>
-                      </Tooltip>
+                      <span className="text-left">
+                        {"\u2013\u00a0"}The emotional warmth was measured at{"\u00a0"}
+                        <b>{formattedSentimentScore}</b>.
+                      </span>
                     </div>
                     <div className="my-3 border-gray-200" />
                     <div className="text-xs text-gray-500 text-left">
                       <p>
                         <sub>
-                          ✨These insights were gently generated using natural language models from{" "}
+                          ✨These insights were gently generated using two NLP models:{" "}
                           <a
-                            href="https://huggingface.co/"
+                            href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
                             className="underline"
                             target="_blank"
                             rel="noreferrer"
                           >
-                            Hugging Face
+                            Sam Lowe&apos;s GoEmotions
+                          </a>{" "}
+                          and{" "}
+                          <a
+                            href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
+                            className="underline"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                          CardiffNLP&apos;s sentiment model
                           </a>
                           .{" "}
-                          <span className="hidden md:inline">
-                            Hover over scores for more details.
-                          </span>
-                          <span className="md:hidden">
-                            Click scores for more details.
-                          </span>
                         </sub>
                       </p>
                     </div>
