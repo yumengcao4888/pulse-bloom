@@ -59,6 +59,7 @@ export async function GET(
       hfEnabled,
       sentimentScore: null,
       topEmotions: [],
+      emotionCounts: [],
     });
   }
 
@@ -134,10 +135,15 @@ export async function GET(
     })
     .slice(0, 2)
     .map(([label, count]) => ({ label, count }));
+  const emotionCountsList = Object.entries(emotionCounts).map(([label, count]) => ({
+    label,
+    count,
+  }));
 
   return NextResponse.json({
     hfEnabled,
     sentimentScore,
     topEmotions,
+    emotionCounts: emotionCountsList,
   });
 }

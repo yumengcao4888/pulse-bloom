@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import { useLocale } from "@/components/shared/locale-provider";
-import Tooltip from "@/components/shared/tooltip";
 import { delius, roboto } from "@/app/fonts";
 import { capitalize, fetcher, getMonthlyReflections } from "@/lib/utils";
 import type { TrendPoint } from "@/lib/utils";
@@ -32,6 +31,7 @@ type SentimentSummary = {
   hfEnabled: boolean;
   sentimentScore: number | null;
   topEmotions: { label: string; count: number }[];
+  emotionCounts: { label: string; count: number }[];
 };
 
 function ReflectionsSkeleton() {
@@ -415,14 +415,84 @@ export default function ReflectionCard({
     sentimentData?.sentimentScore == null
       ? "\u2014 / 100"
       : `${Math.round(sentimentData.sentimentScore)} / 100`;
-  const topEmotions = sentimentData?.topEmotions ?? [];
-  const primaryEmotion = topEmotions[0] ?? { label: "\u2014", count: 0 };
-  const secondaryEmotion = topEmotions[1] ?? { label: "\u2014", count: 0 };
+  const emotionCounts = sentimentData?.emotionCounts ?? [];
+  const topEmotionLabels = [
+    "gratitude",
+    "love",
+    "admiration",
+    "joy",
+    "caring",
+    "approval",
+    "optimism",
+    "pride",
+    "relief",
+    "excitement",
+    "amusement",
+    "desire",
+    "curiosity",
+    "surprise",
+    "realization",
+    "confusion",
+    "neutral",
+  ];
+  const topEmotionPriority = new Map(
+    topEmotionLabels.map((label, index) => [label, index]),
+  );
+  const displayTopEmotions = emotionCounts
+    .filter((emotion) => topEmotionLabels.includes(emotion.label.toLowerCase()))
+    .sort((a, b) => {
+      const countDiff = b.count - a.count;
+      if (countDiff !== 0) return countDiff;
+      const aIndex =
+        topEmotionPriority.get(a.label.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      const bIndex =
+        topEmotionPriority.get(b.label.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex;
+    });
+  const primaryEmotion = displayTopEmotions[0] ?? { label: "\u2014", count: 0 };
+  const secondaryEmotion = displayTopEmotions[1] ?? { label: "\u2014", count: 0 };
+  const gentleEmotionLabels = [
+    "sadness",
+    "nervousness",
+    "fear",
+    "disappointment",
+    "remorse",
+    "embarrassment",
+    "grief",
+  ];
+  const gentleEmotions = emotionCounts
+    .filter((emotion) =>
+      gentleEmotionLabels.includes(emotion.label.toLowerCase()),
+    )
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 2);
+  const gentlePrimaryEmotion = gentleEmotions[0] ?? { label: "\u2014", count: 0 };
+  const gentleSecondaryEmotion = gentleEmotions[1] ?? { label: "\u2014", count: 0 };
   const formatEmotionLabel = (label: string, capitalizeFirst: boolean) => {
     if (label === "\u2014") return label;
     const lowered = label.toLowerCase();
     return capitalizeFirst ? capitalize(lowered) : lowered;
   };
+  const renderEmotionButton = (
+    emotion: { label: string; count: number },
+    capitalizeFirst: boolean,
+  ) => (
+    <button
+      type="button"
+      onClick={() => handleEmotionSelect(emotion.label, emotion.count)}
+      className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
+        selectedEmotion?.label.toLowerCase() === emotion.label.toLowerCase()
+          ? "text-pulse-bloom-deep"
+          : "text-gray-800 hover:text-pulse-bloom-deep"
+      }`}
+      aria-pressed={
+        selectedEmotion?.label.toLowerCase() === emotion.label.toLowerCase()
+      }
+      disabled={emotion.label === "\u2014" || emotion.count <= 0}
+    >
+      {formatEmotionLabel(emotion.label, capitalizeFirst)}
+    </button>
+  );
 
   const renderReflectionItem = (reflection: ReflectionEntry) => {
     const hasFeeling = Boolean(reflection.feeling?.trim());
@@ -674,68 +744,55 @@ export default function ReflectionCard({
                 ) : isSentimentLoading && !sentimentData ? null : (
                   <>
                     <p>
-                      <b>Through the lens of language:</b>
+                      <b>{"\u00a0\u00a0"}Through the lens of language:</b>
                     </p>
                     <div className="text-left">
-                      <span className="text-left">
-                        {"\u2013\u00a0"}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleEmotionSelect(primaryEmotion.label, primaryEmotion.count)
-                          }
-                          className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
-                            selectedEmotion?.label.toLowerCase() ===
-                            primaryEmotion.label.toLowerCase()
-                              ? "text-pulse-bloom-deep"
-                              : "text-gray-800 hover:text-pulse-bloom-deep"
-                          }`}
-                          aria-pressed={
-                            selectedEmotion?.label.toLowerCase() ===
-                            primaryEmotion.label.toLowerCase()
-                          }
-                          disabled={primaryEmotion.label === "\u2014" || primaryEmotion.count <= 0}
-                        >
-                          {formatEmotionLabel(primaryEmotion.label, true)}
-                        </button>
-                        {"\u00a0("}
-                        {primaryEmotion.count}
-                        {")"}
-                        {secondaryEmotion.label !== "\u2014" &&
-                        secondaryEmotion.count > 0 ? (
-                          <>
-                            {"\u00a0and\u00a0"}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleEmotionSelect(secondaryEmotion.label, secondaryEmotion.count)
-                              }
-                              className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
-                                selectedEmotion?.label.toLowerCase() ===
-                                secondaryEmotion.label.toLowerCase()
-                                  ? "text-pulse-bloom-deep"
-                                  : "text-gray-800 hover:text-pulse-bloom-deep"
-                              }`}
-                              aria-pressed={
-                                selectedEmotion?.label.toLowerCase() ===
-                                secondaryEmotion.label.toLowerCase()
-                              }
-                            >
-                              {formatEmotionLabel(secondaryEmotion.label, false)}
-                            </button>
-                            {"\u00a0("}
-                            {secondaryEmotion.count}
-                            {")"}
-                          </>
-                        ) : null}
-                        {"\u00a0"}feelings surfaced most.
-                      </span>
+                      {primaryEmotion.label !== "\u2014" &&
+                      primaryEmotion.count > 0 ? (
+                        <span className="text-left">
+                          {"\u2013\u00a0"}
+                          {renderEmotionButton(primaryEmotion, true)}
+                          {"\u00a0("}
+                          {primaryEmotion.count}
+                          {")"}
+                          {secondaryEmotion.label !== "\u2014" &&
+                          secondaryEmotion.count > 0 ? (
+                            <>
+                              {"\u00a0and\u00a0"}
+                              {renderEmotionButton(secondaryEmotion, false)}
+                              {"\u00a0("}
+                              {secondaryEmotion.count}
+                              {")"}
+                            </>
+                          ) : null}
+                          {"\u00a0"}feelings surfaced most.
+                        </span>
+                      ) : null}
                     </div>
                     <div className="text-left">
                       <span className="text-left">
                         {"\u2013\u00a0"}The emotional warmth was measured at{"\u00a0"}
                         <b>{formattedSentimentScore}</b>.
                       </span>
+                    </div>
+                    <div className="pt-2 space-y-1">
+                      <p>
+                        <b>{"\u00a0\u00a0"}Gentle signals to notice:</b>
+                      </p>
+                      <div className="text-left">
+                        <span className="text-left">
+                          {"\u2013\u00a0"}Some reflections carried traces of{" "}
+                          {renderEmotionButton(gentlePrimaryEmotion, false)}
+                          {"\u00a0"}or{"\u00a0"}
+                          {renderEmotionButton(gentleSecondaryEmotion, false)}.
+                        </span>
+                      </div>
+                      <div className="text-left">
+                        <span className="text-left">
+                          {"\u2013\u00a0"}A few moments felt a bit heavier, perhaps asking for
+                          {"\u00a0"}care.
+                        </span>
+                      </div>
                     </div>
                     <div className="my-3 border-gray-200" />
                     <div className="text-xs text-gray-500 text-left">
