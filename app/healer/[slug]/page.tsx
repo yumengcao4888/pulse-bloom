@@ -1,13 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import {
-  computeScores,
-  getMonthlyReflections,
-} from "@/lib/utils";
+import { computeScores, getMonthlyReflections, roundToTwo } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import AutoPrint from "@/components/healer/auto-print";
 import ProfileImage from "@/components/healer/profile-image";
-import FeltCardAsync from "@/components/healer/felt-card-async";
+import FeltCard from "@/components/healer/felt-card";
 import { clerkClient } from "@clerk/nextjs/server";
 
 import 'tippy.js/dist/tippy.css';
@@ -53,6 +50,7 @@ export default async function HealerPage(props: PageProps) {
           supported: true,
           connected: true,
           createdAt: true,
+          emotionalWarmth: true,
         },
       },
     },
@@ -77,9 +75,33 @@ export default async function HealerPage(props: PageProps) {
 
   const scores = computeScores(healer.reflections);
   const monthlyReflections = getMonthlyReflections(healer.reflections);
-  const placeholderToken = "\u2014";
-  const pendingMoodValue = `${placeholderToken} / 100`;
-  const pendingTopWords = Array.from({ length: 3 }, () => placeholderToken);
+  const getAverageWarmth = (
+    reflections: Array<{ emotionalWarmth: { toString(): string } | number | null }>,
+  ) => {
+    const warmthScores = reflections
+      .map((reflection) =>
+        reflection.emotionalWarmth == null
+          ? null
+          : Number(reflection.emotionalWarmth),
+      )
+      .filter((score): score is number => Number.isFinite(score));
+    if (warmthScores.length === 0) return null;
+    const avg = warmthScores.reduce((total, value) => total + value, 0) / warmthScores.length;
+    return roundToTwo(avg);
+  };
+  const formatWarmth = (value: number | null) =>
+    value == null ? t("common.none") : `${Math.round(value)} / 100`;
+  const monthlySentiment = getAverageWarmth(monthlyReflections);
+  const allTimeSentiment = getAverageWarmth(healer.reflections);
+  const topWords = [
+    { text: "grounded", value: scores.allTime.grounded ?? 0 },
+    { text: "supported", value: scores.allTime.supported ?? 0 },
+    { text: "connected", value: scores.allTime.connected ?? 0 },
+  ]
+    .filter((word) => word.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 3)
+    .map((word) => word.text);
 
 
   const monthlyCount = monthlyReflections.length;
@@ -98,10 +120,10 @@ export default async function HealerPage(props: PageProps) {
     connectedValueLabel: t("healer.monthly.connected.value"),
     moodLabel: t("healer.monthly.mood"),
     moodValueLabel: t("healer.monthly.mood.value"),
-    moodValue: pendingMoodValue,
+    moodValue: formatWarmth(monthlySentiment),
     topWordsLabel: t("healer.monthly.topWords"),
     topWordsValueLabel: t("healer.monthly.topWords.value"),
-    topWords: pendingTopWords,
+    topWords,
     noneLabel: t("common.none"),
   };
   const allTimeCardData = {
@@ -117,10 +139,10 @@ export default async function HealerPage(props: PageProps) {
     connectedValueLabel: t("healer.monthly.connected.value"),
     moodLabel: t("healer.monthly.mood"),
     moodValueLabel: t("healer.monthly.mood.value"),
-    moodValue: pendingMoodValue,
+    moodValue: formatWarmth(allTimeSentiment),
     topWordsLabel: t("healer.monthly.topWords"),
     topWordsValueLabel: t("healer.monthly.topWords.value"),
-    topWords: pendingTopWords,
+    topWords,
     noneLabel: t("common.none"),
   };
 
@@ -199,8 +221,7 @@ export default async function HealerPage(props: PageProps) {
             </p>
           </div>
           {healer.reflections.length > 0 ? (
-            <FeltCardAsync
-              slug={slug}
+            <FeltCard
               monthly={monthlyCardData}
               allTime={allTimeCardData}
               monthlyLabel={t("healer.monthly.toggle.month")}

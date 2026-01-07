@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { classifyEmotion } from "@/lib/huggingface";
 import { computeScores, getMonthlyReflections, roundToTwo } from "@/lib/utils";
 
 type Word = {
@@ -36,16 +35,8 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const hfEnabled = Boolean(process.env.HF_TOKEN);
-  const reflectionsWithAnalysis = await Promise.all(
-    healer.reflections.map(async (reflection) => ({
-      ...reflection,
-      emotion: hfEnabled ? await classifyEmotion(reflection.feeling) : null,
-    })),
-  );
-
-  const scores = computeScores(reflectionsWithAnalysis);
-  const monthlyReflections = getMonthlyReflections(reflectionsWithAnalysis);
+  const scores = computeScores(healer.reflections);
+  const monthlyReflections = getMonthlyReflections(healer.reflections);
   const monthlySentiment = (() => {
     const warmthScores = monthlyReflections
       .map((reflection) =>
@@ -59,7 +50,7 @@ export async function GET(
     return roundToTwo(avg);
   })();
   const allTimeSentiment = (() => {
-    const warmthScores = reflectionsWithAnalysis
+    const warmthScores = healer.reflections
       .map((reflection) =>
         reflection.emotionalWarmth == null
           ? null
@@ -76,28 +67,10 @@ export async function GET(
     value: value ?? 0,
   });
 
-  const emotionCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
-    (acc, reflection) => {
-      const label = reflection.emotion?.label;
-      if (!label) return acc;
-      acc[label] = (acc[label] ?? 0) + 1;
-      return acc;
-    },
-    {},
-  );
-  const totalEmotionCount = Object.values(emotionCounts).reduce(
-    (sum, count) => sum + count,
-    0,
-  );
-  const emotionWords: Word[] = Object.entries(emotionCounts).map(([label, count]) => {
-    const percentage = totalEmotionCount === 0 ? 0 : (count / totalEmotionCount) * 100;
-    return metricToWord(label, Math.round(percentage));
-  });
   const topWords = [
     metricToWord("grounded", scores.allTime.grounded),
     metricToWord("supported", scores.allTime.supported),
     metricToWord("connected", scores.allTime.connected),
-    ...emotionWords,
   ]
     .filter((word) => word.value > 0)
     .sort((a, b) => b.value - a.value)
