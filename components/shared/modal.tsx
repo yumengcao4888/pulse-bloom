@@ -55,9 +55,7 @@ export default function Modal({
               className,
             )}
             style={
-              keyboardOffset > 0
-                ? { transform: `translateY(-${keyboardOffset}px)` }
-                : undefined
+              keyboardOffset > 0 ? { bottom: `${keyboardOffset}px` } : undefined
             }
           >
             <Drawer.Title className="sr-only">{title}</Drawer.Title>
