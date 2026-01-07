@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
+import { classifyEmotion } from "@/lib/huggingface";
+import { roundToTwo } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,7 @@ export async function GET(
         select: {
           feeling: true,
           createdAt: true,
+          emotionalWarmth: true,
         },
       },
     },
@@ -53,36 +55,29 @@ export async function GET(
         )
       : healer.reflections;
 
-  const hfEnabled = Boolean(process.env.HF_TOKEN);
-  if (!hfEnabled || reflections.length === 0) {
-    return NextResponse.json({
-      hfEnabled,
-      sentimentScore: null,
-      topEmotions: [],
-      emotionCounts: [],
-    });
-  }
-
-  const reflectionsWithAnalysis = await Promise.all(
-    reflections.map(async (reflection) => ({
-      sentiment: await classifyFeeling(reflection.feeling),
-      emotion: await classifyEmotion(reflection.feeling),
-    })),
-  );
-
-  const sentimentScores = reflectionsWithAnalysis
-    .map((reflection) => reflection.sentiment?.score)
-    .filter((score): score is number => score != null);
+  const emotionalWarmthScores = reflections
+    .map((reflection) =>
+      reflection.emotionalWarmth == null ? null : Number(reflection.emotionalWarmth),
+    )
+    .filter((score): score is number => Number.isFinite(score));
   const sentimentScore =
-    sentimentScores.length === 0
+    emotionalWarmthScores.length === 0
       ? null
-      : Math.round(
-          (sentimentScores.reduce((total, value) => total + value, 0) /
-            sentimentScores.length) *
-            100,
+      : roundToTwo(
+          emotionalWarmthScores.reduce((total, value) => total + value, 0) /
+            emotionalWarmthScores.length,
         );
 
-  const emotionCounts = reflectionsWithAnalysis.reduce<Record<string, number>>(
+  const hfEnabled = Boolean(process.env.HF_TOKEN);
+  const reflectionsWithEmotion = hfEnabled
+    ? await Promise.all(
+        reflections.map(async (reflection) => ({
+          emotion: await classifyEmotion(reflection.feeling),
+        })),
+      )
+    : [];
+
+  const emotionCounts = reflectionsWithEmotion.reduce<Record<string, number>>(
     (acc, reflection) => {
       const label = reflection.emotion?.label;
       if (!label) return acc;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
-import { computeScores, getMonthlyReflections } from "@/lib/utils";
+import { classifyEmotion } from "@/lib/huggingface";
+import { computeScores, getMonthlyReflections, roundToTwo } from "@/lib/utils";
 
 type Word = {
   text: string;
@@ -26,6 +26,7 @@ export async function GET(
           supported: true,
           connected: true,
           createdAt: true,
+          emotionalWarmth: true,
         },
       },
     },
@@ -39,7 +40,6 @@ export async function GET(
   const reflectionsWithAnalysis = await Promise.all(
     healer.reflections.map(async (reflection) => ({
       ...reflection,
-      sentiment: hfEnabled ? await classifyFeeling(reflection.feeling) : null,
       emotion: hfEnabled ? await classifyEmotion(reflection.feeling) : null,
     })),
   );
@@ -47,20 +47,28 @@ export async function GET(
   const scores = computeScores(reflectionsWithAnalysis);
   const monthlyReflections = getMonthlyReflections(reflectionsWithAnalysis);
   const monthlySentiment = (() => {
-    const sentimentScores = monthlyReflections
-      .map((reflection) => reflection.sentiment?.score)
-      .filter((score): score is number => score != null);
-    if (sentimentScores.length === 0) return null;
-    const avg = sentimentScores.reduce((total, value) => total + value, 0) / sentimentScores.length;
-    return Math.round(avg * 100);
+    const warmthScores = monthlyReflections
+      .map((reflection) =>
+        reflection.emotionalWarmth == null
+          ? null
+          : Number(reflection.emotionalWarmth),
+      )
+      .filter((score): score is number => Number.isFinite(score));
+    if (warmthScores.length === 0) return null;
+    const avg = warmthScores.reduce((total, value) => total + value, 0) / warmthScores.length;
+    return roundToTwo(avg);
   })();
   const allTimeSentiment = (() => {
-    const sentimentScores = reflectionsWithAnalysis
-      .map((reflection) => reflection.sentiment?.score)
-      .filter((score): score is number => score != null);
-    if (sentimentScores.length === 0) return null;
-    const avg = sentimentScores.reduce((total, value) => total + value, 0) / sentimentScores.length;
-    return Math.round(avg * 100);
+    const warmthScores = reflectionsWithAnalysis
+      .map((reflection) =>
+        reflection.emotionalWarmth == null
+          ? null
+          : Number(reflection.emotionalWarmth),
+      )
+      .filter((score): score is number => Number.isFinite(score));
+    if (warmthScores.length === 0) return null;
+    const avg = warmthScores.reduce((total, value) => total + value, 0) / warmthScores.length;
+    return roundToTwo(avg);
   })();
 
   const metricToWord = (text: string, value: number | null): Word => ({

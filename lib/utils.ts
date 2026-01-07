@@ -64,6 +64,18 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export function roundToTwo(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+export function calculateEmotionalWarmth(
+  sentiment: SentimentPrediction | null,
+): number | null {
+  if (!sentiment) return null;
+  const warmth = sentiment.score * 100;
+  return roundToTwo(Math.min(100, Math.max(0, warmth)));
+}
+
 export const truncate = (str: string, length: number) => {
   if (!str || str.length <= length) return str;
   return `${str.slice(0, length)}...`;

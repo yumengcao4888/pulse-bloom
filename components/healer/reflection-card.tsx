@@ -746,7 +746,7 @@ export default function ReflectionCard({
   const formattedSentimentScore =
     sentimentData?.sentimentScore == null
       ? "\u2014 / 100"
-      : `${Math.round(sentimentData.sentimentScore)} / 100`;
+      : `${sentimentData.sentimentScore.toFixed(2)} / 100`;
   const emotionCounts = sentimentData?.emotionCounts ?? [];
   const topEmotionLabels = [
     "gratitude",
