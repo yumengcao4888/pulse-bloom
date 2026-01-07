@@ -1493,9 +1493,12 @@ export default function ReflectionCard({
             >
               <div className="w-full bg-white p-6">
                 <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-gray-900">Change time</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    🕰️ Choose a time range
+                  </h3>
                   <p className="text-sm text-gray-500">
-                    Use the spinners or click a number to type a start and end date.
+                    Pick the start and end dates you'd like to explore. You can use
+                    the spinners or type the dates directly.
                   </p>
                 </div>
                 <div className="mt-5 grid gap-4">
