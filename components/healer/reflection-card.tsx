@@ -109,6 +109,7 @@ export default function ReflectionCard({
   const [printoutEndDate, setPrintoutEndDate] = useState("");
   const [printoutDraftStart, setPrintoutDraftStart] = useState("");
   const [printoutDraftEnd, setPrintoutDraftEnd] = useState("");
+  const [isPrintoutKeyboardOpen, setIsPrintoutKeyboardOpen] = useState(false);
   const [editingDatePartKey, setEditingDatePartKey] = useState<string | null>(null);
   const [editingDatePartValue, setEditingDatePartValue] = useState("");
   const [isTrendLoading, setIsTrendLoading] = useState(false);
@@ -607,6 +608,25 @@ export default function ReflectionCard({
       setTrendFreeTextOnly(false);
     }
   }, [showTrends]);
+
+  useEffect(() => {
+    if (!isPrintoutTimeOpen || typeof window === "undefined") return;
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const updateKeyboard = () => {
+      const keyboardHeight = window.innerHeight - viewport.height;
+      setIsPrintoutKeyboardOpen(keyboardHeight > 150);
+    };
+
+    updateKeyboard();
+    viewport.addEventListener("resize", updateKeyboard);
+    viewport.addEventListener("scroll", updateKeyboard);
+    return () => {
+      viewport.removeEventListener("resize", updateKeyboard);
+      viewport.removeEventListener("scroll", updateKeyboard);
+    };
+  }, [isPrintoutTimeOpen]);
 
   useEffect(() => {
     setSelectedTrendLabel(null);
@@ -1539,7 +1559,11 @@ export default function ReflectionCard({
               open={isPrintoutTimeOpen}
               setOpen={setIsPrintoutTimeOpen}
               title="Change time range"
-              className="mt-0 h-[100dvh] max-h-none overflow-y-auto sm:mt-24 sm:h-auto sm:max-h-fit sm:overflow-visible"
+              className={
+                isPrintoutKeyboardOpen
+                  ? "mt-0 h-[100dvh] max-h-none overflow-y-auto sm:mt-24 sm:h-auto sm:max-h-fit sm:overflow-visible"
+                  : "mt-24 max-h-[85dvh] overflow-y-auto sm:mt-24 sm:max-h-fit sm:overflow-visible"
+              }
             >
               <div className="w-full bg-white p-6">
                 <div className="space-y-1">
