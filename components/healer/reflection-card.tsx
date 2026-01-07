@@ -110,6 +110,7 @@ export default function ReflectionCard({
   const [printoutDraftStart, setPrintoutDraftStart] = useState("");
   const [printoutDraftEnd, setPrintoutDraftEnd] = useState("");
   const [isPrintoutKeyboardOpen, setIsPrintoutKeyboardOpen] = useState(false);
+  const [printoutViewportHeight, setPrintoutViewportHeight] = useState<number | null>(null);
   const [editingDatePartKey, setEditingDatePartKey] = useState<string | null>(null);
   const [editingDatePartValue, setEditingDatePartValue] = useState("");
   const [isTrendLoading, setIsTrendLoading] = useState(false);
@@ -617,6 +618,7 @@ export default function ReflectionCard({
     const updateKeyboard = () => {
       const keyboardHeight = window.innerHeight - viewport.height;
       setIsPrintoutKeyboardOpen(keyboardHeight > 150);
+      setPrintoutViewportHeight(Math.round(viewport.height));
     };
 
     updateKeyboard();
@@ -1559,9 +1561,14 @@ export default function ReflectionCard({
               open={isPrintoutTimeOpen}
               setOpen={setIsPrintoutTimeOpen}
               title="Change time range"
+              contentStyle={
+                isPrintoutKeyboardOpen && printoutViewportHeight
+                  ? { height: printoutViewportHeight }
+                  : undefined
+              }
               className={
                 isPrintoutKeyboardOpen
-                  ? "mt-0 h-[100dvh] max-h-none overflow-y-auto sm:mt-24 sm:h-auto sm:max-h-fit sm:overflow-visible"
+                  ? "mt-0 max-h-none overflow-y-auto sm:mt-24 sm:max-h-fit sm:overflow-visible"
                   : "mt-24 max-h-[85dvh] overflow-y-auto sm:mt-24 sm:max-h-fit sm:overflow-visible"
               }
             >

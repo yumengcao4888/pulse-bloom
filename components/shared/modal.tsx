@@ -9,12 +9,14 @@ import useMediaQuery from "@/lib/hooks/use-media-query";
 export default function Modal({
   children,
   className,
+  contentStyle,
   open,
   setOpen,
   title = "Modal",
 }: {
   children: React.ReactNode;
   className?: string;
+  contentStyle?: React.CSSProperties;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   title?: string;
@@ -30,6 +32,7 @@ export default function Modal({
               "fixed bottom-0 left-0 right-0 z-50 mt-24 max-h-[85dvh] overflow-y-auto rounded-t-[10px] border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]",
               className,
             )}
+            style={contentStyle}
           >
             <Drawer.Title className="sr-only">{title}</Drawer.Title>
             <div className="sticky top-0 z-20 flex w-full items-center justify-center rounded-t-[10px] bg-inherit">
@@ -57,6 +60,7 @@ export default function Modal({
             "animate-scale-in fixed inset-0 z-40 m-auto max-h-fit w-full max-w-md overflow-hidden border border-gray-200 bg-white p-0 shadow-xl md:rounded-2xl",
             className,
           )}
+          style={contentStyle}
         >
           <Dialog.Title className="sr-only">{title}</Dialog.Title>
           {children}
