@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
+import Modal from "@/components/shared/modal";
 import { useLocale } from "@/components/shared/locale-provider";
 import { delius, roboto } from "@/app/fonts";
 import {
@@ -100,7 +101,16 @@ export default function ReflectionCard({
   const [selectedTrendLabel, setSelectedTrendLabel] = useState<string | null>(null);
   const [trendPrintoutSort, setTrendPrintoutSort] = useState<"desc" | "asc">("desc");
   const [trendPrintoutPage, setTrendPrintoutPage] = useState(1);
+  const [trendFreeTextOnly, setTrendFreeTextOnly] = useState(false);
   const [printoutSort, setPrintoutSort] = useState<"desc" | "asc">("desc");
+  const [printoutFreeTextOnly, setPrintoutFreeTextOnly] = useState(false);
+  const [isPrintoutTimeOpen, setIsPrintoutTimeOpen] = useState(false);
+  const [printoutStartDate, setPrintoutStartDate] = useState("");
+  const [printoutEndDate, setPrintoutEndDate] = useState("");
+  const [printoutDraftStart, setPrintoutDraftStart] = useState("");
+  const [printoutDraftEnd, setPrintoutDraftEnd] = useState("");
+  const [editingDatePartKey, setEditingDatePartKey] = useState<string | null>(null);
+  const [editingDatePartValue, setEditingDatePartValue] = useState("");
   const [isTrendLoading, setIsTrendLoading] = useState(false);
   const [trendError, setTrendError] = useState<string | null>(null);
   const [printoutPage, setPrintoutPage] = useState(1);
@@ -240,6 +250,156 @@ export default function ReflectionCard({
   };
   const formatBool = (value: boolean | null | undefined) =>
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
+  const isPrintoutRangeActive = Boolean(printoutStartDate || printoutEndDate);
+
+  const pad2 = (value: number) => String(value).padStart(2, "0");
+  const formatDateInput = (date: Date) =>
+    `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+  const daysInMonth = (year: number, month: number) =>
+    new Date(year, month, 0).getDate();
+  const parseDateString = (value: string) => {
+    if (!value) return null;
+    const [year, month, day] = value.split("-").map((part) => Number(part));
+    if (!year || !month || !day) return null;
+    const maxDay = daysInMonth(year, month);
+    if (month < 1 || month > 12 || day < 1 || day > maxDay) return null;
+    return { year, month, day };
+  };
+  const formatDateString = (year: number, month: number, day: number) =>
+    `${year}-${pad2(month)}-${pad2(day)}`;
+  const normalizeDateParts = (year: number, month: number, day: number) => {
+    const safeMonth = Math.min(12, Math.max(1, month));
+    const maxDay = daysInMonth(year, safeMonth);
+    const safeDay = Math.min(maxDay, Math.max(1, day));
+    return { year, month: safeMonth, day: safeDay };
+  };
+  const getBaseDateParts = (value: string) => {
+    const parsed = parseDateString(value);
+    if (parsed) return parsed;
+    const today = new Date();
+    return {
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate(),
+    };
+  };
+  const updateDatePart = (
+    value: string,
+    part: "year" | "month" | "day",
+    delta: number,
+  ) => {
+    const base = getBaseDateParts(value);
+    const nextDate = new Date(base.year, base.month - 1, base.day);
+    if (part === "year") {
+      nextDate.setFullYear(nextDate.getFullYear() + delta);
+    }
+    if (part === "month") {
+      nextDate.setMonth(nextDate.getMonth() + delta);
+    }
+    if (part === "day") {
+      nextDate.setDate(nextDate.getDate() + delta);
+    }
+    return formatDateInput(nextDate);
+  };
+  const updateDatePartFromInput = (
+    value: string,
+    part: "year" | "month" | "day",
+    inputValue: string,
+  ) => {
+    const parsed = Number(inputValue);
+    if (!Number.isFinite(parsed)) return value;
+    const base = getBaseDateParts(value);
+    const next = { ...base };
+    const safeValue = part === "year" ? Math.max(1, parsed) : parsed;
+    if (part === "year") next.year = safeValue;
+    if (part === "month") next.month = safeValue;
+    if (part === "day") next.day = safeValue;
+    const normalized = normalizeDateParts(next.year, next.month, next.day);
+    return formatDateString(normalized.year, normalized.month, normalized.day);
+  };
+  const earliestReflectionDate = useMemo(() => {
+    if (!data?.reflections?.length) return null;
+    const earliest = data.reflections.reduce<Date | null>((earliestDate, reflection) => {
+      const createdAt = new Date(reflection.createdAt);
+      if (Number.isNaN(createdAt.getTime())) return earliestDate;
+      if (!earliestDate || createdAt < earliestDate) return createdAt;
+      return earliestDate;
+    }, null);
+    if (!earliest) return null;
+    const normalized = new Date(earliest);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
+  }, [data]);
+  const clampDateString = (value: string, minDate: Date | null, maxDate: Date) => {
+    if (!value) return value;
+    const parsed = parseDateString(value);
+    if (!parsed) return value;
+    let next = new Date(parsed.year, parsed.month - 1, parsed.day);
+    if (minDate && next < minDate) next = minDate;
+    if (next > maxDate) next = maxDate;
+    return formatDateInput(next);
+  };
+  const applyPrintoutDateChange = useCallback(
+    (range: "start" | "end", nextValue: string) => {
+      const maxDate = new Date();
+      maxDate.setHours(0, 0, 0, 0);
+      const minDate = earliestReflectionDate;
+      const clamp = (value: string) => clampDateString(value, minDate, maxDate);
+      let nextStart = range === "start" ? nextValue : printoutDraftStart;
+      let nextEnd = range === "end" ? nextValue : printoutDraftEnd;
+
+      if (nextStart) nextStart = clamp(nextStart);
+      if (nextEnd) nextEnd = clamp(nextEnd);
+
+      if (nextStart && nextEnd) {
+        const startDate = new Date(`${nextStart}T00:00:00`);
+        const endDate = new Date(`${nextEnd}T00:00:00`);
+        if (startDate > endDate) {
+          if (range === "start") {
+            nextEnd = nextStart;
+          } else {
+            nextStart = nextEnd;
+          }
+        }
+      }
+
+      setPrintoutDraftStart(nextStart);
+      setPrintoutDraftEnd(nextEnd);
+    },
+    [earliestReflectionDate, printoutDraftEnd, printoutDraftStart],
+  );
+
+  useEffect(() => {
+    if (!isPrintoutTimeOpen) {
+      setEditingDatePartKey(null);
+      setEditingDatePartValue("");
+    }
+  }, [isPrintoutTimeOpen]);
+
+  const getDefaultPrintoutRange = useCallback(() => {
+    const today = new Date();
+    if (countRange === "monthly") {
+      const start = new Date(today);
+      start.setDate(start.getDate() - 30);
+      return {
+        start: formatDateInput(start),
+        end: formatDateInput(today),
+      };
+    }
+
+    const reflections = data?.reflections ?? [];
+    const earliest = reflections.reduce<Date | null>((earliestDate, reflection) => {
+      const createdAt = new Date(reflection.createdAt);
+      if (Number.isNaN(createdAt.getTime())) return earliestDate;
+      if (!earliestDate || createdAt < earliestDate) return createdAt;
+      return earliestDate;
+    }, null);
+    const start = earliest ?? today;
+    return {
+      start: formatDateInput(start),
+      end: formatDateInput(today),
+    };
+  }, [countRange, data]);
 
   const hasData = Boolean(data);
   const showTrends = activeSection === "trends";
@@ -319,14 +479,36 @@ export default function ReflectionCard({
   }, [countRange, data]);
 
   const sortedPrintout = useMemo(() => {
-    const items = [...filteredPrintout];
+    const items = [...filteredPrintout].filter((reflection) => {
+      if (!printoutFreeTextOnly) return true;
+      return Boolean(reflection.feeling?.trim());
+    });
+    const rangeStart = printoutStartDate
+      ? new Date(`${printoutStartDate}T00:00:00`)
+      : null;
+    const rangeEnd = printoutEndDate
+      ? new Date(`${printoutEndDate}T23:59:59.999`)
+      : null;
     items.sort((a, b) => {
       const aTime = new Date(a.createdAt).getTime();
       const bTime = new Date(b.createdAt).getTime();
       return printoutSort === "asc" ? aTime - bTime : bTime - aTime;
     });
-    return items;
-  }, [filteredPrintout, printoutSort]);
+    if (!rangeStart && !rangeEnd) return items;
+    return items.filter((reflection) => {
+      const createdAt = new Date(reflection.createdAt);
+      if (Number.isNaN(createdAt.getTime())) return false;
+      if (rangeStart && createdAt < rangeStart) return false;
+      if (rangeEnd && createdAt > rangeEnd) return false;
+      return true;
+    });
+  }, [
+    filteredPrintout,
+    printoutFreeTextOnly,
+    printoutSort,
+    printoutStartDate,
+    printoutEndDate,
+  ]);
 
   const trendReflections = useMemo(() => {
     if (!data || !selectedTrendLabel) return [];
@@ -335,9 +517,11 @@ export default function ReflectionCard({
         countRange === "monthly"
           ? getWeekStartKey(reflection.createdAt, timeZone)
           : getMonthStartKey(reflection.createdAt, timeZone);
-      return bucketKey === selectedTrendLabel;
+      if (bucketKey !== selectedTrendLabel) return false;
+      if (!trendFreeTextOnly) return true;
+      return Boolean(reflection.feeling?.trim());
     });
-  }, [countRange, data, selectedTrendLabel, timeZone]);
+  }, [countRange, data, selectedTrendLabel, timeZone, trendFreeTextOnly]);
 
   const sortedTrendReflections = useMemo(() => {
     const items = [...trendReflections];
@@ -360,6 +544,29 @@ export default function ReflectionCard({
       setPrintoutPage(1);
     }
   }, [activeSection]);
+
+  useEffect(() => {
+    if (activeSection !== "printout") {
+      setPrintoutFreeTextOnly(false);
+    }
+  }, [activeSection]);
+
+  useEffect(() => {
+    if (!isPrintoutTimeOpen) return;
+    if (printoutStartDate || printoutEndDate) {
+      setPrintoutDraftStart(printoutStartDate);
+      setPrintoutDraftEnd(printoutEndDate);
+      return;
+    }
+    const defaults = getDefaultPrintoutRange();
+    setPrintoutDraftStart(defaults.start);
+    setPrintoutDraftEnd(defaults.end);
+  }, [
+    getDefaultPrintoutRange,
+    isPrintoutTimeOpen,
+    printoutEndDate,
+    printoutStartDate,
+  ]);
 
   useEffect(() => {
     if (showSentiment) return;
@@ -397,12 +604,14 @@ export default function ReflectionCard({
     if (!showTrends) {
       setSelectedTrendLabel(null);
       setTrendPrintoutPage(1);
+      setTrendFreeTextOnly(false);
     }
   }, [showTrends]);
 
   useEffect(() => {
     setSelectedTrendLabel(null);
     setTrendPrintoutPage(1);
+    setTrendFreeTextOnly(false);
   }, [countRange]);
 
   const emotionKey = selectedEmotion
@@ -868,18 +1077,35 @@ export default function ReflectionCard({
                               <p className="text-sm font-semibold text-gray-700">
                                 Reflections from {formatTrendLabel(selectedTrendLabel)}
                               </p>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setTrendPrintoutSort((prev) =>
-                                    prev === "desc" ? "asc" : "desc",
-                                  )
-                                }
-                                className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                                aria-pressed={trendPrintoutSort === "asc"}
-                              >
-                                {trendPrintoutSort === "desc" ? "Desc" : "Asc"}
-                              </button>
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setTrendPrintoutSort((prev) =>
+                                      prev === "desc" ? "asc" : "desc",
+                                    )
+                                  }
+                                  className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                                  aria-pressed={trendPrintoutSort === "asc"}
+                                >
+                                  {trendPrintoutSort === "desc" ? "Desc" : "Asc"}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTrendFreeTextOnly((prev) => !prev);
+                                    setTrendPrintoutPage(1);
+                                  }}
+                                  className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                                    trendFreeTextOnly
+                                      ? "bg-pulse-bloom text-white"
+                                      : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                                  }`}
+                                  aria-pressed={trendFreeTextOnly}
+                                >
+                                  Free text
+                                </button>
+                              </div>
                             </div>
                             {error ? (
                               <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -1186,6 +1412,32 @@ export default function ReflectionCard({
               >
                 {printoutSort === "desc" ? "Desc" : "Asc"}
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPrintoutFreeTextOnly((prev) => !prev);
+                  setPrintoutPage(1);
+                }}
+                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                  printoutFreeTextOnly
+                    ? "bg-pulse-bloom text-white"
+                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                }`}
+                aria-pressed={printoutFreeTextOnly}
+              >
+                Free text
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPrintoutTimeOpen(true)}
+                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                  isPrintoutRangeActive
+                    ? "bg-pulse-bloom text-white"
+                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                }`}
+              >
+                Change time
+              </button>
             </div>
             {sortedPrintout.length === 0 ? (
               <p className="text-sm text-gray-500">{t("reflection.none")}</p>
@@ -1234,6 +1486,225 @@ export default function ReflectionCard({
                 );
               })()
             )}
+            <Modal
+              open={isPrintoutTimeOpen}
+              setOpen={setIsPrintoutTimeOpen}
+              title="Change time range"
+            >
+              <div className="w-full bg-white p-6">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-gray-900">Change time</h3>
+                  <p className="text-sm text-gray-500">
+                    Use the spinners or click a number to type a start and end date.
+                  </p>
+                </div>
+                <div className="mt-5 grid gap-4">
+                  {[
+                    {
+                      id: "start" as const,
+                      label: "Start date",
+                      value: printoutDraftStart,
+                    },
+                    {
+                      id: "end" as const,
+                      label: "End date",
+                      value: printoutDraftEnd,
+                    },
+                  ].map(({ id, label, value }) => {
+                    const parsed = parseDateString(value);
+                    const displayYear = parsed ? String(parsed.year) : "----";
+                    const displayMonth = parsed ? pad2(parsed.month) : "--";
+                    const displayDay = parsed ? pad2(parsed.day) : "--";
+
+                    return (
+                      <div key={label} className="space-y-2">
+                        <p className="text-sm font-medium text-gray-700">{label}</p>
+                        <div className="mx-auto w-fit rounded-2xl bg-pulse-bloom-soft/30 p-3 shadow-sm">
+                          <div className="flex flex-wrap items-center justify-center gap-3">
+                            {[
+                              {
+                                value: displayYear,
+                                part: "year" as const,
+                                widthClass: "w-[6ch]",
+                              },
+                              {
+                                value: displayMonth,
+                                part: "month" as const,
+                                widthClass: "w-[4ch]",
+                              },
+                              {
+                                value: displayDay,
+                                part: "day" as const,
+                                widthClass: "w-[4ch]",
+                              },
+                            ].map((item) => (
+                              <div key={item.part} className="flex flex-col items-center gap-0.5">
+                                {(() => {
+                                  const editKey = `${id}-${item.part}`;
+                                  const isEditing = editingDatePartKey === editKey;
+                                  const maxLength = item.part === "year" ? 4 : 2;
+                                  const initialValue = parsed
+                                    ? item.part === "year"
+                                      ? String(parsed.year)
+                                      : pad2(parsed[item.part])
+                                    : "";
+                                  const commitEdit = () => {
+                                    if (!isEditing) return;
+                                    if (editingDatePartValue.trim()) {
+                                      applyPrintoutDateChange(
+                                        id,
+                                        updateDatePartFromInput(
+                                          value,
+                                          item.part,
+                                          editingDatePartValue,
+                                        ),
+                                      );
+                                    }
+                                    setEditingDatePartKey(null);
+                                    setEditingDatePartValue("");
+                                  };
+                                  const cancelEdit = () => {
+                                    setEditingDatePartKey(null);
+                                    setEditingDatePartValue("");
+                                  };
+
+                                  return (
+                                    <>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    applyPrintoutDateChange(
+                                      id,
+                                      updateDatePart(value, item.part, 1),
+                                    )
+                                  }
+                                  className="flex h-6 w-6 items-center justify-center rounded-full bg-pulse-bloom/80 text-[10px] font-semibold uppercase leading-none tracking-wide text-white transition hover:bg-pulse-bloom-deep"
+                                  aria-label={`${label} ${item.part} up`}
+                                >
+                                  <svg
+                                    viewBox="0 0 12 12"
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                  >
+                                    <path d="M6 3l3.5 4.5h-7L6 3z" fill="currentColor" />
+                                  </svg>
+                                </button>
+                                {isEditing ? (
+                                  <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    value={editingDatePartValue}
+                                    onChange={(event) => {
+                                      const next = event.target.value.replace(/\D/g, "");
+                                      setEditingDatePartValue(next.slice(0, maxLength));
+                                    }}
+                                    onBlur={commitEdit}
+                                    onKeyDown={(event) => {
+                                      if (event.key === "Enter") {
+                                        event.preventDefault();
+                                        commitEdit();
+                                      }
+                                      if (event.key === "Escape") {
+                                        event.preventDefault();
+                                        cancelEdit();
+                                      }
+                                    }}
+                                    autoFocus
+                                    className={`h-12 rounded-lg bg-white px-3 py-2 text-center text-2xl font-semibold leading-none tabular-nums tracking-wide text-gray-600 shadow-inner focus:outline-none focus:ring-2 focus:ring-pulse-bloom/40 ${item.widthClass}`}
+                                    aria-label={`${label} ${item.part} value`}
+                                  />
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingDatePartKey(editKey);
+                                      setEditingDatePartValue(initialValue);
+                                    }}
+                                    className={`inline-flex h-12 items-center justify-center rounded-lg bg-white px-3 py-2 text-center text-2xl font-semibold leading-none tabular-nums tracking-wide text-gray-600 shadow-inner transition hover:bg-pulse-bloom/10 ${item.widthClass}`}
+                                    aria-label={`${label} ${item.part} value`}
+                                  >
+                                    {item.value}
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    applyPrintoutDateChange(
+                                      id,
+                                      updateDatePart(value, item.part, -1),
+                                    )
+                                  }
+                                  className="flex h-6 w-6 items-center justify-center rounded-full bg-pulse-bloom/80 text-[10px] font-semibold uppercase leading-none tracking-wide text-white transition hover:bg-pulse-bloom-deep"
+                                  aria-label={`${label} ${item.part} down`}
+                                >
+                                  <svg
+                                    viewBox="0 0 12 12"
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                  >
+                                    <path d="M6 9L2.5 4.5h7L6 9z" fill="currentColor" />
+                                  </svg>
+                                </button>
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-6 flex flex-wrap justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const defaults = getDefaultPrintoutRange();
+                      setPrintoutDraftStart(defaults.start);
+                      setPrintoutDraftEnd(defaults.end);
+                      setPrintoutStartDate("");
+                      setPrintoutEndDate("");
+                      setPrintoutPage(1);
+                    }}
+                    className="rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPrintoutTimeOpen(false)}
+                    className="rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      let start = printoutDraftStart;
+                      let end = printoutDraftEnd;
+                      if (start && end) {
+                        const startDate = new Date(`${start}T00:00:00`);
+                        const endDate = new Date(`${end}T00:00:00`);
+                        if (startDate > endDate) {
+                          [start, end] = [end, start];
+                        }
+                      }
+                      setPrintoutStartDate(start);
+                      setPrintoutEndDate(end);
+                      setPrintoutPage(1);
+                      setIsPrintoutTimeOpen(false);
+                    }}
+                    className="rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </Modal>
           </div>
         )}
         </div>

@@ -389,7 +389,7 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
         <button
           type="button"
           onClick={() => handleOpenChange(true)}
-          className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
+          className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
         >
           Edit your space
         </button>
@@ -414,7 +414,7 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
       <button
         type="button"
         onClick={() => handleOpenChange(true)}
-        className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
+        className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
       >
         Edit your space
       </button>
