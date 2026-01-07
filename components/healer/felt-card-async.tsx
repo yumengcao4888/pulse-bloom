@@ -14,7 +14,7 @@ type Props = FeltCardProps & {
 };
 
 const formatSentiment = (value: number | null, fallback: string) =>
-  value == null ? fallback : `${value} / 100`;
+  value == null ? fallback : `${Math.round(value)} / 100`;
 
 export default function FeltCardAsync({
   slug,
