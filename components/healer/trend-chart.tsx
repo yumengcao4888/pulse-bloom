@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -13,6 +12,7 @@ import {
 
 import { type TrendPoint } from "@/lib/utils";
 import { useLocale } from "@/components/shared/locale-provider";
+import useMediaQuery from "@/lib/hooks/use-media-query";
 
 const tooltipStyle = {
   backgroundColor: "rgb(255, 255, 255)",
@@ -28,7 +28,7 @@ function TrendTooltip({
   formatLabel,
   onSelectPoint,
   selectedLabel,
-  isCoarsePointer,
+  isMobile,
 }: {
   active?: boolean;
   payload?: Array<{
@@ -41,7 +41,7 @@ function TrendTooltip({
   formatLabel?: (label?: string) => string;
   onSelectPoint?: (label?: string) => void;
   selectedLabel?: string | null;
-  isCoarsePointer?: boolean;
+  isMobile?: boolean;
 }) {
   if (!active || !payload?.length) {
     return null;
@@ -55,10 +55,8 @@ function TrendTooltip({
   const isClickable = Boolean(onSelectPoint);
   const isSelected = Boolean(selectedLabel && label && selectedLabel === label);
   const ctaVerb = isSelected ? "hide" : "view";
-  const ctaLabel = isCoarsePointer
-    ? `Tap to ${ctaVerb}`
-    : `Click to ${ctaVerb}`;
-  const allowContainerClick = isClickable && isCoarsePointer;
+  const ctaLabel = isMobile ? `Tap to ${ctaVerb}` : `Click to ${ctaVerb}`;
+  const allowContainerClick = isClickable && isMobile;
 
   return (
     <div
@@ -116,7 +114,9 @@ function TrendTooltip({
         <div className="mt-2 flex justify-center">
           <button
             type="button"
-            onClick={() => onSelectPoint?.(label)}
+            onClick={
+              allowContainerClick ? undefined : () => onSelectPoint?.(label)
+            }
             className="rounded-full bg-pulse-bloom-soft/30 px-3 py-1 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition hover:bg-pulse-bloom-soft/50"
           >
             {ctaLabel}
@@ -145,25 +145,6 @@ function formatWeekRangeLabel(label: string | undefined, locale: string) {
   return `${startDisplay} -\n${endDisplay}`;
 }
 
-function useCoarsePointer() {
-  const [isCoarse, setIsCoarse] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const media = window.matchMedia("(pointer: coarse)");
-    const update = () => setIsCoarse(media.matches);
-    update();
-    if (media.addEventListener) {
-      media.addEventListener("change", update);
-      return () => media.removeEventListener("change", update);
-    }
-    media.addListener(update);
-    return () => media.removeListener(update);
-  }, []);
-
-  return isCoarse;
-}
-
 export function TrendChart({
   data,
   tooltipLabelMode,
@@ -176,7 +157,7 @@ export function TrendChart({
   selectedLabel?: string | null;
 }) {
   const { t, locale } = useLocale();
-  const isCoarsePointer = useCoarsePointer();
+  const { isMobile } = useMediaQuery();
   const tooltipFormatter =
     tooltipLabelMode === "weekRange"
       ? (label?: string) => formatWeekRangeLabel(label, locale)
@@ -195,7 +176,7 @@ export function TrendChart({
                 formatLabel={tooltipFormatter}
                 onSelectPoint={onSelectPoint}
                 selectedLabel={selectedLabel}
-                isCoarsePointer={isCoarsePointer}
+                isMobile={isMobile}
               />
             }
           />
