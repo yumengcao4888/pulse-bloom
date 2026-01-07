@@ -60,7 +60,7 @@ export async function GET(
       reflection.emotionalWarmth == null ? null : Number(reflection.emotionalWarmth),
     )
     .filter((score): score is number => Number.isFinite(score));
-  const sentimentScore =
+  const emotionalWarmth =
     emotionalWarmthScores.length === 0
       ? null
       : roundToTwo(
@@ -137,7 +137,7 @@ export async function GET(
 
   return NextResponse.json({
     hfEnabled,
-    sentimentScore,
+    emotionalWarmth,
     topEmotions,
     emotionCounts: emotionCountsList,
   });

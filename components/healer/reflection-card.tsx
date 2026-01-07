@@ -36,7 +36,7 @@ type TrendsPayload = {
 
 type SentimentSummary = {
   hfEnabled: boolean;
-  sentimentScore: number | null;
+  emotionalWarmth: number | null;
   topEmotions: { label: string; count: number }[];
   emotionCounts: { label: string; count: number }[];
 };
@@ -82,6 +82,71 @@ type ReflectionCardProps = {
 };
 
 type SectionKey = "trends" | "printout";
+
+const pad2 = (value: number) => String(value).padStart(2, "0");
+const formatDateInput = (date: Date) =>
+  `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+const daysInMonth = (year: number, month: number) => new Date(year, month, 0).getDate();
+const parseDateString = (value: string) => {
+  if (!value) return null;
+  const [year, month, day] = value.split("-").map((part) => Number(part));
+  if (!year || !month || !day) return null;
+  const maxDay = daysInMonth(year, month);
+  if (month < 1 || month > 12 || day < 1 || day > maxDay) return null;
+  return { year, month, day };
+};
+const formatDateString = (year: number, month: number, day: number) =>
+  `${year}-${pad2(month)}-${pad2(day)}`;
+const normalizeDateParts = (year: number, month: number, day: number) => {
+  const safeMonth = Math.min(12, Math.max(1, month));
+  const maxDay = daysInMonth(year, safeMonth);
+  const safeDay = Math.min(maxDay, Math.max(1, day));
+  return { year, month: safeMonth, day: safeDay };
+};
+const getBaseDateParts = (value: string) => {
+  const parsed = parseDateString(value);
+  if (parsed) return parsed;
+  const today = new Date();
+  return {
+    year: today.getFullYear(),
+    month: today.getMonth() + 1,
+    day: today.getDate(),
+  };
+};
+const updateDatePart = (
+  value: string,
+  part: "year" | "month" | "day",
+  delta: number,
+) => {
+  const base = getBaseDateParts(value);
+  const nextDate = new Date(base.year, base.month - 1, base.day);
+  if (part === "year") {
+    nextDate.setFullYear(nextDate.getFullYear() + delta);
+  }
+  if (part === "month") {
+    nextDate.setMonth(nextDate.getMonth() + delta);
+  }
+  if (part === "day") {
+    nextDate.setDate(nextDate.getDate() + delta);
+  }
+  return formatDateInput(nextDate);
+};
+const updateDatePartFromInput = (
+  value: string,
+  part: "year" | "month" | "day",
+  inputValue: string,
+) => {
+  const parsed = Number(inputValue);
+  if (!Number.isFinite(parsed)) return value;
+  const base = getBaseDateParts(value);
+  const next = { ...base };
+  const safeValue = part === "year" ? Math.max(1, parsed) : parsed;
+  if (part === "year") next.year = safeValue;
+  if (part === "month") next.month = safeValue;
+  if (part === "day") next.day = safeValue;
+  const normalized = normalizeDateParts(next.year, next.month, next.day);
+  return formatDateString(normalized.year, normalized.month, normalized.day);
+};
 
 export default function ReflectionCard({
   slug,
@@ -253,72 +318,6 @@ export default function ReflectionCard({
   const formatBool = (value: boolean | null | undefined) =>
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
   const isPrintoutRangeActive = Boolean(printoutStartDate || printoutEndDate);
-
-  const pad2 = (value: number) => String(value).padStart(2, "0");
-  const formatDateInput = (date: Date) =>
-    `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
-  const daysInMonth = (year: number, month: number) =>
-    new Date(year, month, 0).getDate();
-  const parseDateString = (value: string) => {
-    if (!value) return null;
-    const [year, month, day] = value.split("-").map((part) => Number(part));
-    if (!year || !month || !day) return null;
-    const maxDay = daysInMonth(year, month);
-    if (month < 1 || month > 12 || day < 1 || day > maxDay) return null;
-    return { year, month, day };
-  };
-  const formatDateString = (year: number, month: number, day: number) =>
-    `${year}-${pad2(month)}-${pad2(day)}`;
-  const normalizeDateParts = (year: number, month: number, day: number) => {
-    const safeMonth = Math.min(12, Math.max(1, month));
-    const maxDay = daysInMonth(year, safeMonth);
-    const safeDay = Math.min(maxDay, Math.max(1, day));
-    return { year, month: safeMonth, day: safeDay };
-  };
-  const getBaseDateParts = (value: string) => {
-    const parsed = parseDateString(value);
-    if (parsed) return parsed;
-    const today = new Date();
-    return {
-      year: today.getFullYear(),
-      month: today.getMonth() + 1,
-      day: today.getDate(),
-    };
-  };
-  const updateDatePart = (
-    value: string,
-    part: "year" | "month" | "day",
-    delta: number,
-  ) => {
-    const base = getBaseDateParts(value);
-    const nextDate = new Date(base.year, base.month - 1, base.day);
-    if (part === "year") {
-      nextDate.setFullYear(nextDate.getFullYear() + delta);
-    }
-    if (part === "month") {
-      nextDate.setMonth(nextDate.getMonth() + delta);
-    }
-    if (part === "day") {
-      nextDate.setDate(nextDate.getDate() + delta);
-    }
-    return formatDateInput(nextDate);
-  };
-  const updateDatePartFromInput = (
-    value: string,
-    part: "year" | "month" | "day",
-    inputValue: string,
-  ) => {
-    const parsed = Number(inputValue);
-    if (!Number.isFinite(parsed)) return value;
-    const base = getBaseDateParts(value);
-    const next = { ...base };
-    const safeValue = part === "year" ? Math.max(1, parsed) : parsed;
-    if (part === "year") next.year = safeValue;
-    if (part === "month") next.month = safeValue;
-    if (part === "day") next.day = safeValue;
-    const normalized = normalizeDateParts(next.year, next.month, next.day);
-    return formatDateString(normalized.year, normalized.month, normalized.day);
-  };
   const earliestReflectionDate = useMemo(() => {
     if (!data?.reflections?.length) return null;
     const earliest = data.reflections.reduce<Date | null>((earliestDate, reflection) => {
@@ -332,20 +331,20 @@ export default function ReflectionCard({
     normalized.setHours(0, 0, 0, 0);
     return normalized;
   }, [data]);
-  const clampDateString = (value: string, minDate: Date | null, maxDate: Date) => {
-    if (!value) return value;
-    const parsed = parseDateString(value);
-    if (!parsed) return value;
-    let next = new Date(parsed.year, parsed.month - 1, parsed.day);
-    if (minDate && next < minDate) next = minDate;
-    if (next > maxDate) next = maxDate;
-    return formatDateInput(next);
-  };
   const applyPrintoutDateChange = useCallback(
     (range: "start" | "end", nextValue: string) => {
       const maxDate = new Date();
       maxDate.setHours(0, 0, 0, 0);
       const minDate = earliestReflectionDate;
+      const clampDateString = (value: string, min: Date | null, max: Date) => {
+        if (!value) return value;
+        const parsed = parseDateString(value);
+        if (!parsed) return value;
+        let next = new Date(parsed.year, parsed.month - 1, parsed.day);
+        if (min && next < min) next = min;
+        if (next > max) next = max;
+        return formatDateInput(next);
+      };
       const clamp = (value: string) => clampDateString(value, minDate, maxDate);
       let nextStart = range === "start" ? nextValue : printoutDraftStart;
       let nextEnd = range === "end" ? nextValue : printoutDraftEnd;
@@ -741,12 +740,12 @@ export default function ReflectionCard({
   const hasNlpInsights = Boolean(
     sentimentData &&
       ((sentimentData.emotionCounts?.length ?? 0) > 0 ||
-        sentimentData.sentimentScore != null),
+        sentimentData.emotionalWarmth != null),
   );
-  const formattedSentimentScore =
-    sentimentData?.sentimentScore == null
+  const formattedEmotionalWarmth =
+    sentimentData?.emotionalWarmth == null
       ? "\u2014 / 100"
-      : `${sentimentData.sentimentScore.toFixed(2)} / 100`;
+      : `${sentimentData.emotionalWarmth.toFixed(2)} / 100`;
   const emotionCounts = sentimentData?.emotionCounts ?? [];
   const topEmotionLabels = [
     "gratitude",
@@ -1302,7 +1301,7 @@ export default function ReflectionCard({
                     <div className="text-left">
                       <span className="text-left">
                         {"\u2013\u00a0"}The emotional warmth was measured at{"\u00a0"}
-                        <b>{formattedSentimentScore}</b>.
+                        <b>{formattedEmotionalWarmth}</b>.
                       </span>
                     </div>
                     <div className="pt-2 space-y-1">
@@ -1578,7 +1577,7 @@ export default function ReflectionCard({
                     🕰️ Choose a time range
                   </h3>
                   <p className="text-sm text-gray-500">
-                    Pick the start and end dates you'd like to explore. You can use
+                    Pick the start and end dates you&apos;d like to explore. You can use
                     the spinners or type the dates directly.
                   </p>
                 </div>

@@ -25,17 +25,44 @@ export default function FeltCardAsync({
   showToggle,
   defaultView = "monthly",
 }: Props) {
+  const resetKey = [
+    slug,
+    defaultView,
+    monthly.title,
+    monthly.moodValue,
+    monthly.topWords.join("|"),
+    allTime.title,
+    allTime.moodValue,
+    allTime.topWords.join("|"),
+  ].join("::");
+
+  return (
+    <FeltCardAsyncInner
+      key={resetKey}
+      slug={slug}
+      monthly={monthly}
+      allTime={allTime}
+      monthlyLabel={monthlyLabel}
+      overTimeLabel={overTimeLabel}
+      showToggle={showToggle}
+      defaultView={defaultView}
+    />
+  );
+}
+
+function FeltCardAsyncInner({
+  slug,
+  monthly,
+  allTime,
+  monthlyLabel,
+  overTimeLabel,
+  showToggle,
+  defaultView = "monthly",
+}: Props) {
   const [view, setView] = useState<"monthly" | "allTime">(defaultView);
   const [monthlyData, setMonthlyData] = useState<FeltCardData>(monthly);
   const [allTimeData, setAllTimeData] = useState<FeltCardData>(allTime);
   const [loaded, setLoaded] = useState({ monthly: false, allTime: false });
-
-  useEffect(() => {
-    setMonthlyData(monthly);
-    setAllTimeData(allTime);
-    setLoaded({ monthly: false, allTime: false });
-    setView(defaultView);
-  }, [monthly, allTime, defaultView, slug]);
 
   useEffect(() => {
     const controller = new AbortController();
