@@ -460,14 +460,43 @@ export default function ReflectionCard({
     "embarrassment",
     "grief",
   ];
+  const gentleEmotionPriority = new Map(
+    gentleEmotionLabels.map((label, index) => [label, index]),
+  );
   const gentleEmotions = emotionCounts
     .filter((emotion) =>
       gentleEmotionLabels.includes(emotion.label.toLowerCase()),
     )
-    .sort((a, b) => b.count - a.count)
+    .sort((a, b) => {
+      const countDiff = b.count - a.count;
+      if (countDiff !== 0) return countDiff;
+      const aIndex =
+        gentleEmotionPriority.get(a.label.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      const bIndex =
+        gentleEmotionPriority.get(b.label.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex;
+    })
     .slice(0, 2);
   const gentlePrimaryEmotion = gentleEmotions[0] ?? { label: "\u2014", count: 0 };
   const gentleSecondaryEmotion = gentleEmotions[1] ?? { label: "\u2014", count: 0 };
+  const harshEmotionLabels = ["annoyance", "disapproval", "anger", "disgust"];
+  const harshEmotionPriority = new Map(
+    harshEmotionLabels.map((label, index) => [label, index]),
+  );
+  const harshEmotions = emotionCounts
+    .filter((emotion) =>
+      harshEmotionLabels.includes(emotion.label.toLowerCase()),
+    )
+    .sort((a, b) => {
+      const countDiff = b.count - a.count;
+      if (countDiff !== 0) return countDiff;
+      const aIndex =
+        harshEmotionPriority.get(a.label.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      const bIndex =
+        harshEmotionPriority.get(b.label.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex;
+    });
+  const harshPrimaryEmotion = harshEmotions[0] ?? { label: "\u2014", count: 0 };
   const formatEmotionLabel = (label: string, capitalizeFirst: boolean) => {
     if (label === "\u2014") return label;
     const lowered = label.toLowerCase();
@@ -780,18 +809,42 @@ export default function ReflectionCard({
                         <b>{"\u00a0\u00a0"}Gentle signals to notice:</b>
                       </p>
                       <div className="text-left">
-                        <span className="text-left">
-                          {"\u2013\u00a0"}Some reflections carried traces of{" "}
-                          {renderEmotionButton(gentlePrimaryEmotion, false)}
-                          {"\u00a0"}or{"\u00a0"}
-                          {renderEmotionButton(gentleSecondaryEmotion, false)}.
-                        </span>
+                        {gentlePrimaryEmotion.label !== "\u2014" &&
+                        gentlePrimaryEmotion.count > 0 ? (
+                          <span className="text-left">
+                            {"\u2013\u00a0"}Some reflections carried traces of{" "}
+                            {renderEmotionButton(gentlePrimaryEmotion, false)}
+                            {gentleSecondaryEmotion.label !== "\u2014" &&
+                            gentleSecondaryEmotion.count > 0 ? (
+                              <>
+                                {"\u00a0"}or{"\u00a0"}
+                                {renderEmotionButton(gentleSecondaryEmotion, false)}
+                              </>
+                            ) : null}
+                            .
+                          </span>
+                        ) : null}
                       </div>
                       <div className="text-left">
-                        <span className="text-left">
-                          {"\u2013\u00a0"}A few moments felt a bit heavier, perhaps asking for
-                          {"\u00a0"}care.
-                        </span>
+                        {harshPrimaryEmotion.label !== "\u2014" &&
+                        harshPrimaryEmotion.count > 0 ? (
+                          <span className="text-left">
+                            {"\u2013\u00a0"}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleEmotionSelect(
+                                  harshPrimaryEmotion.label,
+                                  harshPrimaryEmotion.count,
+                                )
+                              }
+                              className="font-semibold underline decoration-dotted underline-offset-2 transition text-gray-800 hover:text-pulse-bloom-deep"
+                            >
+                              A few moments
+                            </button>
+                            {"\u00a0"}felt a bit heavier, perhaps asking for care.
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                     <div className="my-3 border-gray-200" />
