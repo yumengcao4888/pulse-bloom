@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import Modal from "@/components/shared/modal";
 import { useLocale } from "@/components/shared/locale-provider";
@@ -833,6 +833,59 @@ export default function ReflectionCard({
     </button>
   );
 
+  const FeelingNote = ({ text }: { text: string }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+    const textRef = useRef<HTMLSpanElement | null>(null);
+
+    useEffect(() => {
+      const el = textRef.current;
+      if (!el) return;
+
+      const updateOverflow = () => {
+        setIsOverflowing(el.scrollHeight > el.clientHeight + 1);
+      };
+
+      updateOverflow();
+      if (typeof ResizeObserver === "undefined") return;
+      const observer = new ResizeObserver(updateOverflow);
+      observer.observe(el);
+      return () => observer.disconnect();
+    }, [text, isExpanded]);
+
+    return (
+      <div className="mb-1 pl-3 text-xs text-gray-900">
+        <span
+          ref={textRef}
+          className={`${delius.className} block font-normal tracking-wider not-italic`}
+          style={
+            isExpanded
+              ? undefined
+              : {
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }
+          }
+        >
+          {text}
+        </span>
+        {isOverflowing && !isExpanded ? (
+          <button
+            type="button"
+            onClick={() => setIsExpanded(true)}
+            className="mt-1 text-[11px] font-semibold text-pulse-bloom-deep underline decoration-dotted underline-offset-2 transition hover:text-pulse-bloom"
+            aria-label="View more of this note"
+          >
+            View more
+          </button>
+        ) : null}
+      </div>
+    );
+  };
+
   const renderReflectionItem = (reflection: ReflectionEntry) => {
     const hasFeeling = Boolean(reflection.feeling?.trim());
 
@@ -876,11 +929,7 @@ export default function ReflectionCard({
           </span>
         </p>
         {hasFeeling && (
-          <p className="mb-1 pl-3 text-xs text-gray-900">
-            <span className={`${delius.className} font-normal tracking-wider not-italic`}>
-              {reflection.feeling}
-            </span>
-          </p>
+          <FeelingNote text={reflection.feeling ?? ""} />
         )}
       </div>
     );
