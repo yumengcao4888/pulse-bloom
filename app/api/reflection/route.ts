@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { calculateEmotionalWarmth } from "@/lib/utils";
 
-async function updateReflectionSentiment(reflectionId: string, feeling: string | null) {
+async function updateReflectionSentiment(reflectionId: number, feeling: string | null) {
   if (!feeling) {
     return;
   }
