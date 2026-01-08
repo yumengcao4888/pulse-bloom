@@ -1108,7 +1108,7 @@ export default function ReflectionCard({
         <button
           type="button"
           onClick={() => handleHiddenToggle(reflection.id, isHidden)}
-          className={`absolute right-2 top-2 rounded-full border px-2 py-0 text-[9px] font-semibold tracking-wide shadow-sm transition ${
+          className={`absolute right-2 top-1.5 rounded-full border px-2 py-0.5 text-[9px] font-semibold leading-none tracking-wide shadow-sm transition ${
             isHidden
               ? "border-gray-700 bg-gray-700 text-white"
               : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
@@ -1269,11 +1269,11 @@ export default function ReflectionCard({
               </div>
             </div>
             <div className="my-4 border-t border-gray-200" />
-            <div className="mt-3 grid w-full grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center">
+            <div className="mt-3 grid w-full grid-cols-1 place-items-center gap-2 sm:grid-cols-3 sm:items-center">
               <button
                 type="button"
                 onClick={handleSentimentToggle}
-                className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center justify-self-center rounded-full bg-pulse-bloom-soft/20 px-4 py-2 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 sm:justify-self-start"
                 disabled={isSentimentLoading}
               >
                 <span className="flex flex-col items-center">
@@ -1294,7 +1294,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => handleSectionToggle("trends")}
-                className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-center"
+                className="inline-flex items-center justify-center justify-self-center rounded-full bg-pulse-bloom-soft/20 px-4 py-2 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-center"
               >
                 <span className="flex flex-col items-center">
                   <span>
@@ -1316,7 +1316,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => handleSectionToggle("printout")}
-                className="justify-self-start rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-end"
+                className="inline-flex items-center justify-center justify-self-center rounded-full bg-pulse-bloom-soft/20 px-4 py-2 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-end"
               >
                 <span className="flex flex-col items-center">
                   <span>
@@ -1462,7 +1462,7 @@ export default function ReflectionCard({
                                               Math.max(1, prev - 1),
                                             )
                                           }
-                                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                           disabled={trendPrintoutPage <= 1}
                                         >
                                           Last page
@@ -1474,7 +1474,7 @@ export default function ReflectionCard({
                                               Math.min(totalPages, prev + 1),
                                             )
                                           }
-                                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                           disabled={trendPrintoutPage >= totalPages}
                                         >
                                           Next page
@@ -1697,7 +1697,7 @@ export default function ReflectionCard({
                                           Math.max(1, prev - 1),
                                         )
                                       }
-                                      className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                      className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={emotionPrintoutPage <= 1}
                                     >
                                       Last page
@@ -1709,7 +1709,7 @@ export default function ReflectionCard({
                                           Math.min(totalPages, prev + 1),
                                         )
                                       }
-                                      className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                      className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={emotionPrintoutPage >= totalPages}
                                     >
                                       Next page
@@ -1833,7 +1833,7 @@ export default function ReflectionCard({
                           onClick={() =>
                             setPrintoutPage((prev) => Math.max(1, prev - 1))
                           }
-                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={printoutPage <= 1}
                         >
                           Last page
@@ -1843,7 +1843,7 @@ export default function ReflectionCard({
                           onClick={() =>
                             setPrintoutPage((prev) => Math.min(totalPages, prev + 1))
                           }
-                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={printoutPage >= totalPages}
                         >
                           Next page
