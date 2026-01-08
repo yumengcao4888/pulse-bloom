@@ -1108,7 +1108,7 @@ export default function ReflectionCard({
         <button
           type="button"
           onClick={() => handleHiddenToggle(reflection.id, isHidden)}
-          className={`absolute right-2 top-2 rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide shadow-sm transition ${
+          className={`absolute right-2 top-2 rounded-full border px-2 py-0 text-[10px] font-semibold tracking-wide shadow-sm transition ${
             isHidden
               ? "border-gray-700 bg-gray-700 text-white"
               : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
