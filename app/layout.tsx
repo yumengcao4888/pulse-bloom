@@ -16,6 +16,12 @@ export const metadata = {
   metadataBase: new URL("https://pulse-bloom.vercel.app/"),
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default async function RootLayout({
   children,
 }: {
