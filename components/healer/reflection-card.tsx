@@ -1906,14 +1906,10 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => setPrintoutIncludeHidden((prev) => !prev)}
-                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                  printoutIncludeHidden
-                    ? "bg-pulse-bloom text-white"
-                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                }`}
+                className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
                 aria-pressed={printoutIncludeHidden}
               >
-                Include hidden
+                {printoutIncludeHidden ? "🙈 Hide again" : "🙈 Show hidden"}
               </button>
             </div>
               {showHiddenPrintoutNotice ? (
