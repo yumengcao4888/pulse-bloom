@@ -71,6 +71,21 @@ export default function FeltCard({
       </>
     );
   };
+  const renderTopWords = (words: string[]) =>
+    words.map((word, index) => {
+      const isLast = index === words.length - 1;
+      const isSecondLast = index === words.length - 2;
+      const separator =
+        isLast ? "" : words.length === 2 ? " and " : isSecondLast ? ", and " : ", ";
+      return (
+        <span key={`${word}-${index}`}>
+          <b>
+            <i>{word}</i>
+          </b>
+          {separator}
+        </span>
+      );
+    });
 
   return (
     <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm space-y-3">
@@ -137,14 +152,7 @@ export default function FeltCard({
               <LoadingCircle />
             </span>
           ) : data.topWords.length > 0
-            ? data.topWords.map((word, index) => (
-                <span key={`${word}-${index}`}>
-                  <b>
-                    <i>{word}</i>
-                  </b>
-                  {index < data.topWords.length - 1 ? ", " : ""}
-                </span>
-              ))
+            ? renderTopWords(data.topWords)
             : <b>{data.noneLabel}</b>}
           .
         </p>
