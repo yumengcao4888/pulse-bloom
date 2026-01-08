@@ -36,6 +36,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [clearOpen, setClearOpen] = useState(false);
+  const [clearError, setClearError] = useState("");
+  const [isClearing, setIsClearing] = useState(false);
   const startedAtRef = useRef(Date.now());
   const pronounsRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLTextAreaElement>(null);
@@ -57,6 +60,13 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
       setIsDeleting(false);
     }
   }, [deleteOpen]);
+
+  useEffect(() => {
+    if (!clearOpen) {
+      setClearError("");
+      setIsClearing(false);
+    }
+  }, [clearOpen]);
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
       startedAtRef.current = Date.now();
@@ -234,6 +244,24 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
     }
   };
 
+  const handleClearReflections = async () => {
+    setClearError("");
+    setIsClearing(true);
+    try {
+      const res = await fetch("/api/healer/reflections", { method: "DELETE" });
+      if (!res.ok) {
+        throw new Error("Failed to clear reflections");
+      }
+      setClearOpen(false);
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to clear reflections:", err);
+      setClearError("We could not clear reflections. Please try again.");
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSave();
@@ -391,6 +419,23 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               />
             </div>
           </div>
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
+            <p className="text-sm font-semibold text-amber-700">
+              Clear all reflections
+            </p>
+            <p className="mt-1 text-xs text-amber-700">
+              Remove all reflections and give your space a fresh start.
+            </p>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setClearOpen(true)}
+                className="rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600"
+              >
+                Clear all reflections
+              </button>
+            </div>
+          </div>
           <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/60 p-4">
             <p className="text-sm font-semibold text-red-700">Delete your space</p>
             <p className="mt-1 text-xs text-red-700">
@@ -453,6 +498,37 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
             <button
               type="button"
               onClick={() => setDeleteOpen(false)}
+              className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+      <Modal open={clearOpen} setOpen={setClearOpen} title="Clear all reflections">
+        <div className="p-6 space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Clear all reflections?
+            </h3>
+            <p className="text-sm text-gray-600">
+              This will permanently remove all reflections from your space. Your
+              profile and space settings will remain unchanged.
+            </p>
+          </div>
+          {clearError ? <p className="text-sm text-red-600">{clearError}</p> : null}
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              onClick={handleClearReflections}
+              className="rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600"
+              disabled={isClearing}
+            >
+              Clear all reflections
+            </button>
+            <button
+              type="button"
+              onClick={() => setClearOpen(false)}
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
             >
               Cancel
