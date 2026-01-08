@@ -22,9 +22,10 @@ type HealerProfile = {
 
 type EditProfileSheetProps = {
   healer: HealerProfile;
+  buttonClassName?: string;
 };
 
-export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
+export default function EditProfileSheet({ healer, buttonClassName }: EditProfileSheetProps) {
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState<HealerProfile>(healer);
@@ -389,7 +390,10 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
         <button
           type="button"
           onClick={() => handleOpenChange(true)}
-          className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
+          className={cn(
+            "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50",
+            buttonClassName,
+          )}
         >
           Edit your space
         </button>
@@ -414,7 +418,10 @@ export default function EditProfileSheet({ healer }: EditProfileSheetProps) {
       <button
         type="button"
         onClick={() => handleOpenChange(true)}
-        className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
+        className={cn(
+          "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50",
+          buttonClassName,
+        )}
       >
         Edit your space
       </button>

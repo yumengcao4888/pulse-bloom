@@ -187,7 +187,7 @@ export default async function HealingSpacePage(props: PageProps) {
                     </p>
                   ) : null}
                 </div>
-                <div className="hidden shrink-0 flex-col items-center gap-2 sm:flex">
+                <div className="hidden shrink-0 flex-col items-center gap-2 sm:flex sm:w-max sm:items-stretch">
                   <EditProfileSheet
                     healer={{
                       name: healer.name,
@@ -199,19 +199,21 @@ export default async function HealingSpacePage(props: PageProps) {
                       contactType: healer.contactType,
                       bio: healer.bio,
                     }}
+                    buttonClassName="sm:w-full sm:justify-center"
                   />
                   <ShareLinkButton
                     link={sharableLink}
                     buttonLabel="Share your space"
                     title="Share your space"
                     description="Share this link or QR code to let others see your space."
-                    buttonClassName="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
+                    buttonClassName="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50 sm:w-full sm:justify-center"
                   />
                   <ShareLinkButton
                     link={reflectionLink}
                     buttonLabel="Invite reflection"
                     title="Invite reflection"
                     description="Share this link or QRcode with your clients."
+                    buttonClassName="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800 sm:w-full sm:justify-center"
                   />
                 </div>
               </div>
