@@ -26,14 +26,14 @@ export function TriStateButton({
   };
 
   const base =
-    "w-full px-4 py-3 rounded-lg transition inline-flex items-center justify-center gap-1 disabled:cursor-not-allowed disabled:opacity-70";
+    "w-full px-4 py-3 rounded-lg border border-pulse-bloom/30 transition inline-flex items-center justify-center gap-1 disabled:cursor-not-allowed disabled:opacity-70";
 
   const color =
     value === "yes"
-      ? "bg-green-100 border-green-400 hover:bg-green-100/60 hover:backdrop-blur-sm hover:shadow-md"
+      ? "bg-green-100 hover:bg-green-100/60 hover:backdrop-blur-sm hover:shadow-md"
       : value === "no"
-      ? "bg-red-100 border-red-400 hover:bg-red-100/60 hover:backdrop-blur-sm hover:shadow-md"
-      : "bg-gray-100 border-gray-300 opacity-80 hover:bg-gray-100/60 hover:backdrop-blur-sm hover:shadow-md";
+      ? "bg-red-100 hover:bg-red-100/60 hover:backdrop-blur-sm hover:shadow-md"
+      : "bg-gray-100 opacity-80 hover:bg-gray-100/60 hover:backdrop-blur-sm hover:shadow-md";
 
   const statusLabel =
     value === "yes" ? (<CheckIcon className="w-5 h-5 text-green-500" />) : value === "no" ? (<XMarkIcon className="w-5 h-5 text-red-500" />) : "";

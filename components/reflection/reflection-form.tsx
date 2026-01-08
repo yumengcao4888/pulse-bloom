@@ -136,7 +136,7 @@ export default function ReflectionForm({ slug }: Props) {
       <div className="flex justify-center">
         <button
           type="submit"
-          className="bg-pulse-bloom-soft/20 text-pulse-bloom-deep hover:bg-pulse-bloom-soft-hover px-4 py-2 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60"
           disabled={submitting}
         >
           {submitting ? t("reflection.submitting") : t("reflection.submit")}
