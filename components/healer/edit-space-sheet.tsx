@@ -6,6 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import useMediaQuery from "@/lib/hooks/use-media-query";
 import { useLocale } from "@/components/shared/locale-provider";
+import Modal from "@/components/shared/modal";
 import { cn } from "@/lib/utils";
 import { isValidPronouns } from "@/lib/pronouns";
 
@@ -32,6 +33,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
   const [pronounError, setPronounError] = useState("");
   const [contactError, setContactError] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const startedAtRef = useRef(Date.now());
   const pronounsRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLTextAreaElement>(null);
@@ -46,6 +50,13 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
       setContactError("");
     }
   }, [open, healer]);
+
+  useEffect(() => {
+    if (!deleteOpen) {
+      setDeleteError("");
+      setIsDeleting(false);
+    }
+  }, [deleteOpen]);
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
       startedAtRef.current = Date.now();
@@ -198,6 +209,28 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
       console.error("Failed to update healer profile:", err);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteSpace = async () => {
+    setDeleteError("");
+    setIsDeleting(true);
+    try {
+      const res = await fetch("/api/healer", { method: "DELETE" });
+      if (!res.ok) {
+        throw new Error("Failed to delete healer");
+      }
+      setDeleteOpen(false);
+      setOpen(false);
+      router.push("/healer");
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to delete healer space:", err);
+      setDeleteError(
+        "We could not confirm the code or delete your space. Please try again.",
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -358,6 +391,21 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               />
             </div>
           </div>
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/60 p-4">
+            <p className="text-sm font-semibold text-red-700">Delete your space</p>
+            <p className="mt-1 text-xs text-red-700">
+              This will permanently delete your space and all associated reflections.
+            </p>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setDeleteOpen(true)}
+                className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
+              >
+                Delete your space
+              </button>
+            </div>
+          </div>
         </div>
         <div className="border-t px-6 py-4">
           <div className="flex items-center justify-end gap-3">
@@ -381,6 +429,37 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
           </div>
         </div>
       </form>
+      <Modal open={deleteOpen} setOpen={setDeleteOpen} title="Delete your space">
+        <div className="p-6 space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Delete your space?
+            </h3>
+            <p className="text-sm text-gray-600">
+              This will permanently delete your space and all associated reflections.
+              Your profile and data cannot be recovered.
+            </p>
+          </div>
+          {deleteError ? <p className="text-sm text-red-600">{deleteError}</p> : null}
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              onClick={handleDeleteSpace}
+              className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
+              disabled={isDeleting}
+            >
+              Delete your space
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeleteOpen(false)}
+              className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 
