@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { EmotionalTone, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    void updateReflectionSentiment(reflection.id, trimmedFeeling);
+    after(() => updateReflectionSentiment(reflection.id, trimmedFeeling));
 
     return NextResponse.json(
       { success: true, id: reflection.id },
