@@ -755,6 +755,10 @@ export default function ReflectionCard({
     [emotionData],
   );
   const hasEmotionReflections = Boolean(emotionData?.reflections?.length);
+  const hasHiddenEmotionReflections = Boolean(
+    emotionData?.reflections?.some((reflection) => reflection.hidden),
+  );
+  const hasVisibleEmotionReflections = filteredEmotionPrintout.length > 0;
 
   const sortedEmotionPrintout = useMemo(() => {
     const items = [...filteredEmotionPrintout];
@@ -1549,7 +1553,7 @@ export default function ReflectionCard({
                             <span>Loading reflections...</span>
                           </div>
                         ) : sortedEmotionPrintout.length === 0 ? (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-center text-gray-500">
                             {hasEmotionReflections
                               ? t("reflection.noneVisible")
                               : t("reflection.none")}
@@ -1558,6 +1562,9 @@ export default function ReflectionCard({
                           (() => {
                             const shouldShowSort =
                               sortedEmotionPrintout.length > 0;
+                            const showHiddenNotice =
+                              hasHiddenEmotionReflections &&
+                              hasVisibleEmotionReflections;
                             const totalPages = Math.max(
                               1,
                               Math.ceil(sortedEmotionPrintout.length / pageSize),
@@ -1565,31 +1572,45 @@ export default function ReflectionCard({
 
                             return (
                               <>
-                                {shouldShowSort && (
-                                  <div className="flex flex-wrap gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        setEmotionPrintoutSort((prev) =>
-                                          prev === "desc" ? "asc" : "desc",
-                                        )
-                                      }
-                                      className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                                      aria-pressed={emotionPrintoutSort === "asc"}
-                                    >
-                                      {emotionPrintoutSort === "desc"
-                                        ? "Desc"
-                                        : "Asc"}
-                                    </button>
+                                <div className="space-y-2">
+                                  {shouldShowSort || showHiddenNotice ? (
+                                    <div className="space-y-1">
+                                      {shouldShowSort ? (
+                                        <div className="flex flex-wrap gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              setEmotionPrintoutSort((prev) =>
+                                                prev === "desc" ? "asc" : "desc",
+                                              )
+                                            }
+                                            className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                                            aria-pressed={
+                                              emotionPrintoutSort === "asc"
+                                            }
+                                          >
+                                            {emotionPrintoutSort === "desc"
+                                              ? "Desc"
+                                              : "Asc"}
+                                          </button>
+                                        </div>
+                                      ) : null}
+                                      {showHiddenNotice ? (
+                                        <p className="text-sm text-center text-gray-500">
+                                          {t("reflection.includesHidden")}
+                                        </p>
+                                      ) : null}
+                                    </div>
+                                  ) : null}
+                                  <div className="space-y-0">
+                                    {emotionPageItems.map((reflection) =>
+                                      renderReflectionItem(reflection, {
+                                        showHearButton:
+                                          selectedEmotion.allowHear,
+                                        emotionLabel: selectedEmotion.label,
+                                      }),
+                                    )}
                                   </div>
-                                )}
-                                <div className="space-y-0">
-                                  {emotionPageItems.map((reflection) =>
-                                    renderReflectionItem(reflection, {
-                                      showHearButton: selectedEmotion.allowHear,
-                                      emotionLabel: selectedEmotion.label,
-                                    }),
-                                  )}
                                 </div>
                                 {totalPages > 1 && (
                                   <div className="flex flex-wrap items-center justify-center gap-2">
