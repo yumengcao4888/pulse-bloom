@@ -76,7 +76,13 @@ export default function NavBar() {
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <UserButton>
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonPopoverCard: "w-fit max-w-sm",
+                  },
+                }}
+              >
                 <UserButton.MenuItems>
                   {healerSlug && (
                     <UserButton.Link
