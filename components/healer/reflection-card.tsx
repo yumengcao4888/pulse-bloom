@@ -211,6 +211,7 @@ export default function ReflectionCard({
   const [hiddenUpdates, setHiddenUpdates] = useState<Record<string, boolean>>({});
   const [hiddenOverrides, setHiddenOverrides] = useState<Record<string, boolean>>({});
   const pageSize = 5;
+  const noticeTextClass = "text-sm text-center text-gray-500 font-normal";
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
     [],
@@ -585,6 +586,37 @@ export default function ReflectionCard({
     if (countRange === "allTime") return visible;
     return getMonthlyReflections(visible);
   }, [countRange, data]);
+  const filteredPrintoutAll = useMemo(() => {
+    if (!data) return [];
+    if (countRange === "allTime") return data.reflections;
+    return getMonthlyReflections(data.reflections);
+  }, [countRange, data]);
+
+  const printoutFilteredAll = useMemo(() => {
+    const items = [...filteredPrintoutAll].filter((reflection) => {
+      if (!printoutFreeTextOnly) return true;
+      return Boolean(reflection.feeling?.trim());
+    });
+    const rangeStart = printoutStartDate
+      ? new Date(`${printoutStartDate}T00:00:00`)
+      : null;
+    const rangeEnd = printoutEndDate
+      ? new Date(`${printoutEndDate}T23:59:59.999`)
+      : null;
+    if (!rangeStart && !rangeEnd) return items;
+    return items.filter((reflection) => {
+      const createdAt = new Date(reflection.createdAt);
+      if (Number.isNaN(createdAt.getTime())) return false;
+      if (rangeStart && createdAt < rangeStart) return false;
+      if (rangeEnd && createdAt > rangeEnd) return false;
+      return true;
+    });
+  }, [
+    filteredPrintoutAll,
+    printoutFreeTextOnly,
+    printoutStartDate,
+    printoutEndDate,
+  ]);
 
   const sortedPrintout = useMemo(() => {
     const items = [...filteredPrintout].filter((reflection) => {
@@ -622,6 +654,18 @@ export default function ReflectionCard({
     if (!data || !selectedTrendLabel) return [];
     return data.reflections.filter((reflection) => {
       if (reflection.hidden) return false;
+      const bucketKey =
+        countRange === "monthly"
+          ? getWeekStartKey(reflection.createdAt, timeZone)
+          : getMonthStartKey(reflection.createdAt, timeZone);
+      if (bucketKey !== selectedTrendLabel) return false;
+      if (!trendFreeTextOnly) return true;
+      return Boolean(reflection.feeling?.trim());
+    });
+  }, [countRange, data, selectedTrendLabel, timeZone, trendFreeTextOnly]);
+  const trendReflectionsAll = useMemo(() => {
+    if (!data || !selectedTrendLabel) return [];
+    return data.reflections.filter((reflection) => {
       const bucketKey =
         countRange === "monthly"
           ? getWeekStartKey(reflection.createdAt, timeZone)
@@ -759,6 +803,18 @@ export default function ReflectionCard({
     emotionData?.reflections?.some((reflection) => reflection.hidden),
   );
   const hasVisibleEmotionReflections = filteredEmotionPrintout.length > 0;
+  const hasPrintoutReflections = printoutFilteredAll.length > 0;
+  const hasHiddenPrintoutReflections = printoutFilteredAll.some(
+    (reflection) => reflection.hidden,
+  );
+  const hasVisiblePrintoutReflections = sortedPrintout.length > 0;
+  const showHiddenPrintoutNotice =
+    hasHiddenPrintoutReflections && hasVisiblePrintoutReflections;
+  const hasTrendReflections = trendReflectionsAll.length > 0;
+  const hasHiddenTrendReflections = trendReflectionsAll.some(
+    (reflection) => reflection.hidden,
+  );
+  const hasVisibleTrendReflections = sortedTrendReflections.length > 0;
 
   const sortedEmotionPrintout = useMemo(() => {
     const items = [...filteredEmotionPrintout];
@@ -1306,40 +1362,43 @@ export default function ReflectionCard({
                         {selectedTrendLabel && (
                           <div className="mt-4 space-y-4">
                             <div className="border-t border-dashed border-gray-200" />
-                            <div className="flex flex-wrap items-center justify-between gap-2">
-                              <p className="text-sm font-semibold text-gray-700">
-                                Reflections from {formatTrendLabel(selectedTrendLabel)}
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setTrendPrintoutSort((prev) =>
-                                      prev === "desc" ? "asc" : "desc",
-                                    )
-                                  }
-                                  className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                                  aria-pressed={trendPrintoutSort === "asc"}
-                                >
-                                  {trendPrintoutSort === "desc" ? "Desc" : "Asc"}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setTrendFreeTextOnly((prev) => !prev);
-                                    setTrendPrintoutPage(1);
-                                  }}
-                                  className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                                    trendFreeTextOnly
-                                      ? "bg-pulse-bloom text-white"
-                                      : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                                  }`}
-                                  aria-pressed={trendFreeTextOnly}
-                                >
-                                  Free text
-                                </button>
+                            {!(sortedTrendReflections.length === 0 && hasTrendReflections) ? (
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <p className="text-sm font-semibold text-gray-700">
+                                  Reflections from{" "}
+                                  {formatTrendLabel(selectedTrendLabel)}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setTrendPrintoutSort((prev) =>
+                                        prev === "desc" ? "asc" : "desc",
+                                      )
+                                    }
+                                    className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                                    aria-pressed={trendPrintoutSort === "asc"}
+                                  >
+                                    {trendPrintoutSort === "desc" ? "Desc" : "Asc"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setTrendFreeTextOnly((prev) => !prev);
+                                      setTrendPrintoutPage(1);
+                                    }}
+                                    className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                                      trendFreeTextOnly
+                                        ? "bg-pulse-bloom text-white"
+                                        : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                                    }`}
+                                    aria-pressed={trendFreeTextOnly}
+                                  >
+                                    Free text
+                                  </button>
+                                </div>
                               </div>
-                            </div>
+                            ) : null}
                             {error ? (
                               <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                                 <p>{error}</p>
@@ -1360,11 +1419,16 @@ export default function ReflectionCard({
                                 <span>Loading reflections...</span>
                               </div>
                             ) : sortedTrendReflections.length === 0 ? (
-                              <p className="text-sm text-gray-500">
-                                {t("reflection.none")}
+                              <p className={noticeTextClass}>
+                                {hasTrendReflections
+                                  ? t("reflection.noneVisible")
+                                  : t("reflection.none")}
                               </p>
                             ) : (
                               (() => {
+                                const showHiddenNotice =
+                                  hasHiddenTrendReflections &&
+                                  hasVisibleTrendReflections;
                                 const totalPages = Math.max(
                                   1,
                                   Math.ceil(sortedTrendReflections.length / pageSize),
@@ -1372,10 +1436,17 @@ export default function ReflectionCard({
 
                                 return (
                                   <>
-                                    <div className="space-y-0">
-                                      {trendPageItems.map((reflection) =>
-                                        renderReflectionItem(reflection),
-                                      )}
+                                    <div className="space-y-2">
+                                      {showHiddenNotice ? (
+                                      <p className={noticeTextClass}>
+                                        {t("reflection.includesHidden")}
+                                      </p>
+                                      ) : null}
+                                      <div className="space-y-0">
+                                        {trendPageItems.map((reflection) =>
+                                          renderReflectionItem(reflection),
+                                        )}
+                                      </div>
                                     </div>
                                     {totalPages > 1 && (
                                       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -1553,7 +1624,7 @@ export default function ReflectionCard({
                             <span>Loading reflections...</span>
                           </div>
                         ) : sortedEmotionPrintout.length === 0 ? (
-                          <p className="text-sm text-center text-gray-500">
+                          <p className={noticeTextClass}>
                             {hasEmotionReflections
                               ? t("reflection.noneVisible")
                               : t("reflection.none")}
@@ -1596,7 +1667,7 @@ export default function ReflectionCard({
                                         </div>
                                       ) : null}
                                       {showHiddenNotice ? (
-                                        <p className="text-sm text-center text-gray-500">
+                                        <p className={noticeTextClass}>
                                           {t("reflection.includesHidden")}
                                         </p>
                                       ) : null}
@@ -1665,52 +1736,66 @@ export default function ReflectionCard({
         )}
         {showPrintout && data && (
           <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  setPrintoutSort((prev) => (prev === "desc" ? "asc" : "desc"))
-                }
-                className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                aria-pressed={printoutSort === "asc"}
-              >
-                {printoutSort === "desc" ? "Desc" : "Asc"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPrintoutFreeTextOnly((prev) => !prev);
-                  setPrintoutPage(1);
-                }}
-                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                  printoutFreeTextOnly
-                    ? "bg-pulse-bloom text-white"
-                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                }`}
-                aria-pressed={printoutFreeTextOnly}
-              >
-                Free text
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsPrintoutTimeOpen(true)}
-                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                  isPrintoutRangeActive
-                    ? "bg-pulse-bloom text-white"
-                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                }`}
-              >
-                Change time
-              </button>
+            <div className="flex flex-col gap-[2px]">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPrintoutSort((prev) => (prev === "desc" ? "asc" : "desc"))
+                  }
+                  className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                  aria-pressed={printoutSort === "asc"}
+                >
+                  {printoutSort === "desc" ? "Desc" : "Asc"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPrintoutFreeTextOnly((prev) => !prev);
+                    setPrintoutPage(1);
+                  }}
+                  className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                    printoutFreeTextOnly
+                      ? "bg-pulse-bloom text-white"
+                      : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                  }`}
+                  aria-pressed={printoutFreeTextOnly}
+                >
+                  Free text
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPrintoutTimeOpen(true)}
+                  className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                    isPrintoutRangeActive
+                      ? "bg-pulse-bloom text-white"
+                      : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                  }`}
+                >
+                  Change time
+                </button>
+              </div>
+              {showHiddenPrintoutNotice ? (
+                <p className={`${noticeTextClass} -mb-2`}>
+                  {t("reflection.includesHidden")}
+                </p>
+              ) : null}
             </div>
             {sortedPrintout.length === 0 ? (
-              <p className="text-sm text-gray-500">{t("reflection.none")}</p>
+              <p className={noticeTextClass}>
+                {hasPrintoutReflections
+                  ? t("reflection.noneVisible")
+                  : t("reflection.none")}
+              </p>
             ) : (
               (() => {
                 const totalPages = Math.max(
                   1,
                   Math.ceil(sortedPrintout.length / pageSize),
                 );
+                const printoutListOffsetClass = showHiddenPrintoutNotice
+                  ? "-mt-4"
+                  : "";
                 const startIndex = (printoutPage - 1) * pageSize;
                 const pageItems = sortedPrintout.slice(
                   startIndex,
@@ -1719,8 +1804,10 @@ export default function ReflectionCard({
 
                 return (
                   <>
-                    <div className="space-y-0">
-                      {pageItems.map((reflection) => renderReflectionItem(reflection))}
+                    <div className={`space-y-0 ${printoutListOffsetClass}`}>
+                      {pageItems.map((reflection) =>
+                        renderReflectionItem(reflection),
+                      )}
                     </div>
                     {totalPages > 1 && (
                       <div className="flex flex-wrap items-center justify-center gap-2">
