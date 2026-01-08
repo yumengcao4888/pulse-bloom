@@ -216,7 +216,8 @@ export default function ReflectionCard({
   const [hiddenOverrides, setHiddenOverrides] = useState<Record<string, boolean>>({});
   const pageSize = 5;
   const noticeTextClass = "text-sm text-center text-gray-500 font-normal";
-  const listTitleClass = "text-sm font-semibold text-gray-700";
+  const listTitleClass =
+    "text-sm font-semibold text-gray-700 w-full text-center sm:w-auto sm:text-left";
   const printoutButtonClass =
     "inline-flex min-w-[160px] items-center justify-center gap-2 rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10";
   const timeZone = useMemo(
@@ -1418,7 +1419,7 @@ export default function ReflectionCard({
                             <div className="border-t border-dashed border-gray-200" />
                             {!(sortedTrendReflections.length === 0 && hasTrendReflections) ? (
                               <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                <p className="text-sm font-semibold text-gray-700">
+                                <p className={listTitleClass}>
                                   Reflections from{" "}
                                   {formatTrendLabel(selectedTrendLabel)}
                                 </p>
