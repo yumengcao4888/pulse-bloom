@@ -11,6 +11,9 @@ type Props = {
 };
 
 type TriState = null | "yes" | "no";
+const WORD_LIMIT = 300;
+const countWords = (value: string) =>
+  value.trim().split(/\s+/).filter(Boolean).length;
 
 export default function ReflectionForm({ slug }: Props) {
   const router = useRouter();
@@ -127,10 +130,21 @@ export default function ReflectionForm({ slug }: Props) {
           name="feeling"
           className="w-full border p-3 rounded mt-1"
           placeholder={t("reflection.form.placeholder")}
-          onChange={(e) => setFeeling(e.target.value)}
+          onChange={(e) => {
+            const nextValue = e.target.value;
+            if (countWords(nextValue) <= WORD_LIMIT) {
+              setFeeling(nextValue);
+              return;
+            }
+            const words = nextValue.trim().split(/\s+/).slice(0, WORD_LIMIT);
+            setFeeling(words.join(" "));
+          }}
           value={feeling}
           rows={3}
         />
+        <p className="mt-0.5 text-right text-xs text-gray-500">
+          {countWords(feeling)}/{WORD_LIMIT}
+        </p>
       </label>
 
       <div className="flex justify-center">
