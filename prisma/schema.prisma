@@ -48,6 +48,7 @@ model Reflection {
   feeling   String?
   emotionalWarmth Decimal? @db.Decimal(5, 2)
   emotionalTone EmotionalTone?
+  heardAt DateTime?
 
   healer   Healer @relation(fields: [healerId], references: [id])
   healerId Int
