@@ -171,6 +171,7 @@ export default function ReflectionCard({
   const [trendFreeTextOnly, setTrendFreeTextOnly] = useState(false);
   const [printoutSort, setPrintoutSort] = useState<"desc" | "asc">("desc");
   const [printoutFreeTextOnly, setPrintoutFreeTextOnly] = useState(false);
+  const [printoutIncludeHidden, setPrintoutIncludeHidden] = useState(false);
   const [isPrintoutTimeOpen, setIsPrintoutTimeOpen] = useState(false);
   const [printoutStartDate, setPrintoutStartDate] = useState("");
   const [printoutEndDate, setPrintoutEndDate] = useState("");
@@ -582,10 +583,12 @@ export default function ReflectionCard({
 
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
-    const visible = data.reflections.filter((reflection) => !reflection.hidden);
-    if (countRange === "allTime") return visible;
-    return getMonthlyReflections(visible);
-  }, [countRange, data]);
+    const source = printoutIncludeHidden
+      ? data.reflections
+      : data.reflections.filter((reflection) => !reflection.hidden);
+    if (countRange === "allTime") return source;
+    return getMonthlyReflections(source);
+  }, [countRange, data, printoutIncludeHidden]);
   const filteredPrintoutAll = useMemo(() => {
     if (!data) return [];
     if (countRange === "allTime") return data.reflections;
@@ -809,7 +812,9 @@ export default function ReflectionCard({
   );
   const hasVisiblePrintoutReflections = sortedPrintout.length > 0;
   const showHiddenPrintoutNotice =
-    hasHiddenPrintoutReflections && hasVisiblePrintoutReflections;
+    !printoutIncludeHidden &&
+    hasHiddenPrintoutReflections &&
+    hasVisiblePrintoutReflections;
   const hasTrendReflections = trendReflectionsAll.length > 0;
   const hasHiddenTrendReflections = trendReflectionsAll.some(
     (reflection) => reflection.hidden,
@@ -1763,18 +1768,30 @@ export default function ReflectionCard({
                 >
                   Free text
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setIsPrintoutTimeOpen(true)}
-                  className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                    isPrintoutRangeActive
-                      ? "bg-pulse-bloom text-white"
-                      : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                  }`}
-                >
-                  Change time
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsPrintoutTimeOpen(true)}
+                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                  isPrintoutRangeActive
+                    ? "bg-pulse-bloom text-white"
+                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                }`}
+              >
+                Change time
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrintoutIncludeHidden((prev) => !prev)}
+                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
+                  printoutIncludeHidden
+                    ? "bg-pulse-bloom text-white"
+                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
+                }`}
+                aria-pressed={printoutIncludeHidden}
+              >
+                Include hidden
+              </button>
+            </div>
               {showHiddenPrintoutNotice ? (
                 <p className={`${noticeTextClass} -mb-2`}>
                   {t("reflection.includesHidden")}
