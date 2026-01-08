@@ -6,7 +6,8 @@ import FeltCard, { type FeltCardData, type FeltCardProps } from "@/components/he
 type AnalysisResponse = {
   monthlySentiment: number | null;
   allTimeSentiment: number | null;
-  topWords: string[];
+  monthlyTopWords: string[];
+  allTimeTopWords: string[];
 };
 
 type Props = FeltCardProps & {
@@ -78,20 +79,25 @@ function FeltCardAsyncInner({
         if (!response.ok) return;
 
         const data = (await response.json()) as AnalysisResponse;
-        const topWords = Array.isArray(data.topWords) ? data.topWords : [];
+        const monthlyTopWords = Array.isArray(data.monthlyTopWords)
+          ? data.monthlyTopWords
+          : [];
+        const allTimeTopWords = Array.isArray(data.allTimeTopWords)
+          ? data.allTimeTopWords
+          : [];
 
         if (view === "monthly") {
           setMonthlyData((prev) => ({
             ...prev,
             moodValue: formatSentiment(data.monthlySentiment, prev.noneLabel),
-            topWords,
+            topWords: monthlyTopWords,
           }));
           setLoaded((prev) => ({ ...prev, monthly: true }));
         } else {
           setAllTimeData((prev) => ({
             ...prev,
             moodValue: formatSentiment(data.allTimeSentiment, prev.noneLabel),
-            topWords,
+            topWords: allTimeTopWords,
           }));
           setLoaded((prev) => ({ ...prev, allTime: true }));
         }

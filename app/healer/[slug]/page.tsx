@@ -99,7 +99,8 @@ export default async function HealerPage(props: PageProps) {
     value == null ? t("common.none") : `${Math.round(value)} / 100`;
   const monthlySentiment = getAverageWarmth(monthlyReflections);
   const allTimeSentiment = getAverageWarmth(healer.reflections);
-  const topWords = getTopEmotionWords(healer.reflections);
+  const monthlyTopWords = getTopEmotionWords(monthlyReflections);
+  const allTimeTopWords = getTopEmotionWords(healer.reflections);
 
 
   const monthlyCount = monthlyReflections.length;
@@ -121,7 +122,7 @@ export default async function HealerPage(props: PageProps) {
     moodValue: formatWarmth(monthlySentiment),
     topWordsLabel: t("healer.monthly.topWords"),
     topWordsValueLabel: t("healer.monthly.topWords.value"),
-    topWords,
+    topWords: monthlyTopWords,
     noneLabel: t("common.none"),
   };
   const allTimeCardData = {
@@ -140,7 +141,7 @@ export default async function HealerPage(props: PageProps) {
     moodValue: formatWarmth(allTimeSentiment),
     topWordsLabel: t("healer.monthly.topWords"),
     topWordsValueLabel: t("healer.monthly.topWords.value"),
-    topWords,
+    topWords: allTimeTopWords,
     noneLabel: t("common.none"),
   };
 

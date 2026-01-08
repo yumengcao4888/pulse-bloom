@@ -57,11 +57,13 @@ export async function GET(
     return roundToTwo(avg);
   })();
 
-  const topWords = getTopEmotionWords(healer.reflections);
+  const monthlyTopWords = getTopEmotionWords(monthlyReflections);
+  const allTimeTopWords = getTopEmotionWords(healer.reflections);
 
   return NextResponse.json({
     monthlySentiment,
     allTimeSentiment,
-    topWords,
+    monthlyTopWords,
+    allTimeTopWords,
   });
 }
