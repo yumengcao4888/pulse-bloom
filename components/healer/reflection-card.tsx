@@ -213,6 +213,7 @@ export default function ReflectionCard({
   const [hiddenOverrides, setHiddenOverrides] = useState<Record<string, boolean>>({});
   const pageSize = 5;
   const noticeTextClass = "text-sm text-center text-gray-500 font-normal";
+  const listTitleClass = "text-sm font-semibold text-gray-700";
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
     [],
@@ -1681,60 +1682,67 @@ export default function ReflectionCard({
 
                             return (
                               <>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                   {shouldShowSort || showHiddenNotice ? (
                                     <div className="space-y-1">
-                                      {shouldShowSort ? (
-                                        <div className="flex flex-wrap gap-2">
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              setEmotionPrintoutSort((prev) =>
-                                                prev === "desc" ? "asc" : "desc",
-                                              )
-                                            }
-                                            className="inline-flex items-center gap-2 rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
-                                            aria-pressed={
-                                              emotionPrintoutSort === "asc"
-                                            }
-                                            aria-label={
-                                              emotionPrintoutSort === "desc"
-                                                ? "Newest first"
-                                                : "Oldest first"
-                                            }
-                                            title={
-                                              emotionPrintoutSort === "desc"
-                                                ? "Newest first"
-                                                : "Oldest first"
-                                            }
-                                          >
-                                            <svg
-                                              aria-hidden="true"
-                                              className={`h-3.5 w-3.5 text-pulse-bloom transition-transform ${
+                                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                        <p className={listTitleClass}>
+                                          Reflections with {selectedEmotion.label} tone
+                                        </p>
+                                        {shouldShowSort ? (
+                                          <div className="flex flex-wrap gap-2">
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                setEmotionPrintoutSort((prev) =>
+                                                  prev === "desc"
+                                                    ? "asc"
+                                                    : "desc",
+                                                )
+                                              }
+                                              className="inline-flex items-center gap-2 rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
+                                              aria-pressed={
                                                 emotionPrintoutSort === "asc"
-                                                  ? "rotate-180"
-                                                  : ""
-                                              }`}
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              strokeWidth="2"
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
+                                              }
+                                              aria-label={
+                                                emotionPrintoutSort === "desc"
+                                                  ? "Newest first"
+                                                  : "Oldest first"
+                                              }
+                                              title={
+                                                emotionPrintoutSort === "desc"
+                                                  ? "Newest first"
+                                                  : "Oldest first"
+                                              }
                                             >
-                                              <path d="M6 3v18" />
-                                              <path d="M10 7l-4-4-4 4" />
-                                              <path d="M18 21V3" />
-                                              <path d="M14 17l4 4 4-4" />
-                                            </svg>
-                                            <span>
-                                              {emotionPrintoutSort === "desc"
-                                                ? "Newest first"
-                                                : "Oldest first"}
-                                            </span>
-                                          </button>
-                                        </div>
-                                      ) : null}
+                                              <svg
+                                                aria-hidden="true"
+                                                className={`h-3.5 w-3.5 text-pulse-bloom transition-transform ${
+                                                  emotionPrintoutSort === "asc"
+                                                    ? "rotate-180"
+                                                    : ""
+                                                }`}
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              >
+                                                <path d="M6 3v18" />
+                                                <path d="M10 7l-4-4-4 4" />
+                                                <path d="M18 21V3" />
+                                                <path d="M14 17l4 4 4-4" />
+                                              </svg>
+                                              <span>
+                                                {emotionPrintoutSort === "desc"
+                                                  ? "Newest first"
+                                                  : "Oldest first"}
+                                              </span>
+                                            </button>
+                                          </div>
+                                        ) : null}
+                                      </div>
                                       {showHiddenNotice ? (
                                         <p className={noticeTextClass}>
                                           {t("reflection.includesHidden")}
