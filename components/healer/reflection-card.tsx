@@ -327,6 +327,36 @@ export default function ReflectionCard({
 
     return `${datePart} at ${timePart}`;
   };
+  const formatPrintoutRangeTitle = () => {
+    const formatter = new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    const today = new Date();
+    let start: Date | null = null;
+    let end: Date | null = null;
+
+    if (printoutStartDate && printoutEndDate) {
+      start = new Date(`${printoutStartDate}T00:00:00`);
+      end = new Date(`${printoutEndDate}T00:00:00`);
+    } else if (countRange === "monthly") {
+      const rangeStart = new Date();
+      rangeStart.setDate(rangeStart.getDate() - 30);
+      start = rangeStart;
+      end = today;
+    } else {
+      start = earliestReflectionDate ?? null;
+      end = today;
+    }
+
+    if (!start || !end) return "Reflections";
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return "Reflections";
+    }
+
+    return `Reflections from ${formatter.format(start)} - ${formatter.format(end)}`;
+  };
   const formatBool = (value: boolean | null | undefined) =>
     value == null ? t("common.na") : value ? t("common.yes") : t("common.no");
   const isPrintoutRangeActive = Boolean(printoutStartDate || printoutEndDate);
@@ -794,7 +824,12 @@ export default function ReflectionCard({
     setSelectedTrendLabel(null);
     setTrendPrintoutPage(1);
     setTrendFreeTextOnly(false);
-  }, [countRange]);
+    const defaults = getDefaultPrintoutRange();
+    setPrintoutStartDate(defaults.start);
+    setPrintoutEndDate(defaults.end);
+    setPrintoutDraftStart(defaults.start);
+    setPrintoutDraftEnd(defaults.end);
+  }, [countRange, getDefaultPrintoutRange]);
 
   const emotionKey = selectedEmotion
     ? `${countRange}:${selectedEmotion.label.toLowerCase()}`
@@ -1816,6 +1851,7 @@ export default function ReflectionCard({
         )}
         {showPrintout && data && (
           <div className="space-y-4">
+            <p className={listTitleClass}>{formatPrintoutRangeTitle()}</p>
             <div className="flex flex-col gap-[2px]">
               <div className="flex flex-wrap gap-2">
               <button
@@ -1863,13 +1899,9 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => setIsPrintoutTimeOpen(true)}
-                className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                  isPrintoutRangeActive
-                    ? "bg-pulse-bloom text-white"
-                    : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                }`}
+                className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
               >
-                Change time
+                📆 Choose dates
               </button>
               <button
                 type="button"
