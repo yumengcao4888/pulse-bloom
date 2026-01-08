@@ -754,6 +754,7 @@ export default function ReflectionCard({
       ) as ReflectionEntry[],
     [emotionData],
   );
+  const hasEmotionReflections = Boolean(emotionData?.reflections?.length);
 
   const sortedEmotionPrintout = useMemo(() => {
     const items = [...filteredEmotionPrintout];
@@ -1535,20 +1536,6 @@ export default function ReflectionCard({
                     {selectedEmotion && (
                       <div className="pt-4 space-y-4 text-left">
                         <div className="border-t border-dashed border-gray-200" />
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setEmotionPrintoutSort((prev) =>
-                                prev === "desc" ? "asc" : "desc",
-                              )
-                            }
-                            className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
-                            aria-pressed={emotionPrintoutSort === "asc"}
-                          >
-                            {emotionPrintoutSort === "desc" ? "Desc" : "Asc"}
-                          </button>
-                        </div>
                         {emotionKey && emotionErrors[emotionKey] ? (
                           <p className="text-sm text-red-600">
                             {emotionErrors[emotionKey]}
@@ -1562,9 +1549,15 @@ export default function ReflectionCard({
                             <span>Loading reflections...</span>
                           </div>
                         ) : sortedEmotionPrintout.length === 0 ? (
-                          <p className="text-sm text-gray-500">{t("reflection.none")}</p>
+                          <p className="text-sm text-gray-500">
+                            {hasEmotionReflections
+                              ? t("reflection.noneVisible")
+                              : t("reflection.none")}
+                          </p>
                         ) : (
                           (() => {
+                            const shouldShowSort =
+                              sortedEmotionPrintout.length > 0;
                             const totalPages = Math.max(
                               1,
                               Math.ceil(sortedEmotionPrintout.length / pageSize),
@@ -1572,6 +1565,24 @@ export default function ReflectionCard({
 
                             return (
                               <>
+                                {shouldShowSort && (
+                                  <div className="flex flex-wrap gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEmotionPrintoutSort((prev) =>
+                                          prev === "desc" ? "asc" : "desc",
+                                        )
+                                      }
+                                      className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-pulse-bloom shadow-sm transition hover:bg-pulse-bloom/10"
+                                      aria-pressed={emotionPrintoutSort === "asc"}
+                                    >
+                                      {emotionPrintoutSort === "desc"
+                                        ? "Desc"
+                                        : "Asc"}
+                                    </button>
+                                  </div>
+                                )}
                                 <div className="space-y-0">
                                   {emotionPageItems.map((reflection) =>
                                     renderReflectionItem(reflection, {
