@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { classifyEmotion } from "@/lib/huggingface";
 import { roundToTwo } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -35,9 +34,9 @@ export async function GET(
       reflections: {
         orderBy: { createdAt: "desc" },
         select: {
-          feeling: true,
           createdAt: true,
           emotionalWarmth: true,
+          emotionalTone: true,
         },
       },
     },
@@ -68,18 +67,9 @@ export async function GET(
             emotionalWarmthScores.length,
         );
 
-  const hfEnabled = Boolean(process.env.HF_TOKEN);
-  const reflectionsWithEmotion = hfEnabled
-    ? await Promise.all(
-        reflections.map(async (reflection) => ({
-          emotion: await classifyEmotion(reflection.feeling),
-        })),
-      )
-    : [];
-
-  const emotionCounts = reflectionsWithEmotion.reduce<Record<string, number>>(
+  const emotionCounts = reflections.reduce<Record<string, number>>(
     (acc, reflection) => {
-      const label = reflection.emotion?.label;
+      const label = reflection.emotionalTone;
       if (!label) return acc;
       acc[label] = (acc[label] ?? 0) + 1;
       return acc;
@@ -136,7 +126,7 @@ export async function GET(
   }));
 
   return NextResponse.json({
-    hfEnabled,
+    hfEnabled: reflections.some((reflection) => Boolean(reflection.emotionalTone)),
     emotionalWarmth,
     topEmotions,
     emotionCounts: emotionCountsList,

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { classifyEmotion } from "@/lib/huggingface";
 
 export const dynamic = "force-dynamic";
 
@@ -53,23 +52,23 @@ export async function GET(
         )
       : healer.reflections;
 
-  const hfEnabled = Boolean(process.env.HF_TOKEN);
-  if (!hfEnabled || reflections.length === 0) {
+  if (reflections.length === 0) {
     return NextResponse.json({ reflections: [] });
   }
 
-  const reflectionsWithEmotion = await Promise.all(
-    reflections.map(async (reflection) => ({
+  const targetLabel = emotion.toLowerCase();
+  const matched = reflections
+    .filter(
+      (reflection) =>
+        reflection.emotionalTone?.toLowerCase() === targetLabel,
+    )
+    .map((reflection) => ({
       ...reflection,
       sentiment: null,
-      emotion: await classifyEmotion(reflection.feeling),
-    })),
-  );
-
-  const targetLabel = emotion.toLowerCase();
-  const matched = reflectionsWithEmotion.filter(
-    (reflection) => reflection.emotion?.label?.toLowerCase() === targetLabel,
-  );
+      emotion: reflection.emotionalTone
+        ? { label: reflection.emotionalTone, score: 1 }
+        : null,
+    }));
 
   return NextResponse.json({ reflections: matched });
 }
