@@ -1422,7 +1422,7 @@ export default function ReflectionCard({
                                   Reflections from{" "}
                                   {formatTrendLabel(selectedTrendLabel)}
                                 </p>
-                                <div className="flex w-full flex-col items-end gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+                                <div className="flex w-full flex-col items-center gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -1532,7 +1532,7 @@ export default function ReflectionCard({
                                       </div>
                                     </div>
                                 {totalPages > 1 && (
-                                  <div className="flex w-full flex-col items-end gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
+                                  <div className="flex flex-row items-center justify-center gap-2">
                                     <button
                                       type="button"
                                       onClick={() =>
@@ -1540,7 +1540,7 @@ export default function ReflectionCard({
                                           Math.max(1, prev - 1),
                                         )
                                       }
-                                      className="inline-flex w-full max-w-[220px] items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:max-w-none"
+                                      className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={trendPrintoutPage <= 1}
                                     >
                                       Last page
@@ -1552,7 +1552,7 @@ export default function ReflectionCard({
                                           Math.min(totalPages, prev + 1),
                                         )
                                       }
-                                      className="inline-flex w-full max-w-[220px] items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:max-w-none"
+                                      className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={trendPrintoutPage >= totalPages}
                                     >
                                       Next page
@@ -1736,7 +1736,7 @@ export default function ReflectionCard({
                                             `Reflections with ${selectedEmotion.label} tone`}
                                         </p>
                                         {shouldShowSort ? (
-                                          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-end">
+                                          <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-end">
                                             <button
                                               type="button"
                                               onClick={() =>
@@ -1807,7 +1807,7 @@ export default function ReflectionCard({
                                   </div>
                                 </div>
                                 {totalPages > 1 && (
-                                  <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-center">
+                                  <div className="flex flex-row items-center justify-center gap-2">
                                     <button
                                       type="button"
                                       onClick={() =>
@@ -1862,7 +1862,7 @@ export default function ReflectionCard({
             <div className="flex flex-col gap-2 sm:gap-1">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className={listTitleClass}>{formatPrintoutRangeTitle()}</p>
-                <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-end">
+                <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-end">
                   <button
                     type="button"
                     onClick={() => {
@@ -1913,7 +1913,7 @@ export default function ReflectionCard({
                   </button>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2 sm:-mt-1 sm:flex-row sm:items-center sm:justify-end">
+              <div className="flex flex-col items-center gap-2 sm:-mt-1 sm:flex-row sm:items-center sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setPrintoutIncludeHidden((prev) => !prev)}
@@ -1965,13 +1965,13 @@ export default function ReflectionCard({
                       )}
                     </div>
                     {totalPages > 1 && (
-                      <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-center">
+                      <div className="flex flex-row items-center justify-center gap-2">
                         <button
                           type="button"
                           onClick={() =>
                             setPrintoutPage((prev) => Math.max(1, prev - 1))
                           }
-                          className="inline-flex w-full max-w-[220px] items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:max-w-none"
+                          className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={printoutPage <= 1}
                         >
                           Last page
@@ -1981,7 +1981,7 @@ export default function ReflectionCard({
                           onClick={() =>
                             setPrintoutPage((prev) => Math.min(totalPages, prev + 1))
                           }
-                          className="inline-flex w-full max-w-[220px] items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:max-w-none"
+                          className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={printoutPage >= totalPages}
                         >
                           Next page
