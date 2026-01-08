@@ -1380,51 +1380,6 @@ export default function ReflectionCard({
                                   {formatTrendLabel(selectedTrendLabel)}
                                 </p>
                                 <div className="flex flex-wrap gap-2 sm:justify-end">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setTrendPrintoutSort((prev) =>
-                                      prev === "desc" ? "asc" : "desc",
-                                    )
-                                  }
-                                  className="inline-flex items-center gap-2 rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
-                                  aria-pressed={trendPrintoutSort === "asc"}
-                                  aria-label={
-                                    trendPrintoutSort === "desc"
-                                      ? "Newest first"
-                                      : "Oldest first"
-                                  }
-                                  title={
-                                    trendPrintoutSort === "desc"
-                                      ? "Newest first"
-                                      : "Oldest first"
-                                  }
-                                >
-                                  <svg
-                                    aria-hidden="true"
-                                    className={`h-3.5 w-3.5 text-pulse-bloom transition-transform ${
-                                      trendPrintoutSort === "asc"
-                                        ? "rotate-180"
-                                        : ""
-                                    }`}
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
-                                    <path d="M6 3v18" />
-                                    <path d="M10 7l-4-4-4 4" />
-                                    <path d="M18 21V3" />
-                                    <path d="M14 17l4 4 4-4" />
-                                  </svg>
-                                  <span>
-                                    {trendPrintoutSort === "desc"
-                                      ? "Newest first"
-                                      : "Oldest first"}
-                                  </span>
-                                </button>
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -1435,6 +1390,51 @@ export default function ReflectionCard({
                                     aria-pressed={trendFreeTextOnly}
                                   >
                                     {trendFreeTextOnly ? "💬 Show all" : "💬 Comments only"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setTrendPrintoutSort((prev) =>
+                                        prev === "desc" ? "asc" : "desc",
+                                      )
+                                    }
+                                    className="inline-flex items-center gap-2 rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
+                                    aria-pressed={trendPrintoutSort === "asc"}
+                                    aria-label={
+                                      trendPrintoutSort === "desc"
+                                        ? "Newest first"
+                                        : "Oldest first"
+                                    }
+                                    title={
+                                      trendPrintoutSort === "desc"
+                                        ? "Newest first"
+                                        : "Oldest first"
+                                    }
+                                  >
+                                    <svg
+                                      aria-hidden="true"
+                                      className={`h-3.5 w-3.5 text-pulse-bloom transition-transform ${
+                                        trendPrintoutSort === "asc"
+                                          ? "rotate-180"
+                                          : ""
+                                      }`}
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <path d="M6 3v18" />
+                                      <path d="M10 7l-4-4-4 4" />
+                                      <path d="M18 21V3" />
+                                      <path d="M14 17l4 4 4-4" />
+                                    </svg>
+                                    <span>
+                                      {trendPrintoutSort === "desc"
+                                        ? "Newest first"
+                                        : "Oldest first"}
+                                    </span>
                                   </button>
                                 </div>
                               </div>
