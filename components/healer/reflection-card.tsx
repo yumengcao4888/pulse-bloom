@@ -200,6 +200,7 @@ export default function ReflectionCard({
   const [selectedEmotion, setSelectedEmotion] = useState<{
     label: string;
     count: number;
+    allowHear: boolean;
   } | null>(null);
   const [emotionPrintoutSort, setEmotionPrintoutSort] = useState<"desc" | "asc">(
     "desc",
@@ -465,10 +466,16 @@ export default function ReflectionCard({
     [emotionLoading, emotionPrintouts, slug, t],
   );
 
-  const handleEmotionSelect = (label: string, count: number) => {
+  const handleEmotionSelect = (
+    label: string,
+    count: number,
+    allowHear = false,
+  ) => {
     if (label === "\u2014" || count <= 0) return;
-    const isSameEmotion = selectedEmotion?.label.toLowerCase() === label.toLowerCase();
-    setSelectedEmotion(isSameEmotion ? null : { label, count });
+    const isSameEmotion =
+      selectedEmotion?.label.toLowerCase() === label.toLowerCase() &&
+      selectedEmotion?.allowHear === allowHear;
+    setSelectedEmotion(isSameEmotion ? null : { label, count, allowHear });
     setEmotionPrintoutPage(1);
     if (!isSameEmotion) {
       void loadEmotionPrintout(label, countRange);
@@ -910,10 +917,11 @@ export default function ReflectionCard({
   const renderEmotionButton = (
     emotion: { label: string; count: number },
     capitalizeFirst: boolean,
+    allowHear = false,
   ) => (
     <button
       type="button"
-      onClick={() => handleEmotionSelect(emotion.label, emotion.count)}
+      onClick={() => handleEmotionSelect(emotion.label, emotion.count, allowHear)}
       className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
         selectedEmotion?.label.toLowerCase() === emotion.label.toLowerCase()
           ? "text-pulse-bloom-deep"
@@ -1419,12 +1427,12 @@ export default function ReflectionCard({
                         gentlePrimaryEmotion.count > 0 ? (
                           <span className="text-left">
                             {"\u2013\u00a0"}Some reflections carried traces of{" "}
-                            {renderEmotionButton(gentlePrimaryEmotion, false)}
+                            {renderEmotionButton(gentlePrimaryEmotion, false, true)}
                             {gentleSecondaryEmotion.label !== "\u2014" &&
                             gentleSecondaryEmotion.count > 0 ? (
                               <>
                                 {"\u00a0"}or{"\u00a0"}
-                                {renderEmotionButton(gentleSecondaryEmotion, false)}
+                                {renderEmotionButton(gentleSecondaryEmotion, false, true)}
                               </>
                             ) : null}
                             .
@@ -1442,6 +1450,7 @@ export default function ReflectionCard({
                                 handleEmotionSelect(
                                   harshPrimaryEmotion.label,
                                   harshPrimaryEmotion.count,
+                                  true,
                                 )
                               }
                               className="font-semibold underline decoration-dotted underline-offset-2 transition text-gray-800 hover:text-pulse-bloom-deep"
@@ -1522,7 +1531,7 @@ export default function ReflectionCard({
                                 <div className="space-y-0">
                                   {emotionPageItems.map((reflection) =>
                                     renderReflectionItem(reflection, {
-                                      showHearButton: true,
+                                      showHearButton: selectedEmotion.allowHear,
                                       emotionLabel: selectedEmotion.label,
                                     }),
                                   )}
