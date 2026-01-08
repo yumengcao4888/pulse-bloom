@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { Prisma } from "@prisma/client";
+import { EmotionalTone, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { classifyFeeling } from "@/lib/huggingface";
+import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { calculateEmotionalWarmth } from "@/lib/utils";
 
 async function main() {
@@ -11,12 +11,14 @@ async function main() {
 
   const reflections = await prisma.reflection.findMany({
     where: {
-      emotionalWarmth: null,
       feeling: { not: null },
+      OR: [{ emotionalWarmth: null }, { emotionalTone: null }],
     },
     select: {
       id: true,
       feeling: true,
+      emotionalWarmth: true,
+      emotionalTone: true,
     },
   });
 
@@ -30,9 +32,17 @@ async function main() {
       continue;
     }
 
-    const sentiment = await classifyFeeling(feeling);
+    const [sentiment, emotion] = await Promise.all([
+      classifyFeeling(feeling),
+      classifyEmotion(feeling),
+    ]);
     const emotionalWarmth = calculateEmotionalWarmth(sentiment);
-    if (emotionalWarmth == null) {
+    const emotionalTone =
+      emotion?.label && (Object.values(EmotionalTone) as string[]).includes(emotion.label)
+        ? (emotion.label as EmotionalTone)
+        : null;
+
+    if (emotionalWarmth == null && emotionalTone == null) {
       skipped += 1;
       continue;
     }
@@ -40,7 +50,14 @@ async function main() {
     await prisma.reflection.update({
       where: { id: reflection.id },
       data: {
-        emotionalWarmth: new Prisma.Decimal(emotionalWarmth.toFixed(2)),
+        emotionalWarmth:
+          reflection.emotionalWarmth == null && emotionalWarmth != null
+            ? new Prisma.Decimal(emotionalWarmth.toFixed(2))
+            : undefined,
+        emotionalTone:
+          reflection.emotionalTone == null && emotionalTone != null
+            ? emotionalTone
+            : undefined,
       },
     });
     updated += 1;

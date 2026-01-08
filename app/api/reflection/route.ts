@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { EmotionalTone, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { classifyFeeling } from "@/lib/huggingface";
+import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { calculateEmotionalWarmth } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
@@ -54,7 +54,12 @@ export async function POST(req: NextRequest) {
     const trimmedFeeling =
       typeof feeling === "string" && feeling.trim() !== "" ? feeling.trim() : null;
     const sentiment = await classifyFeeling(trimmedFeeling);
+    const emotion = await classifyEmotion(trimmedFeeling);
     const emotionalWarmth = calculateEmotionalWarmth(sentiment);
+    const emotionalTone =
+      emotion?.label && (Object.values(EmotionalTone) as string[]).includes(emotion.label)
+        ? (emotion.label as EmotionalTone)
+        : null;
 
     const reflection = await prisma.reflection.create({
       data: {
@@ -66,6 +71,7 @@ export async function POST(req: NextRequest) {
           emotionalWarmth == null
             ? null
             : new Prisma.Decimal(emotionalWarmth.toFixed(2)),
+        emotionalTone,
         healerId: healer.id,
       },
     });

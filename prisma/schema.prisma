@@ -47,9 +47,41 @@ model Reflection {
 
   feeling   String?
   emotionalWarmth Decimal? @db.Decimal(5, 2)
+  emotionalTone EmotionalTone?
 
   healer   Healer @relation(fields: [healerId], references: [id])
   healerId Int
 
   createdAt DateTime @default(now())
+}
+
+enum EmotionalTone {
+  gratitude
+  love
+  admiration
+  joy
+  caring
+  approval
+  optimism
+  pride
+  relief
+  excitement
+  amusement
+  desire
+  curiosity
+  surprise
+  realization
+  confusion
+  neutral
+  sadness
+  nervousness
+  fear
+  disappointment
+  remorse
+  embarrassment
+  grief
+  annoyance
+  disapproval
+  anger
+  disgust
 }
