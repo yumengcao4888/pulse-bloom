@@ -1055,6 +1055,38 @@ export default function ReflectionCard({
       return aIndex - bIndex;
     });
   const harshPrimaryEmotion = harshEmotions[0] ?? { label: "\u2014", count: 0 };
+  const getEmotionUnheardCount = useCallback(
+    (label: string) => {
+      if (!label || label === "\u2014") return 0;
+      const normalized = label.toLowerCase();
+      const key = `${countRange}:${normalized}`;
+      const printout = emotionPrintouts[key];
+      if (printout?.reflections?.length) {
+        return printout.reflections.filter(
+          (reflection) => reflection.heardAt == null,
+        ).length;
+      }
+      return (
+        emotionCounts.find((entry) => entry.label.toLowerCase() === normalized)
+          ?.count ?? 0
+      );
+    },
+    [countRange, emotionCounts, emotionPrintouts],
+  );
+  const gentlePrimaryUnheardCount = getEmotionUnheardCount(
+    gentlePrimaryEmotion.label,
+  );
+  const gentleSecondaryUnheardCount = getEmotionUnheardCount(
+    gentleSecondaryEmotion.label,
+  );
+  const harshPrimaryUnheardCount = getEmotionUnheardCount(
+    harshPrimaryEmotion.label,
+  );
+  const showGentleLine =
+    gentlePrimaryEmotion.label !== "\u2014" && gentlePrimaryUnheardCount > 0;
+  const showHarshLine =
+    harshPrimaryEmotion.label !== "\u2014" && harshPrimaryUnheardCount > 0;
+  const showGentleSignals = showGentleLine || showHarshLine;
   const formatEmotionLabel = (label: string, capitalizeFirst: boolean) => {
     if (label === "\u2014") return label;
     const lowered = label.toLowerCase();
@@ -1622,51 +1654,55 @@ export default function ReflectionCard({
                         <b>{formattedEmotionalWarmth}</b>.
                       </span>
                     </div>
-                    <div className="pt-2 space-y-1">
-                      <p>
-                        <b>{"\u00a0\u00a0"}Gentle signals to notice:</b>
-                      </p>
-                      <div className="text-left">
-                        {gentlePrimaryEmotion.label !== "\u2014" &&
-                        gentlePrimaryEmotion.count > 0 ? (
-                          <span className="text-left">
-                            {"\u2013\u00a0"}Some reflections carried traces of{" "}
-                            {renderEmotionButton(gentlePrimaryEmotion, false, true)}
-                            {gentleSecondaryEmotion.label !== "\u2014" &&
-                            gentleSecondaryEmotion.count > 0 ? (
-                              <>
-                                {"\u00a0"}or{"\u00a0"}
-                                {renderEmotionButton(gentleSecondaryEmotion, false, true)}
-                              </>
-                            ) : null}
-                            .
-                          </span>
-                        ) : null}
+                    {showGentleSignals ? (
+                      <div className="pt-2 space-y-1">
+                        <p>
+                          <b>{"\u00a0\u00a0"}Gentle signals to notice:</b>
+                        </p>
+                        <div className="text-left">
+                          {showGentleLine ? (
+                            <span className="text-left">
+                              {"\u2013\u00a0"}Some reflections carried traces of{" "}
+                              {renderEmotionButton(gentlePrimaryEmotion, false, true)}
+                              {gentleSecondaryEmotion.label !== "\u2014" &&
+                              gentleSecondaryUnheardCount > 0 ? (
+                                <>
+                                  {"\u00a0"}or{"\u00a0"}
+                                  {renderEmotionButton(
+                                    gentleSecondaryEmotion,
+                                    false,
+                                    true,
+                                  )}
+                                </>
+                              ) : null}
+                              .
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="text-left">
+                          {showHarshLine ? (
+                            <span className="text-left">
+                              {"\u2013\u00a0"}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleEmotionSelect(
+                                    harshPrimaryEmotion.label,
+                                    harshPrimaryEmotion.count,
+                                    true,
+                                    "Reflections that felt a bit heavier",
+                                  )
+                                }
+                                className="font-semibold underline decoration-dotted underline-offset-2 transition text-gray-800 hover:text-pulse-bloom-deep"
+                              >
+                                A few moments
+                              </button>
+                              {"\u00a0"}felt a bit heavier, perhaps asking for care.
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
-                      <div className="text-left">
-                        {harshPrimaryEmotion.label !== "\u2014" &&
-                        harshPrimaryEmotion.count > 0 ? (
-                          <span className="text-left">
-                            {"\u2013\u00a0"}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleEmotionSelect(
-                                  harshPrimaryEmotion.label,
-                                  harshPrimaryEmotion.count,
-                                  true,
-                                  "Reflections that felt a bit heavier",
-                                )
-                              }
-                              className="font-semibold underline decoration-dotted underline-offset-2 transition text-gray-800 hover:text-pulse-bloom-deep"
-                            >
-                              A few moments
-                            </button>
-                            {"\u00a0"}felt a bit heavier, perhaps asking for care.
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
+                    ) : null}
                     <div className="my-3 border-gray-200" />
                     <div className="mb-3 text-xs text-gray-500 text-left">
                       <p>

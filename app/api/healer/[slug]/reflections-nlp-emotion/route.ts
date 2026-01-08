@@ -60,7 +60,8 @@ export async function GET(
   const matched = reflections
     .filter(
       (reflection) =>
-        reflection.emotionalTone?.toLowerCase() === targetLabel,
+        reflection.emotionalTone?.toLowerCase() === targetLabel &&
+        reflection.heardAt == null,
     )
     .map((reflection) => ({
       ...reflection,
