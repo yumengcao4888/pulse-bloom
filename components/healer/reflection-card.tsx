@@ -1273,7 +1273,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={handleSentimentToggle}
-                className="inline-flex items-center justify-center justify-self-center rounded-full bg-pulse-bloom-soft/20 px-4 py-2 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 sm:justify-self-start"
+                className="inline-flex items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 sm:justify-self-start"
                 disabled={isSentimentLoading}
               >
                 <span className="flex flex-col items-center">
@@ -1294,7 +1294,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => handleSectionToggle("trends")}
-                className="inline-flex items-center justify-center justify-self-center rounded-full bg-pulse-bloom-soft/20 px-4 py-2 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-center"
+                className="inline-flex items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-center"
               >
                 <span className="flex flex-col items-center">
                   <span>
@@ -1316,7 +1316,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => handleSectionToggle("printout")}
-                className="inline-flex items-center justify-center justify-self-center rounded-full bg-pulse-bloom-soft/20 px-4 py-2 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-end"
+                className="inline-flex items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:justify-self-end"
               >
                 <span className="flex flex-col items-center">
                   <span>
