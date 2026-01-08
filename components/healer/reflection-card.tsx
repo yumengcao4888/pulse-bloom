@@ -833,6 +833,9 @@ export default function ReflectionCard({
     setSelectedTrendLabel(null);
     setTrendPrintoutPage(1);
     setTrendFreeTextOnly(false);
+  }, [countRange]);
+
+  useEffect(() => {
     const defaults = getDefaultPrintoutRange();
     setPrintoutStartDate(defaults.start);
     setPrintoutEndDate(defaults.end);
