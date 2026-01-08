@@ -1374,12 +1374,12 @@ export default function ReflectionCard({
                           <div className="mt-4 space-y-4">
                             <div className="border-t border-dashed border-gray-200" />
                             {!(sortedTrendReflections.length === 0 && hasTrendReflections) ? (
-                              <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <p className="text-sm font-semibold text-gray-700">
                                   Reflections from{" "}
                                   {formatTrendLabel(selectedTrendLabel)}
                                 </p>
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap gap-2 sm:justify-end">
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -1431,14 +1431,10 @@ export default function ReflectionCard({
                                       setTrendFreeTextOnly((prev) => !prev);
                                       setTrendPrintoutPage(1);
                                     }}
-                                    className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                                      trendFreeTextOnly
-                                        ? "bg-pulse-bloom text-white"
-                                        : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                                    }`}
+                                    className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
                                     aria-pressed={trendFreeTextOnly}
                                   >
-                                    Free text
+                                    {trendFreeTextOnly ? "💬 Show all" : "💬 Comments only"}
                                   </button>
                                 </div>
                               </div>
@@ -1859,14 +1855,10 @@ export default function ReflectionCard({
                     setPrintoutFreeTextOnly((prev) => !prev);
                     setPrintoutPage(1);
                   }}
-                  className={`rounded-full border border-pulse-bloom px-3 py-1 text-xs font-semibold shadow-sm transition ${
-                    printoutFreeTextOnly
-                      ? "bg-pulse-bloom text-white"
-                      : "bg-white text-pulse-bloom hover:bg-pulse-bloom/10"
-                  }`}
+                  className="rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10"
                   aria-pressed={printoutFreeTextOnly}
                 >
-                  Free text
+                  {printoutFreeTextOnly ? "💬 Show all" : "💬 Comments only"}
                 </button>
               <button
                 type="button"
