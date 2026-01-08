@@ -26,6 +26,20 @@ type EditProfileSheetProps = {
   buttonClassName?: string;
 };
 
+const BIO_WORD_LIMIT = 300;
+const getWordCount = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+};
+const limitWords = (value: string, limit: number) => {
+  const trimmed = value.trim();
+  if (!trimmed) return value;
+  const words = trimmed.split(/\s+/);
+  if (words.length <= limit) return value;
+  return `${words.slice(0, limit).join(" ")} `;
+};
+
 export default function EditProfileSheet({ healer, buttonClassName }: EditProfileSheetProps) {
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -165,6 +179,11 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
     }
     const error = validateContact(form.contactType, value);
     setContactError(error);
+  };
+
+  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const nextValue = limitWords(e.target.value, BIO_WORD_LIMIT);
+    setForm((prev) => ({ ...prev, bio: nextValue }));
   };
 
   const handleSave = async () => {
@@ -410,13 +429,18 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               <label className="block text-sm font-medium">
                 {t("form.healer.bio.label")}
               </label>
-              <textarea
-                className="w-full rounded-md border px-3 py-2 text-sm min-h-[120px]"
-                placeholder={t("form.healer.bio.placeholder")}
-                value={form.bio}
-                onChange={handleChange("bio")}
-                required
-              />
+              <div className="space-y-0">
+                <textarea
+                  className="w-full rounded-md border px-3 py-2 text-sm min-h-[104px]"
+                  placeholder={t("form.healer.bio.placeholder")}
+                  value={form.bio}
+                  onChange={handleBioChange}
+                  required
+                />
+                <div className="-mt-1 flex justify-end text-xs text-gray-500">
+                  {getWordCount(form.bio)}/{BIO_WORD_LIMIT}
+                </div>
+              </div>
             </div>
           </div>
           <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
