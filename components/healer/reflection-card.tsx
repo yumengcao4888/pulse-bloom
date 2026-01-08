@@ -204,6 +204,9 @@ export default function ReflectionCard({
     count: number;
     allowHear: boolean;
   } | null>(null);
+  const [emotionTitleOverride, setEmotionTitleOverride] = useState<string | null>(
+    null,
+  );
   const [emotionPrintoutSort, setEmotionPrintoutSort] = useState<"desc" | "asc">(
     "desc",
   );
@@ -476,12 +479,14 @@ export default function ReflectionCard({
     label: string,
     count: number,
     allowHear = false,
+    titleOverride?: string,
   ) => {
     if (label === "\u2014" || count <= 0) return;
     const isSameEmotion =
       selectedEmotion?.label.toLowerCase() === label.toLowerCase() &&
       selectedEmotion?.allowHear === allowHear;
     setSelectedEmotion(isSameEmotion ? null : { label, count, allowHear });
+    setEmotionTitleOverride(isSameEmotion ? null : titleOverride ?? null);
     setEmotionPrintoutPage(1);
     if (!isSameEmotion) {
       void loadEmotionPrintout(label, countRange);
@@ -1166,8 +1171,8 @@ export default function ReflectionCard({
                       options?.emotionLabel ?? "",
                     )
                   }
-                  className={`rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 ${
-                    isHeard ? "bg-pulse-bloom/80 text-white" : ""
+                  className={`inline-flex items-center justify-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-3 py-1.5 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 ${
+                    isHeard ? "border-pulse-bloom/80 bg-pulse-bloom/80 text-white" : ""
                   }`}
                   disabled={isUpdating}
                 >
@@ -1610,6 +1615,7 @@ export default function ReflectionCard({
                                   harshPrimaryEmotion.label,
                                   harshPrimaryEmotion.count,
                                   true,
+                                  "Reflections that felt a bit heavier",
                                 )
                               }
                               className="font-semibold underline decoration-dotted underline-offset-2 transition text-gray-800 hover:text-pulse-bloom-deep"
@@ -1687,7 +1693,8 @@ export default function ReflectionCard({
                                     <div className="space-y-1">
                                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                         <p className={listTitleClass}>
-                                          Reflections with {selectedEmotion.label} tone
+                                          {emotionTitleOverride ??
+                                            `Reflections with ${selectedEmotion.label} tone`}
                                         </p>
                                         {shouldShowSort ? (
                                           <div className="flex flex-wrap gap-2">
