@@ -41,12 +41,12 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-medium text-gray-700 shadow-sm transition hover:border-gray-300 dark:border-gray-800 dark:bg-black dark:text-gray-100"
+      className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-medium text-gray-700 shadow-sm transition hover:border-pulse-bloom/40 hover:bg-pulse-bloom-soft/30 hover:text-gray-900 hover:shadow-md dark:border-gray-800 dark:bg-black dark:text-gray-100 dark:hover:border-pulse-bloom/50 dark:hover:bg-pulse-bloom/20"
       aria-pressed={isDark}
       aria-label="Toggle dark mode"
     >
       {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-      {isDark ? "Light" : "Dark"}
+      <span className="hidden sm:inline">{isDark ? "Light" : "Dark"}</span>
     </button>
   );
 }

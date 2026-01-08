@@ -10,6 +10,7 @@ import LanguageSwitcher from "@/components/layout/language-switcher";
 import { useLocale } from "@/components/shared/locale-provider";
 import { yellowtail } from "@/app/fonts";
 import icon from "@/app/icon.png";
+import ThemeToggle from "@/components/layout/theme-toggle";
 
 export default function NavBar() {
   const scrolled = useScroll(50);
@@ -65,6 +66,7 @@ export default function NavBar() {
             <p className={yellowtail.className}>PulseBloom</p>
           </Link>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <LanguageSwitcher />
             <SignedOut>
               <SignInButton mode="modal">
