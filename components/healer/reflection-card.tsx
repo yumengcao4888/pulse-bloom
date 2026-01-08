@@ -22,6 +22,7 @@ type ReflectionEntry = {
   connected: boolean | null;
   feeling: string | null;
   createdAt: string;
+  heardAt: string | null;
   sentiment: SentimentPrediction | null;
   emotion: EmotionPrediction | null;
 };
@@ -204,6 +205,7 @@ export default function ReflectionCard({
     "desc",
   );
   const [emotionPrintoutPage, setEmotionPrintoutPage] = useState(1);
+  const [hearingUpdates, setHearingUpdates] = useState<Record<string, boolean>>({});
   const pageSize = 5;
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
@@ -472,6 +474,78 @@ export default function ReflectionCard({
       void loadEmotionPrintout(label, countRange);
     }
   };
+
+  const updateSentimentCounts = useCallback(
+    (label: string, delta: number) => {
+      const key = countRange === "monthly" ? "monthly" : "allTime";
+      const normalized = label.toLowerCase();
+      setSentimentSummary((prev) => {
+        const current = prev[key];
+        if (!current) return prev;
+        const nextCounts = current.emotionCounts.map((entry) =>
+          entry.label.toLowerCase() === normalized
+            ? { ...entry, count: Math.max(0, entry.count + delta) }
+            : entry,
+        );
+        const hasMatch = nextCounts.some(
+          (entry) => entry.label.toLowerCase() === normalized,
+        );
+        const finalCounts = hasMatch
+          ? nextCounts
+          : delta > 0
+            ? [...nextCounts, { label, count: delta }]
+            : nextCounts;
+        return {
+          ...prev,
+          [key]: {
+            ...current,
+            emotionCounts: finalCounts.filter((entry) => entry.count > 0),
+          },
+        };
+      });
+    },
+    [countRange],
+  );
+
+  const handleHearToggle = useCallback(
+    async (reflectionId: string, isHeard: boolean, emotionLabel: string) => {
+      if (hearingUpdates[reflectionId]) return;
+      setHearingUpdates((prev) => ({ ...prev, [reflectionId]: true }));
+      try {
+        const res = await fetch("/api/reflection/heard", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: reflectionId, heard: !isHeard }),
+        });
+        if (!res.ok) {
+          throw new Error("Failed to update heardAt");
+        }
+        const payload = await res.json();
+        const nextHeardAt: string | null = payload?.reflection?.heardAt ?? null;
+        const delta = nextHeardAt ? -1 : 1;
+        updateSentimentCounts(emotionLabel, delta);
+        setEmotionPrintouts((prev) => {
+          const next = { ...prev };
+          Object.keys(next).forEach((key) => {
+            if (!next[key]?.reflections?.length) return;
+            next[key] = {
+              reflections: next[key].reflections.map((reflection) =>
+                reflection.id === reflectionId
+                  ? { ...reflection, heardAt: nextHeardAt }
+                  : reflection,
+              ),
+            };
+          });
+          return next;
+        });
+      } catch (err) {
+        console.error("Failed to update heardAt", err);
+      } finally {
+        setHearingUpdates((prev) => ({ ...prev, [reflectionId]: false }));
+      }
+    },
+    [hearingUpdates, updateSentimentCounts],
+  );
 
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
@@ -907,8 +981,18 @@ export default function ReflectionCard({
     );
   };
 
-  const renderReflectionItem = (reflection: ReflectionEntry) => {
+  const renderReflectionItem = (
+    reflection: ReflectionEntry,
+    options?: {
+      showHearButton?: boolean;
+      emotionLabel?: string;
+    },
+  ) => {
     const hasFeeling = Boolean(reflection.feeling?.trim());
+    const shouldShowHearButton =
+      Boolean(options?.showHearButton) && hasFeeling && options?.emotionLabel;
+    const isHeard = Boolean(reflection.heardAt);
+    const isUpdating = hearingUpdates[reflection.id];
 
     return (
       <div
@@ -950,7 +1034,29 @@ export default function ReflectionCard({
           </span>
         </p>
         {hasFeeling && (
-          <FeelingNote text={reflection.feeling ?? ""} />
+          <>
+            <FeelingNote text={reflection.feeling ?? ""} />
+            {shouldShowHearButton ? (
+              <div className="mt-2 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleHearToggle(
+                      reflection.id,
+                      isHeard,
+                      options?.emotionLabel ?? "",
+                    )
+                  }
+                  className={`rounded bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-medium text-pulse-bloom-deep transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 ${
+                    isHeard ? "bg-pulse-bloom/80 text-white" : ""
+                  }`}
+                  disabled={isUpdating}
+                >
+                  {isHeard ? "Heard" : "I hear you"}
+                </button>
+              </div>
+            ) : null}
+          </>
         )}
       </div>
     );
@@ -1415,7 +1521,10 @@ export default function ReflectionCard({
                               <>
                                 <div className="space-y-0">
                                   {emotionPageItems.map((reflection) =>
-                                    renderReflectionItem(reflection),
+                                    renderReflectionItem(reflection, {
+                                      showHearButton: true,
+                                      emotionLabel: selectedEmotion.label,
+                                    }),
                                   )}
                                 </div>
                                 {totalPages > 1 && (

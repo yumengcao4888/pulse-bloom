@@ -37,6 +37,7 @@ export async function GET(
           createdAt: true,
           emotionalWarmth: true,
           emotionalTone: true,
+          heardAt: true,
         },
       },
     },
@@ -67,7 +68,10 @@ export async function GET(
             emotionalWarmthScores.length,
         );
 
-  const emotionCounts = reflections.reduce<Record<string, number>>(
+  const unheardReflections = reflections.filter(
+    (reflection) => reflection.heardAt == null,
+  );
+  const emotionCounts = unheardReflections.reduce<Record<string, number>>(
     (acc, reflection) => {
       const label = reflection.emotionalTone;
       if (!label) return acc;
