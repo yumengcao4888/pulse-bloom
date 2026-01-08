@@ -209,6 +209,7 @@ export default function ReflectionCard({
   const [emotionPrintoutPage, setEmotionPrintoutPage] = useState(1);
   const [hearingUpdates, setHearingUpdates] = useState<Record<string, boolean>>({});
   const [hiddenUpdates, setHiddenUpdates] = useState<Record<string, boolean>>({});
+  const [hiddenOverrides, setHiddenOverrides] = useState<Record<string, boolean>>({});
   const pageSize = 5;
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
@@ -570,30 +571,7 @@ export default function ReflectionCard({
       }
       const payload = await res.json();
       const nextHidden = Boolean(payload?.reflection?.hidden);
-      setData((prev) => {
-        if (!prev) return prev;
-        return {
-          reflections: prev.reflections.map((reflection) =>
-            reflection.id === reflectionId
-              ? { ...reflection, hidden: nextHidden }
-              : reflection,
-          ),
-        };
-      });
-      setEmotionPrintouts((prev) => {
-        const next = { ...prev };
-        Object.keys(next).forEach((key) => {
-          if (!next[key]?.reflections?.length) return;
-          next[key] = {
-            reflections: next[key].reflections.map((reflection) =>
-              reflection.id === reflectionId
-                ? { ...reflection, hidden: nextHidden }
-                : reflection,
-            ),
-          };
-        });
-        return next;
-      });
+      setHiddenOverrides((prev) => ({ ...prev, [reflectionId]: nextHidden }));
     } catch (err) {
       console.error("Failed to update hidden", err);
     } finally {
@@ -603,8 +581,9 @@ export default function ReflectionCard({
 
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
-    if (countRange === "allTime") return data.reflections;
-    return getMonthlyReflections(data.reflections);
+    const visible = data.reflections.filter((reflection) => !reflection.hidden);
+    if (countRange === "allTime") return visible;
+    return getMonthlyReflections(visible);
   }, [countRange, data]);
 
   const sortedPrintout = useMemo(() => {
@@ -642,6 +621,7 @@ export default function ReflectionCard({
   const trendReflections = useMemo(() => {
     if (!data || !selectedTrendLabel) return [];
     return data.reflections.filter((reflection) => {
+      if (reflection.hidden) return false;
       const bucketKey =
         countRange === "monthly"
           ? getWeekStartKey(reflection.createdAt, timeZone)
@@ -768,7 +748,10 @@ export default function ReflectionCard({
     : null;
   const emotionData = emotionKey ? emotionPrintouts[emotionKey] : null;
   const filteredEmotionPrintout = useMemo(
-    () => (emotionData?.reflections ?? []) as ReflectionEntry[],
+    () =>
+      (emotionData?.reflections ?? []).filter(
+        (reflection) => !reflection.hidden,
+      ) as ReflectionEntry[],
     [emotionData],
   );
 
@@ -1048,7 +1031,7 @@ export default function ReflectionCard({
       Boolean(options?.showHearButton) && hasFeeling && options?.emotionLabel;
     const isHeard = Boolean(reflection.heardAt);
     const isUpdating = hearingUpdates[reflection.id];
-    const isHidden = Boolean(reflection.hidden);
+    const isHidden = hiddenOverrides[reflection.id] ?? Boolean(reflection.hidden);
     const isHiddenUpdating = hiddenUpdates[reflection.id];
 
     return (
