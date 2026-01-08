@@ -23,6 +23,7 @@ type ReflectionEntry = {
   feeling: string | null;
   createdAt: string;
   heardAt: string | null;
+  hidden: boolean;
   sentiment: SentimentPrediction | null;
   emotion: EmotionPrediction | null;
 };
@@ -207,6 +208,7 @@ export default function ReflectionCard({
   );
   const [emotionPrintoutPage, setEmotionPrintoutPage] = useState(1);
   const [hearingUpdates, setHearingUpdates] = useState<Record<string, boolean>>({});
+  const [hiddenUpdates, setHiddenUpdates] = useState<Record<string, boolean>>({});
   const pageSize = 5;
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
@@ -553,6 +555,51 @@ export default function ReflectionCard({
     },
     [hearingUpdates, updateSentimentCounts],
   );
+
+  const handleHiddenToggle = useCallback(async (reflectionId: string, isHidden: boolean) => {
+    if (hiddenUpdates[reflectionId]) return;
+    setHiddenUpdates((prev) => ({ ...prev, [reflectionId]: true }));
+    try {
+      const res = await fetch("/api/reflection/hidden", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: reflectionId, hidden: !isHidden }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update hidden");
+      }
+      const payload = await res.json();
+      const nextHidden = Boolean(payload?.reflection?.hidden);
+      setData((prev) => {
+        if (!prev) return prev;
+        return {
+          reflections: prev.reflections.map((reflection) =>
+            reflection.id === reflectionId
+              ? { ...reflection, hidden: nextHidden }
+              : reflection,
+          ),
+        };
+      });
+      setEmotionPrintouts((prev) => {
+        const next = { ...prev };
+        Object.keys(next).forEach((key) => {
+          if (!next[key]?.reflections?.length) return;
+          next[key] = {
+            reflections: next[key].reflections.map((reflection) =>
+              reflection.id === reflectionId
+                ? { ...reflection, hidden: nextHidden }
+                : reflection,
+            ),
+          };
+        });
+        return next;
+      });
+    } catch (err) {
+      console.error("Failed to update hidden", err);
+    } finally {
+      setHiddenUpdates((prev) => ({ ...prev, [reflectionId]: false }));
+    }
+  }, [hiddenUpdates]);
 
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
@@ -1001,12 +1048,26 @@ export default function ReflectionCard({
       Boolean(options?.showHearButton) && hasFeeling && options?.emotionLabel;
     const isHeard = Boolean(reflection.heardAt);
     const isUpdating = hearingUpdates[reflection.id];
+    const isHidden = Boolean(reflection.hidden);
+    const isHiddenUpdating = hiddenUpdates[reflection.id];
 
     return (
       <div
         key={reflection.id}
-        className="border-x border-b border-pulse-bloom px-4 py-2 text-sm text-gray-700 first:rounded-t-xl first:border-t last:rounded-b-xl"
+        className="relative border-x border-b border-pulse-bloom px-4 py-2 text-sm text-gray-700 first:rounded-t-xl first:border-t last:rounded-b-xl"
       >
+        <button
+          type="button"
+          onClick={() => handleHiddenToggle(reflection.id, isHidden)}
+          className={`absolute right-2 top-2 rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide shadow-sm transition ${
+            isHidden
+              ? "border-gray-700 bg-gray-700 text-white"
+              : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
+          }`}
+          disabled={isHiddenUpdating}
+        >
+          {isHidden ? "Hidden" : "Hide"}
+        </button>
         <p
           className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500`}
         >
