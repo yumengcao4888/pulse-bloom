@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { computeScores, getMonthlyReflections, roundToTwo } from "@/lib/utils";
+import {
+  computeScores,
+  getMonthlyReflections,
+  getTopEmotionWords,
+  roundToTwo,
+} from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import AutoPrint from "@/components/healer/auto-print";
@@ -94,60 +99,7 @@ export default async function HealerPage(props: PageProps) {
     value == null ? t("common.none") : `${Math.round(value)} / 100`;
   const monthlySentiment = getAverageWarmth(monthlyReflections);
   const allTimeSentiment = getAverageWarmth(healer.reflections);
-  const emotionalTonePriority = [
-    "gratitude",
-    "love",
-    "admiration",
-    "joy",
-    "caring",
-    "approval",
-    "optimism",
-    "pride",
-    "relief",
-    "excitement",
-    "amusement",
-    "desire",
-    "curiosity",
-    "surprise",
-    "realization",
-    "confusion",
-    "neutral",
-  ];
-  const emotionalToneRank = new Map(
-    emotionalTonePriority.map((tone, index) => [tone, index]),
-  );
-  const toneCounts = healer.reflections.reduce<Map<string, number>>(
-    (acc, reflection) => {
-      const tone = reflection.emotionalTone;
-      if (!tone || !emotionalToneRank.has(tone)) return acc;
-      acc.set(tone, (acc.get(tone) ?? 0) + 1);
-      return acc;
-    },
-    new Map(),
-  );
-  const topTones = Array.from(toneCounts.entries())
-    .sort((a, b) => {
-      if (b[1] !== a[1]) return b[1] - a[1];
-      return (emotionalToneRank.get(a[0]) ?? 0) - (emotionalToneRank.get(b[0]) ?? 0);
-    })
-    .slice(0, 2)
-    .map(([tone]) => tone);
-  const metricCounts = [
-    { text: "grounded", value: healer.reflections.filter((r) => r.grounded).length },
-    { text: "supported", value: healer.reflections.filter((r) => r.supported).length },
-    { text: "connected", value: healer.reflections.filter((r) => r.connected).length },
-  ]
-    .map((item, index) => ({ ...item, index }))
-    .sort((a, b) => {
-      if (b.value !== a.value) return b.value - a.value;
-      return a.index - b.index;
-    });
-  const topWords =
-    topTones.length >= 2
-      ? topTones.slice(0, 2)
-      : topTones.length === 1
-        ? [topTones[0], metricCounts[0]?.text ?? topTones[0]]
-        : metricCounts.slice(0, 2).map((item) => item.text);
+  const topWords = getTopEmotionWords(healer.reflections);
 
 
   const monthlyCount = monthlyReflections.length;

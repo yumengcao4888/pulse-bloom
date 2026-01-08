@@ -143,6 +143,68 @@ export function computeScores(reflections: Reflection[]) {
   };
 }
 
+const EMOTIONAL_TONE_PRIORITY = [
+  "gratitude",
+  "love",
+  "admiration",
+  "joy",
+  "caring",
+  "approval",
+  "optimism",
+  "pride",
+  "relief",
+  "excitement",
+  "amusement",
+  "desire",
+  "curiosity",
+  "surprise",
+  "realization",
+  "confusion",
+  "neutral",
+];
+
+export function getTopEmotionWords(
+  reflections: Array<{
+    emotionalTone?: string | null;
+    grounded?: boolean | null;
+    supported?: boolean | null;
+    connected?: boolean | null;
+  }>,
+): string[] {
+  const emotionalToneRank = new Map(
+    EMOTIONAL_TONE_PRIORITY.map((tone, index) => [tone, index]),
+  );
+  const toneCounts = reflections.reduce<Map<string, number>>((acc, reflection) => {
+    const tone = reflection.emotionalTone;
+    if (!tone || !emotionalToneRank.has(tone)) return acc;
+    acc.set(tone, (acc.get(tone) ?? 0) + 1);
+    return acc;
+  }, new Map());
+  const topTones = Array.from(toneCounts.entries())
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1];
+      return (emotionalToneRank.get(a[0]) ?? 0) - (emotionalToneRank.get(b[0]) ?? 0);
+    })
+    .slice(0, 2)
+    .map(([tone]) => tone);
+  const metricCounts = [
+    { text: "grounded", value: reflections.filter((r) => r.grounded).length },
+    { text: "supported", value: reflections.filter((r) => r.supported).length },
+    { text: "connected", value: reflections.filter((r) => r.connected).length },
+  ]
+    .map((item, index) => ({ ...item, index }))
+    .sort((a, b) => {
+      if (b.value !== a.value) return b.value - a.value;
+      return a.index - b.index;
+    });
+
+  if (topTones.length >= 2) return topTones.slice(0, 2);
+  if (topTones.length === 1) {
+    return [topTones[0], metricCounts[0]?.text ?? topTones[0]];
+  }
+  return metricCounts.slice(0, 2).map((item) => item.text);
+}
+
 export type TrendPoint = {
   date: string;
   grounded: number | null;

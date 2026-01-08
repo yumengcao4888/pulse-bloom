@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { computeScores, getMonthlyReflections, roundToTwo } from "@/lib/utils";
-
-type Word = {
-  text: string;
-  value: number;
-};
+import { getMonthlyReflections, getTopEmotionWords, roundToTwo } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +21,7 @@ export async function GET(
           connected: true,
           createdAt: true,
           emotionalWarmth: true,
+          emotionalTone: true,
         },
       },
     },
@@ -35,7 +31,6 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const scores = computeScores(healer.reflections);
   const monthlyReflections = getMonthlyReflections(healer.reflections);
   const monthlySentiment = (() => {
     const warmthScores = monthlyReflections
@@ -62,20 +57,7 @@ export async function GET(
     return roundToTwo(avg);
   })();
 
-  const metricToWord = (text: string, value: number | null): Word => ({
-    text,
-    value: value ?? 0,
-  });
-
-  const topWords = [
-    metricToWord("grounded", scores.allTime.grounded),
-    metricToWord("supported", scores.allTime.supported),
-    metricToWord("connected", scores.allTime.connected),
-  ]
-    .filter((word) => word.value > 0)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 3)
-    .map((word) => word.text);
+  const topWords = getTopEmotionWords(healer.reflections);
 
   return NextResponse.json({
     monthlySentiment,
