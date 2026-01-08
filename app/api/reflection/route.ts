@@ -4,6 +4,35 @@ import { prisma } from "@/lib/prisma";
 import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { calculateEmotionalWarmth } from "@/lib/utils";
 
+async function updateReflectionSentiment(reflectionId: string, feeling: string | null) {
+  if (!feeling) {
+    return;
+  }
+
+  try {
+    const sentiment = await classifyFeeling(feeling);
+    const emotion = await classifyEmotion(feeling);
+    const emotionalWarmth = calculateEmotionalWarmth(sentiment);
+    const emotionalTone =
+      emotion?.label && (Object.values(EmotionalTone) as string[]).includes(emotion.label)
+        ? (emotion.label as EmotionalTone)
+        : null;
+
+    await prisma.reflection.update({
+      where: { id: reflectionId },
+      data: {
+        emotionalWarmth:
+          emotionalWarmth == null
+            ? null
+            : new Prisma.Decimal(emotionalWarmth.toFixed(2)),
+        emotionalTone,
+      },
+    });
+  } catch (err) {
+    console.error("Failed to update reflection sentiment:", err);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -53,13 +82,6 @@ export async function POST(req: NextRequest) {
 
     const trimmedFeeling =
       typeof feeling === "string" && feeling.trim() !== "" ? feeling.trim() : null;
-    const sentiment = await classifyFeeling(trimmedFeeling);
-    const emotion = await classifyEmotion(trimmedFeeling);
-    const emotionalWarmth = calculateEmotionalWarmth(sentiment);
-    const emotionalTone =
-      emotion?.label && (Object.values(EmotionalTone) as string[]).includes(emotion.label)
-        ? (emotion.label as EmotionalTone)
-        : null;
 
     const reflection = await prisma.reflection.create({
       data: {
@@ -67,14 +89,11 @@ export async function POST(req: NextRequest) {
         supported: supportedBool,
         connected: connectedBool,
         feeling: trimmedFeeling,
-        emotionalWarmth:
-          emotionalWarmth == null
-            ? null
-            : new Prisma.Decimal(emotionalWarmth.toFixed(2)),
-        emotionalTone,
         healerId: healer.id,
       },
     });
+
+    void updateReflectionSentiment(reflection.id, trimmedFeeling);
 
     return NextResponse.json(
       { success: true, id: reflection.id },
