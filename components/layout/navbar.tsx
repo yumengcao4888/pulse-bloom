@@ -17,6 +17,7 @@ export default function NavBar() {
   const { t } = useLocale();
   const { isSignedIn, isLoaded, userId } = useAuth();
   const [healerSlug, setHealerSlug] = useState<string | null>(null);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -46,6 +47,19 @@ export default function NavBar() {
       isActive = false;
     };
   }, [isLoaded, isSignedIn, userId]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const updateTheme = () => {
+      setIsDarkTheme(root.classList.contains("dark"));
+    };
+
+    updateTheme();
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
@@ -79,8 +93,26 @@ export default function NavBar() {
               <UserButton
                 appearance={{
                   elements: {
-                    userButtonPopoverCard: "w-fit max-w-sm",
+                    userButtonPopoverCard:
+                      "w-fit max-w-sm border border-gray-200 bg-white/90 text-gray-900 shadow-lg backdrop-blur dark:border-[rgb(var(--dark-border))] dark:text-gray-100",
+                    userButtonPopoverActionButton:
+                      "dark:text-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))]",
+                    userButtonPopoverCustomItemButton:
+                      "dark:text-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))]",
+                    userButtonPopoverCustomItemButtonIconBox:
+                      "dark:text-gray-100",
+                    userButtonPopoverCustomItemButtonIcon:
+                      "dark:text-gray-100",
                   },
+                  variables: isDarkTheme
+                    ? {
+                        colorBackground: "rgb(var(--dark-card))",
+                        colorForeground: "#f9fafb",
+                        colorMutedForeground: "#d1d5db",
+                        colorMuted: "rgb(var(--dark-card-hover))",
+                        colorNeutral: "#f9fafb",
+                      }
+                    : undefined,
                 }}
               >
                 <UserButton.MenuItems>

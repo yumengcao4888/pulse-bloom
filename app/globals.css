@@ -60,4 +60,18 @@
   .dark .hover\:bg-gray-50:hover {
     background-color: rgb(var(--dark-card-hover));
   }
+
+  .dark .cl-userButtonPopoverCard {
+    background-color: rgb(var(--dark-card)) !important;
+    border-color: rgb(var(--dark-border)) !important;
+    color: #f9fafb !important;
+  }
+
+  .dark .cl-userButtonPopoverActionButton {
+    color: #f9fafb !important;
+  }
+
+  .dark .cl-userButtonPopoverActionButton:hover {
+    background-color: rgb(var(--dark-card-hover)) !important;
+  }
 }
