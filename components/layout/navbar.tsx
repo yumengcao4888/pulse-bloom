@@ -61,6 +61,35 @@ export default function NavBar() {
     return () => observer.disconnect();
   }, []);
 
+  const signInAppearance = isDarkTheme
+    ? {
+        baseTheme: "dark" as const,
+        elements: {
+          socialButtonsBlockButton:
+            "border border-[rgb(var(--dark-border))] bg-[rgb(var(--dark-card))] hover:bg-[rgb(var(--dark-card-hover))]",
+          socialButtonsBlockButtonText: "text-gray-100",
+          footerActionText: "text-gray-300",
+          footerActionLink: "text-gray-100 hover:text-white",
+        },
+        variables: {
+          colorBackground: "rgb(var(--dark-card))",
+          colorBorder: "rgb(var(--dark-border))",
+          colorText: "#f9fafb",
+          colorTextSecondary: "#d1d5db",
+          colorInputBackground: "rgb(var(--dark-card))",
+          colorInputBorder: "rgb(var(--dark-border))",
+          colorInputText: "#f9fafb",
+          colorPrimaryBackground: "rgb(var(--dark-cta-hover))",
+          colorPrimaryText: "#ffffff",
+          colorPrimaryBorder: "rgb(var(--dark-cta))",
+          colorDanger: "#f87171",
+          colorNeutralBackground: "rgb(var(--dark-card-hover))",
+          colorNeutralText: "#f9fafb",
+          colorNeutralBorder: "rgb(var(--dark-border))",
+        },
+      }
+    : undefined;
+
   return (
     <>
       <div
@@ -83,7 +112,7 @@ export default function NavBar() {
             <ThemeToggle />
             <LanguageSwitcher />
             <SignedOut>
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" appearance={signInAppearance}>
                 <button className="rounded-full border border-black bg-black px-4 py-1.5 text-sm text-white transition-colors hover:bg-white hover:text-black dark:border-gray-800 dark:bg-black dark:text-gray-100 dark:hover:border-pulse-bloom/50 dark:hover:bg-pulse-bloom/20 dark:hover:text-gray-100">
                   {t("nav.signIn")}
                 </button>
