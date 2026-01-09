@@ -336,10 +336,10 @@ export default function HealerForm() {
               type="button"
               key={type.id}
               className={cn(
-                "rounded-full border px-3 py-1 text-gray-700 dark:border-[rgb(var(--dark-border))] dark:text-gray-100",
+                "rounded-full border px-3 py-1 text-sm transition-colors",
                 form.contactType === type.id
-                  ? "bg-gray-100 dark:bg-[rgb(var(--dark-cta-hover))] dark:border-[rgb(var(--dark-cta))] dark:text-white dark:ring-1 dark:ring-pulse-bloom/30"
-                  : "hover:bg-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))]"
+                  ? "bg-gray-900 border-gray-900 text-white dark:bg-[rgb(var(--dark-cta-hover))] dark:border-[rgb(var(--dark-cta))] dark:text-white dark:ring-1 dark:ring-pulse-bloom/30"
+                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-[rgb(var(--dark-border))] dark:text-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))]"
               )}
               onClick={() => handleContactTypeSelect(type.id)}
             >

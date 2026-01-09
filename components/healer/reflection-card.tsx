@@ -976,7 +976,10 @@ export default function ReflectionCard({
     sentimentData?.emotionalWarmth == null
       ? "\u2014 / 100"
       : `${Math.round(sentimentData.emotionalWarmth)} / 100`;
-  const emotionCounts = sentimentData?.emotionCounts ?? [];
+  const emotionCounts = useMemo(
+    () => sentimentData?.emotionCounts ?? [],
+    [sentimentData?.emotionCounts],
+  );
   const topEmotionLabels = [
     "gratitude",
     "love",
