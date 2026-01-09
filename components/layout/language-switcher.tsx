@@ -36,7 +36,7 @@ export default function LanguageSwitcher() {
                 ? item === "es"
                   ? "bg-black text-white dark:bg-[rgb(138,92,188)]"
                   : "bg-black text-white"
-                : "text-gray-700 hover:bg-gray-100"
+                : "text-gray-700 hover:bg-gray-100 dark:bg-[rgb(var(--pulse-bloom-midnight))] dark:hover:bg-[rgb(var(--pulse-bloom-dusk))]"
             }`}
             aria-pressed={item === locale}
           >
