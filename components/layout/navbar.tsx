@@ -84,7 +84,7 @@ export default function NavBar() {
             <LanguageSwitcher />
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="rounded-full border border-black bg-black px-4 py-1.5 text-sm text-white transition-colors hover:bg-white hover:text-black">
+                <button className="rounded-full border border-black bg-black px-4 py-1.5 text-sm text-white transition-colors hover:bg-white hover:text-black dark:border-gray-800 dark:bg-black dark:text-gray-100 dark:hover:border-pulse-bloom/50 dark:hover:bg-pulse-bloom/20 dark:hover:text-gray-100">
                   {t("nav.signIn")}
                 </button>
               </SignInButton>
