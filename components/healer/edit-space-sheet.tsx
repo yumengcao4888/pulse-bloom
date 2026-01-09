@@ -347,7 +347,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                 ref={pronounsRef}
               />
               {pronounError ? (
-                <p className="text-sm text-red-600">{pronounError}</p>
+                <p className="text-sm text-red-600 dark:text-red-300">{pronounError}</p>
               ) : null}
             </div>
             <div className="space-y-1">
@@ -407,7 +407,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                     type="button"
                     key={type.id}
                     className={`rounded-full border px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 dark:border-[rgb(var(--dark-border))] dark:text-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))] ${
-                      form.contactType === type.id ? "bg-gray-100 dark:bg-[rgb(var(--dark-card-hover))]" : ""
+                      form.contactType === type.id
+                        ? "bg-gray-100 dark:bg-[rgb(var(--dark-cta-hover))] dark:border-[rgb(var(--dark-cta))] dark:text-white dark:ring-1 dark:ring-pulse-bloom/40"
+                        : ""
                     }`}
                     onClick={() => handleContactTypeSelect(type.id)}
                   >
@@ -424,7 +426,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                 rows={2}
               />
               {contactError ? (
-                <p className="text-sm text-red-600">{contactError}</p>
+                <p className="text-sm text-red-600 dark:text-red-300">{contactError}</p>
               ) : null}
             </div>
             <div className="space-y-1">
@@ -511,7 +513,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               Your profile and data cannot be recovered.
             </p>
           </div>
-          {deleteError ? <p className="text-sm text-red-600">{deleteError}</p> : null}
+          {deleteError ? (
+            <p className="text-sm text-red-600 dark:text-red-300">{deleteError}</p>
+          ) : null}
           <div className="flex flex-wrap justify-end gap-2">
             <button
               type="button"
@@ -542,7 +546,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               profile and space settings will remain unchanged.
             </p>
           </div>
-          {clearError ? <p className="text-sm text-red-600">{clearError}</p> : null}
+          {clearError ? (
+            <p className="text-sm text-red-600 dark:text-red-300">{clearError}</p>
+          ) : null}
           <div className="flex flex-wrap justify-end gap-2">
             <button
               type="button"
