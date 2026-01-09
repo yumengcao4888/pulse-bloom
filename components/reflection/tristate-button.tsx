@@ -26,14 +26,14 @@ export function TriStateButton({
   };
 
   const base =
-    "w-full px-4 py-3 rounded-lg border border-pulse-bloom/30 transition inline-flex items-center justify-center gap-1 disabled:cursor-not-allowed disabled:opacity-70";
+    "w-full px-4 py-3 rounded-lg border border-pulse-bloom/30 text-gray-900 transition inline-flex items-center justify-center gap-1 disabled:cursor-not-allowed disabled:opacity-70 dark:text-gray-100";
 
   const color =
     value === "yes"
-      ? "bg-green-100 hover:bg-green-100/60 hover:backdrop-blur-sm hover:shadow-md"
+      ? "bg-green-100 hover:bg-green-100/60 hover:backdrop-blur-sm hover:shadow-md dark:bg-emerald-500/20 dark:hover:bg-emerald-500/30"
       : value === "no"
-      ? "bg-red-100 hover:bg-red-100/60 hover:backdrop-blur-sm hover:shadow-md"
-      : "bg-gray-100 opacity-80 hover:bg-gray-100/60 hover:backdrop-blur-sm hover:shadow-md";
+      ? "bg-red-100 hover:bg-red-100/60 hover:backdrop-blur-sm hover:shadow-md dark:bg-rose-500/20 dark:hover:bg-rose-500/30"
+      : "bg-gray-100 opacity-80 hover:bg-gray-100/60 hover:backdrop-blur-sm hover:shadow-md dark:bg-[rgb(var(--dark-card))] dark:hover:bg-[rgb(var(--dark-card-hover))]";
 
   const statusLabel =
     value === "yes" ? (<CheckIcon className="w-5 h-5 text-green-500" />) : value === "no" ? (<XMarkIcon className="w-5 h-5 text-red-500" />) : "";
@@ -47,7 +47,9 @@ export function TriStateButton({
       className={`${base} ${color}`}
     >
       <span>{label}</span>
-      <span className="text-sm text-gray-600">{statusLabel}</span>
+      <span className="text-sm text-gray-600 dark:text-gray-300">
+        {statusLabel}
+      </span>
     </button>
   );
 }
