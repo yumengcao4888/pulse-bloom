@@ -12,8 +12,8 @@
 @layer base {
   .dark {
     color-scheme: dark;
-    --dark-cta: 75 85 99;
-    --dark-cta-hover: 107 114 128;
+    --dark-cta: 126 104 170;
+    --dark-cta-hover: 148 125 190;
     --dark-card: 32 35 63;
     --dark-card-hover: 40 43 74;
     --dark-border: 56 62 120;
