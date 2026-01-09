@@ -18,10 +18,10 @@ export default function LanguageSwitcher() {
 
   return (
     <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
-      <span className="hidden text-gray-500 sm:inline">
+      <span className="hidden text-gray-500 dark:text-white sm:inline">
         {t("nav.language")}
       </span>
-      <div className="flex overflow-hidden rounded-full border border-gray-200 bg-white/70">
+      <div className="flex overflow-hidden rounded-full border border-gray-200 bg-white/70 dark:border-gray-800">
         {locales.map((item) => (
           <button
             key={item}
@@ -33,7 +33,9 @@ export default function LanguageSwitcher() {
             }}
             className={`px-2.5 py-1 transition ${
               item === locale
-                ? "bg-black text-white"
+                ? item === "es"
+                  ? "bg-black text-white dark:bg-[rgb(138,92,188)]"
+                  : "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
             aria-pressed={item === locale}
