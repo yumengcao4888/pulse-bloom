@@ -63,14 +63,16 @@ export default function ShareLinkButton({
         <div className="space-y-4">
           <div className="space-y-3 text-center">
             <h2 className="text-xl font-semibold">{title}</h2>
-            <p className="text-sm text-gray-500">{description}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-300">
+              {description}
+            </p>
           </div>
-          <div className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+          <div className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card-hover))] dark:text-gray-100">
             <span className="truncate">{link}</span>
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
+              className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))]"
             >
               <svg
                 className="h-3.5 w-3.5"
@@ -84,12 +86,12 @@ export default function ShareLinkButton({
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
-          <div className="border-t border-gray-200" />
+          <div className="border-t border-gray-200 dark:border-[rgb(var(--dark-border))]" />
           <div className="flex justify-center">
             <button
               type="button"
               onClick={() => setQrExpanded((prev) => !prev)}
-              className={`rounded-lg p-1 transition hover:bg-gray-100 ${
+              className={`rounded-lg p-1 transition hover:bg-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))] ${
                 qrExpanded ? "cursor-zoom-out" : "cursor-zoom-in"
               }`}
               aria-label={qrExpanded ? "Shrink QR code" : "Expand QR code"}
@@ -98,7 +100,7 @@ export default function ShareLinkButton({
               <QRCodeCanvas value={link} size={qrExpanded ? 240 : 140} />
             </button>
           </div>
-          <div className="border-t border-gray-200" />
+          <div className="border-t border-gray-200 dark:border-[rgb(var(--dark-border))]" />
           <button
             type="button"
             onClick={() => setOpen(false)}
