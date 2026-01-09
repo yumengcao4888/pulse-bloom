@@ -8,3 +8,51 @@
   --pulse-bloom-soft-hover: 177 182 227;
   --pulse-bloom-deep: 95 100 184;
 }
+
+@layer base {
+  .dark {
+    color-scheme: dark;
+    --dark-cta: 75 85 99;
+    --dark-cta-hover: 107 114 128;
+    --dark-card-hover: 44 44 44;
+  }
+
+  .dark .bg-white,
+  .dark .bg-white\/50,
+  .dark .bg-white\/70,
+  .dark .bg-white\/80 {
+    background-color: #1f2937;
+  }
+
+  .dark .border,
+  .dark .border-gray-200,
+  .dark .border-gray-300 {
+    border-color: #374151;
+  }
+
+  .dark .text-gray-900,
+  .dark .text-gray-800,
+  .dark .text-gray-700,
+  .dark .text-gray-600 {
+    color: #f9fafb;
+  }
+
+  .dark .text-gray-500,
+  .dark .text-gray-400 {
+    color: #9ca3af;
+  }
+
+  .dark .bg-black,
+  .dark .bg-gray-900 {
+    background-color: rgb(var(--dark-cta));
+  }
+
+  .dark .hover\:bg-gray-800:hover {
+    background-color: rgb(var(--dark-cta-hover));
+  }
+
+  .dark .hover\:bg-gray-100:hover,
+  .dark .hover\:bg-gray-50:hover {
+    background-color: rgb(var(--dark-card-hover));
+  }
+}
