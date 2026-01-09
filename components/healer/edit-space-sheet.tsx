@@ -406,11 +406,12 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                   <button
                     type="button"
                     key={type.id}
-                    className={`rounded-full border px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 dark:border-[rgb(var(--dark-border))] dark:text-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))] ${
+                    className={cn(
+                      "rounded-full border px-3 py-1 text-sm text-gray-700 dark:border-[rgb(var(--dark-border))] dark:text-gray-100",
                       form.contactType === type.id
                         ? "bg-gray-100 dark:bg-[rgb(var(--dark-cta-hover))] dark:border-[rgb(var(--dark-cta))] dark:text-white dark:ring-1 dark:ring-pulse-bloom/40"
-                        : ""
-                    }`}
+                        : "hover:bg-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))]"
+                    )}
                     onClick={() => handleContactTypeSelect(type.id)}
                   >
                     {type.label}

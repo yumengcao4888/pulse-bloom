@@ -4,6 +4,7 @@ import { useRef, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/shared/locale-provider";
 import { isValidPronouns } from "@/lib/pronouns";
+import { cn } from "@/lib/utils";
 
 type HealerForm = {
   name: string;
@@ -244,7 +245,7 @@ export default function HealerForm() {
         <label className="block text-sm font-medium">{t("form.healer.name.label")}</label>
         <input
           type="text"
-          className="w-full rounded-md border px-3 py-2 text-sm"
+          className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
           placeholder={t("form.healer.name.placeholder")}
           value={form.name}
           onChange={handleChange('name')}
@@ -267,14 +268,14 @@ export default function HealerForm() {
         </label>
         <input
           type="text"
-          className="w-full rounded-md border px-3 py-2 text-sm"
+          className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
           placeholder={t("form.healer.pronouns.placeholder")}
           value={form.pronouns}
           onChange={handlePronounsChange}
           ref={pronounsRef}
         />
         {pronounError ? (
-          <p className="text-sm text-red-600">{pronounError}</p>
+          <p className="text-sm text-red-600 dark:text-red-300">{pronounError}</p>
         ) : null}
       </div>
 
@@ -282,7 +283,7 @@ export default function HealerForm() {
         <label className="block text-sm font-medium">{t("form.healer.modality.label")}</label>
         <input
           type="text"
-          className="w-full rounded-md border px-3 py-2 text-sm"
+          className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
           placeholder={t("form.healer.modality.placeholder")}
           value={form.modality}
           onChange={handleChange('modality')}
@@ -294,7 +295,7 @@ export default function HealerForm() {
         <label className="block text-sm font-medium">{t("form.healer.focus.label")}</label>
         <input
           type="text"
-          className="w-full rounded-md border px-3 py-2 text-sm"
+          className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
           placeholder={t("form.healer.focus.placeholder")}
           value={form.focus}
           onChange={handleChange('focus')}
@@ -309,7 +310,7 @@ export default function HealerForm() {
         </label>
         <input
           type="text"
-          className="w-full rounded-md border px-3 py-2 text-sm"
+          className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
           placeholder="e.g. Online / Chicago, IL / Hybrid"
           value={form.location}
           onChange={handleChange('location')}
@@ -323,27 +324,32 @@ export default function HealerForm() {
         </label>
 
         <div className="flex flex-wrap gap-2 text-sm">
-            {(
-              [
-                { id: "email", label: t("form.healer.contact.type.email") },
-                { id: "phone", label: t("form.healer.contact.type.phone") },
-                { id: "website", label: t("form.healer.contact.type.website") },
-                { id: "social", label: t("form.healer.contact.type.social") },
-              ] as const
-            ).map((type) => (
+          {(
+            [
+              { id: "email", label: t("form.healer.contact.type.email") },
+              { id: "phone", label: t("form.healer.contact.type.phone") },
+              { id: "website", label: t("form.healer.contact.type.website") },
+              { id: "social", label: t("form.healer.contact.type.social") },
+            ] as const
+          ).map((type) => (
             <button
-                type="button"
-                key={type.id}
-                className={`rounded-full border px-3 py-1 hover:bg-gray-100 ${form.contactType === type.id ? "bg-gray-100" : ""}`}
-                onClick={() => handleContactTypeSelect(type.id)}
+              type="button"
+              key={type.id}
+              className={cn(
+                "rounded-full border px-3 py-1 text-gray-700 dark:border-[rgb(var(--dark-border))] dark:text-gray-100",
+                form.contactType === type.id
+                  ? "bg-gray-100 dark:bg-[rgb(var(--dark-cta-hover))] dark:border-[rgb(var(--dark-cta))] dark:text-white dark:ring-1 dark:ring-pulse-bloom/30"
+                  : "hover:bg-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))]"
+              )}
+              onClick={() => handleContactTypeSelect(type.id)}
             >
-                {type.label}
+              {type.label}
             </button>
-            ))}
+          ))}
         </div>
 
         <textarea
-          className="w-full rounded-md border px-3 py-2 text-sm"
+          className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
           placeholder={t("form.healer.contact.placeholder")}
           value={form.contact}
           onChange={handleContactChange}
@@ -351,7 +357,7 @@ export default function HealerForm() {
           rows={2}
         />
         {contactError ? (
-          <p className="text-sm text-red-600">{contactError}</p>
+          <p className="text-sm text-red-600 dark:text-red-300">{contactError}</p>
         ) : null}
       </div>
 
@@ -359,13 +365,13 @@ export default function HealerForm() {
         <label className="block text-sm font-medium">{t("form.healer.bio.label")}</label>
         <div className="space-y-0">
           <textarea
-            className="w-full rounded-md border px-3 py-2 text-sm min-h-[88px]"
+            className="w-full rounded-md border px-3 py-2 text-sm min-h-[88px] dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
             placeholder={t("form.healer.bio.placeholder")}
             value={form.bio}
             onChange={handleBioChange}
             required
           />
-          <div className="-mt-1 flex justify-end text-xs text-gray-500">
+          <div className="-mt-1 flex justify-end text-xs text-gray-500 dark:text-gray-400">
             {getWordCount(form.bio)}/{BIO_WORD_LIMIT}
           </div>
         </div>
