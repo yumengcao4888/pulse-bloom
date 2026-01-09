@@ -17,6 +17,9 @@
     --dark-card: 32 35 63;
     --dark-card-hover: 40 43 74;
     --dark-border: 88 90 152;
+    --pulse-bloom-night: 20 9 30;
+    --pulse-bloom-midnight: 36 18 56;
+    --pulse-bloom-dusk: 52 30 76;
   }
 
   .dark .bg-white,
