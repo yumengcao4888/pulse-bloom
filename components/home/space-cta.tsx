@@ -18,6 +18,7 @@ export default function SpaceCta({
   const [loading, setLoading] = useState(false);
   const [slug, setSlug] = useState<string | null>(initialSlug);
   const [hasChecked, setHasChecked] = useState(initialChecked);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const lastUserId = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
@@ -70,6 +71,48 @@ export default function SpaceCta({
       isActive = false;
     };
   }, [hasChecked, isLoaded, isSignedIn]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const updateTheme = () => {
+      setIsDarkTheme(root.classList.contains("dark"));
+    };
+
+    updateTheme();
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const signUpAppearance = isDarkTheme
+    ? {
+        baseTheme: "dark" as const,
+        elements: {
+          socialButtonsBlockButton:
+            "border border-[rgb(var(--dark-border))] bg-[rgb(var(--dark-card))] hover:bg-[rgb(var(--dark-card-hover))]",
+          socialButtonsBlockButtonText: "text-gray-100",
+          footerActionText: "text-gray-300",
+          footerActionLink: "text-gray-100 hover:text-white",
+        },
+        variables: {
+          colorBackground: "rgb(var(--dark-card))",
+          colorBorder: "rgb(var(--dark-border))",
+          colorText: "#f9fafb",
+          colorTextSecondary: "#d1d5db",
+          colorInputBackground: "rgb(var(--dark-card))",
+          colorInputBorder: "rgb(var(--dark-border))",
+          colorInputText: "#f9fafb",
+          colorPrimaryBackground: "rgb(var(--dark-cta-hover))",
+          colorPrimaryText: "#ffffff",
+          colorPrimaryBorder: "rgb(var(--dark-cta))",
+          colorDanger: "#f87171",
+          colorNeutralBackground: "rgb(var(--dark-card-hover))",
+          colorNeutralText: "#f9fafb",
+          colorNeutralBorder: "rgb(var(--dark-border))",
+        },
+      }
+    : undefined;
 
   const handleClick = async () => {
     setLoading(true);
@@ -140,6 +183,7 @@ export default function SpaceCta({
                 mode="modal"
                 forceRedirectUrl="/healer/resolve"
                 signInForceRedirectUrl="/healer/resolve"
+                appearance={signUpAppearance}
               >
                 <button className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white md:w-auto">
                   Create a healing space
