@@ -87,7 +87,6 @@ export default function SpaceCta({
 
   const signUpAppearance = isDarkTheme
     ? {
-        baseTheme: "dark" as const,
         elements: {
           socialButtonsBlockButton:
             "border border-[rgb(var(--dark-border))] bg-[rgb(var(--dark-card))] hover:bg-[rgb(var(--dark-card-hover))]",
