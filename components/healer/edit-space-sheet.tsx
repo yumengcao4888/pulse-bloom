@@ -288,9 +288,11 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
 
   const panelContent = (
     <div className="flex h-full min-h-0 flex-col bg-white">
-      <div className="border-b px-6 py-4">
+      <div className="border-b px-6 py-4 dark:border-[rgb(var(--dark-border))]">
         <Dialog.Title className="text-lg font-semibold">Edit your space</Dialog.Title>
-        <p className="text-sm text-gray-500">These details help others recognize and feel your space.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-300">
+          These details help others recognize and feel your space.
+        </p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-1 min-h-0 flex-col">
         <input type="hidden" name="startedAt" value={startedAtRef.current} />
@@ -316,7 +318,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               </label>
               <input
                 type="text"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
                 placeholder={t("form.healer.name.placeholder")}
                 value={form.name}
                 onChange={handleChange("name")}
@@ -338,7 +340,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               </label>
               <input
                 type="text"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
                 placeholder={t("form.healer.pronouns.placeholder")}
                 value={form.pronouns ?? ""}
                 onChange={handlePronounsChange}
@@ -354,7 +356,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               </label>
               <input
                 type="text"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
                 placeholder={t("form.healer.modality.placeholder")}
                 value={form.modality}
                 onChange={handleChange("modality")}
@@ -367,7 +369,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               </label>
               <input
                 type="text"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
                 placeholder={t("form.healer.focus.placeholder")}
                 value={form.focus}
                 onChange={handleChange("focus")}
@@ -381,7 +383,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               </label>
               <input
                 type="text"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
                 placeholder="e.g. Online / Chicago, IL / Hybrid"
                 value={form.location ?? ""}
                 onChange={handleChange("location")}
@@ -404,8 +406,8 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                   <button
                     type="button"
                     key={type.id}
-                    className={`rounded-full border px-3 py-1 hover:bg-gray-100 ${
-                      form.contactType === type.id ? "bg-gray-100" : ""
+                    className={`rounded-full border px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 dark:border-[rgb(var(--dark-border))] dark:text-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))] ${
+                      form.contactType === type.id ? "bg-gray-100 dark:bg-[rgb(var(--dark-card-hover))]" : ""
                     }`}
                     onClick={() => handleContactTypeSelect(type.id)}
                   >
@@ -414,7 +416,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                 ))}
               </div>
               <textarea
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="w-full rounded-md border px-3 py-2 text-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
                 placeholder={t("form.healer.contact.placeholder")}
                 value={form.contact ?? ""}
                 onChange={handleContactChange}
@@ -431,23 +433,23 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               </label>
               <div className="space-y-0">
                 <textarea
-                  className="w-full rounded-md border px-3 py-2 text-sm min-h-[104px]"
+                  className="w-full rounded-md border px-3 py-2 text-sm min-h-[104px] dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400"
                   placeholder={t("form.healer.bio.placeholder")}
                   value={form.bio}
                   onChange={handleBioChange}
                   required
                 />
-                <div className="-mt-1 flex justify-end text-xs text-gray-500">
+                <div className="-mt-1 flex justify-end text-xs text-gray-500 dark:text-gray-400">
                   {getWordCount(form.bio)}/{BIO_WORD_LIMIT}
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
-            <p className="text-sm font-semibold text-amber-700">
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-300/40 dark:bg-amber-500/15">
+            <p className="text-sm font-semibold text-amber-700 dark:text-amber-200">
               Clear all reflections
             </p>
-            <p className="mt-1 text-xs text-amber-700">
+            <p className="mt-1 text-xs text-amber-700 dark:text-amber-200">
               Remove all reflections and give your space a fresh start.
             </p>
             <div className="mt-3 flex justify-center">
@@ -460,9 +462,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               </button>
             </div>
           </div>
-          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/60 p-4">
-            <p className="text-sm font-semibold text-red-700">Delete your space</p>
-            <p className="mt-1 text-xs text-red-700">
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/60 p-4 dark:border-red-300/40 dark:bg-red-500/15">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-200">Delete your space</p>
+            <p className="mt-1 text-xs text-red-700 dark:text-red-200">
               This will permanently delete your space and all associated reflections.
             </p>
             <div className="mt-3 flex justify-center">
