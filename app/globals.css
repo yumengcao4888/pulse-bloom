@@ -14,20 +14,21 @@
     color-scheme: dark;
     --dark-cta: 75 85 99;
     --dark-cta-hover: 107 114 128;
-    --dark-card-hover: 44 44 44;
+    --dark-card: 32 35 63;
+    --dark-card-hover: 40 43 74;
   }
 
   .dark .bg-white,
   .dark .bg-white\/50,
   .dark .bg-white\/70,
   .dark .bg-white\/80 {
-    background-color: #1f2937;
+    background-color: rgb(var(--dark-card));
   }
 
   .dark .border,
   .dark .border-gray-200,
   .dark .border-gray-300 {
-    border-color: #374151;
+    border-color: rgb(var(--pulse-bloom));
   }
 
   .dark .text-gray-900,
