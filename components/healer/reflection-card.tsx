@@ -1253,8 +1253,10 @@ export default function ReflectionCard({
                       options?.emotionLabel ?? "",
                     )
                   }
-                  className={`inline-flex items-center justify-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-3 py-1.5 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 ${
-                    isHeard ? "border-pulse-bloom/80 bg-pulse-bloom/80 text-white" : ""
+                  className={`inline-flex items-center justify-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-3 py-1.5 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:hover:bg-[rgb(var(--dark-cta-hover))] ${
+                    isHeard
+                      ? "border-pulse-bloom/80 bg-pulse-bloom/80 text-white dark:border-purple-400/60 dark:bg-purple-500/40 dark:text-white"
+                      : ""
                   }`}
                   disabled={isUpdating}
                 >
