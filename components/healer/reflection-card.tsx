@@ -1206,7 +1206,7 @@ export default function ReflectionCard({
           {isHidden ? "Hidden" : "Hide"}
         </button>
         <p
-          className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500`}
+          className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500 dark:text-white`}
         >
           {formatDate(reflection.createdAt)}
         </p>
