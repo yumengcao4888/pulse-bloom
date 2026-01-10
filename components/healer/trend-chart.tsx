@@ -15,8 +15,6 @@ import { useLocale } from "@/components/shared/locale-provider";
 import useMediaQuery from "@/lib/hooks/use-media-query";
 
 const tooltipStyle = {
-  backgroundColor: "rgb(255, 255, 255)",
-  border: "1px solid rgb(204, 204, 204)",
   padding: "10px",
   whiteSpace: "nowrap",
 } as const;
@@ -60,7 +58,7 @@ function TrendTooltip({
 
   return (
     <div
-      className="recharts-default-tooltip"
+      className="recharts-default-tooltip rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-white"
       style={{
         ...tooltipStyle,
         cursor: allowContainerClick ? "pointer" : "default",
@@ -117,7 +115,7 @@ function TrendTooltip({
             onClick={
               allowContainerClick ? undefined : () => onSelectPoint?.(label)
             }
-            className="rounded-full bg-pulse-bloom-soft/30 px-3 py-1 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition hover:bg-pulse-bloom-soft/50"
+            className="rounded-full bg-pulse-bloom-soft/30 px-3 py-1 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition hover:bg-pulse-bloom-soft/50 dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:hover:bg-[rgb(var(--dark-cta-hover))]"
           >
             {ctaLabel}
           </button>
