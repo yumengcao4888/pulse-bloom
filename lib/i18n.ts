@@ -135,8 +135,6 @@ const messages = {
     "healer.dev.city": "Location",
     "healer.dev.contact": "Contact",
     "healer.dev.bio": "Short story",
-    "healer.dev.reflectionLink": "Reflection Link",
-    "healer.dev.reflectionsCount": "Reflections Count",
     "template.intro": "Introducing Precedent",
     "template.title": "Building blocks for your Next project",
     "template.subtitle":
@@ -301,8 +299,6 @@ const messages = {
     "healer.dev.city": "Ubicación",
     "healer.dev.contact": "Contacto",
     "healer.dev.bio": "Biografía",
-    "healer.dev.reflectionLink": "Enlace de reflexión",
-    "healer.dev.reflectionsCount": "Conteo de reflexiones",
     "template.intro": "Presentamos Precedent",
     "template.title": "Bloques para tu próximo proyecto Next",
     "template.subtitle":
