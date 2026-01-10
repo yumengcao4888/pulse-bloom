@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { useLocale } from "@/components/shared/locale-provider";
+
 export default function Footer() {
+  const { t } = useLocale();
   return (
     <footer className="w-full">
       <div className="mx-auto w-full max-w-5xl px-5 pb-10 text-center text-xs text-gray-500 dark:text-gray-400">
         <div className="flex flex-nowrap items-center justify-center gap-2">
-          <p className="whitespace-nowrap">Open source, built with care.</p>
+          <p className="whitespace-nowrap">{t("footer.openSource")}</p>
         </div>
         <p>
           <Link
