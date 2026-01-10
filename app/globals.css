@@ -47,6 +47,15 @@
     color: #9ca3af;
   }
 
+  .dark .recharts-cartesian-axis-line,
+  .dark .recharts-cartesian-axis-tick-line {
+    stroke: #ffffff;
+  }
+
+  .dark .recharts-cartesian-axis-tick-value {
+    fill: #ffffff;
+  }
+
   .dark .bg-black,
   .dark .bg-gray-900 {
     background-color: rgb(var(--dark-cta));
