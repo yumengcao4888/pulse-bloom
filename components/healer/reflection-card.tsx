@@ -1361,7 +1361,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={handleSentimentToggle}
-                className="inline-flex w-full max-w-[260px] items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:max-w-none sm:justify-self-start"
+                className="inline-flex w-full max-w-[260px] items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:max-w-none sm:justify-self-start dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:shadow-md dark:hover:bg-[rgb(var(--dark-cta-hover))]"
                 disabled={isSentimentLoading}
               >
                 <span className="flex flex-col items-center">
@@ -1382,7 +1382,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => handleSectionToggle("trends")}
-                className="inline-flex w-full max-w-[260px] items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:w-auto sm:max-w-none sm:justify-self-center"
+                className="inline-flex w-full max-w-[260px] items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:w-auto sm:max-w-none sm:justify-self-center dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:shadow-md dark:hover:bg-[rgb(var(--dark-cta-hover))]"
               >
                 <span className="flex flex-col items-center">
                   <span>
@@ -1404,7 +1404,7 @@ export default function ReflectionCard({
               <button
                 type="button"
                 onClick={() => handleSectionToggle("printout")}
-                className="inline-flex w-full max-w-[260px] items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:w-auto sm:max-w-none sm:justify-self-end"
+                className="inline-flex w-full max-w-[260px] items-center justify-center justify-self-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-4 py-2 text-sm font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover sm:w-auto sm:max-w-none sm:justify-self-end dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:shadow-md dark:hover:bg-[rgb(var(--dark-cta-hover))]"
               >
                 <span className="flex flex-col items-center">
                   <span>
