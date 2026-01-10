@@ -7,6 +7,7 @@ import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import Navbar from "@/components/layout/navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { getLocale } from "@/lib/i18n-server";
+import { getClerkLocalization } from "@/lib/clerk-localization";
 import { LocaleProvider } from "@/components/shared/locale-provider";
 
 export const metadata = {
@@ -32,9 +33,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const locale = await getLocale();
+  const clerkLocalization = getClerkLocalization(locale);
 
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={clerkLocalization}>
       <html lang={locale}>
         <body className={cx(sfPro.variable, inter.variable, "bg-white text-gray-900 dark:bg-black dark:text-gray-100")}>
           <div className="fixed h-screen w-full bg-gradient-to-br from-indigo-50 via-white to-pulse-bloom-soft dark:from-[rgb(var(--pulse-bloom-night))] dark:via-[rgb(var(--pulse-bloom-midnight))] dark:to-[rgb(var(--pulse-bloom-dusk))]" />
