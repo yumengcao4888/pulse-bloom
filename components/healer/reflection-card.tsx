@@ -353,14 +353,14 @@ export default function ReflectionCard({
       end = today;
     }
 
-    if (!start || !end) return "Reflections";
+    if (!start || !end) return t("healer.reflections.printout.placeholder");
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-      return "Reflections";
+      return t("healer.reflections.printout.placeholder");
     }
 
     return (
       <>
-        Reflections from {formatter.format(start)} -
+        {t("healer.reflections.printout.from")} {formatter.format(start)} -
         <br />
         {formatter.format(end)}
       </>
@@ -1164,7 +1164,7 @@ export default function ReflectionCard({
             type="button"
             onClick={() => setIsExpanded(true)}
             className="mt-1 text-[11px] font-semibold text-pulse-bloom-deep underline decoration-dotted underline-offset-2 transition hover:text-pulse-bloom"
-            aria-label="View more of this note"
+            aria-label={t("reflection.viewMoreNote")}
           >
             View more
           </button>
@@ -1203,7 +1203,7 @@ export default function ReflectionCard({
           }`}
           disabled={isHiddenUpdating}
         >
-          {isHidden ? "Hidden" : "Hide"}
+          {isHidden ? t("reflection.hidden") : t("reflection.hide")}
         </button>
         <p
           className={`${roboto.className} mb-1 pl-3 text-xs font-light !italic tracking-wide text-gray-500 dark:text-white`}
@@ -1260,7 +1260,7 @@ export default function ReflectionCard({
                   }`}
                   disabled={isUpdating}
                 >
-                  {isHeard ? "Heard" : "I hear you"}
+                  {isHeard ? t("reflection.heard") : t("reflection.hear")}
                 </button>
               </div>
             ) : null}
@@ -1314,15 +1314,15 @@ export default function ReflectionCard({
               <span aria-hidden="true">💭</span>
               <p>
                 {countDisplay.total === 1
-                  ? "1 reflection shared in your space."
-                  : `${countDisplay.total} reflections shared in your space.`}
+                  ? t("healer.reflections.summary.single")
+                  : t("healer.reflections.summary.multiple", { count: countDisplay.total })}
               </p>
             </div>
             <div className="my-2 border-t border-dashed border-gray-200" />
             <div className="mt-2 flex items-center gap-2 text-sm font-medium leading-6 text-gray-700">
               <span aria-hidden="true">📝</span>
               <p>
-                {countDisplay.comments} reflections include notes in their own voice.
+                {t("healer.reflections.summary.comments", { count: countDisplay.comments })}
               </p>
             </div>
             <div className="my-2 border-t border-dashed border-gray-200" />
@@ -1368,7 +1368,9 @@ export default function ReflectionCard({
               >
                 <span className="flex flex-col items-center">
                   <span>
-                    {showSentiment ? "✨ Hide NLP insights" : "✨ Explore NLP insights"}
+                    {showSentiment
+                      ? t("healer.reflections.toggle.insights.hide")
+                      : t("healer.reflections.toggle.insights.show")}
                   </span>
                   {showSentiment && isSentimentLoading && !sentimentData && (
                     <span className="mt-1 flex w-full justify-center">
@@ -1376,7 +1378,7 @@ export default function ReflectionCard({
                         aria-hidden="true"
                         className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
                       />
-                      <span className="sr-only">Loading NLP insights...</span>
+                      <span className="sr-only">{t("healer.reflections.loadingInsights")}</span>
                     </span>
                   )}
                 </span>
@@ -1389,8 +1391,8 @@ export default function ReflectionCard({
                 <span className="flex flex-col items-center">
                   <span>
                     {activeSection === "trends"
-                      ? "📈 Hide feeling trends"
-                      : "📈 View feeling trends"}
+                      ? t("healer.reflections.toggle.trends.hide")
+                      : t("healer.reflections.toggle.trends.view")}
                   </span>
                   {showTrends && isTrendLoading && (
                     <span className="mt-1 flex w-full justify-center">
@@ -1398,7 +1400,7 @@ export default function ReflectionCard({
                         aria-hidden="true"
                         className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
                       />
-                      <span className="sr-only">Loading feeling trends...</span>
+                      <span className="sr-only">{t("healer.reflections.loadingTrends")}</span>
                     </span>
                   )}
                 </span>
@@ -1411,8 +1413,8 @@ export default function ReflectionCard({
                 <span className="flex flex-col items-center">
                   <span>
                     {activeSection === "printout"
-                      ? "🔍 Hide full reflection"
-                      : "🔍 View full reflection"}
+                      ? t("healer.reflections.toggle.printout.hide")
+                      : t("healer.reflections.toggle.printout.view")}
                   </span>
                   {showPrintout && isLoading && !data && (
                     <span className="mt-1 flex w-full justify-center">
@@ -1420,7 +1422,7 @@ export default function ReflectionCard({
                         aria-hidden="true"
                         className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
                       />
-                      <span className="sr-only">Loading reflections...</span>
+                      <span className="sr-only">{t("healer.reflections.loadingReflections")}</span>
                     </span>
                   )}
                 </span>
@@ -1460,7 +1462,7 @@ export default function ReflectionCard({
                             {!(sortedTrendReflections.length === 0 && hasTrendReflections) ? (
                               <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <p className={listTitleClass}>
-                                  Reflections from{" "}
+                                  {t("healer.reflections.printout.from")}{" "}
                                   {formatTrendLabel(selectedTrendLabel)}
                                 </p>
                                 <div className="flex w-full flex-col items-center gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
@@ -1473,7 +1475,9 @@ export default function ReflectionCard({
                                     className="inline-flex min-w-[160px] items-center justify-center rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10 sm:min-w-0"
                                     aria-pressed={trendFreeTextOnly}
                                   >
-                                    {trendFreeTextOnly ? "💬 Show all" : "💬 Comments only"}
+                                    {trendFreeTextOnly
+                                      ? t("healer.reflections.printout.comments.showAll")
+                                      : t("healer.reflections.printout.comments.only")}
                                   </button>
                                   <button
                                     type="button"
@@ -1486,13 +1490,13 @@ export default function ReflectionCard({
                                     aria-pressed={trendPrintoutSort === "asc"}
                                     aria-label={
                                       trendPrintoutSort === "desc"
-                                        ? "Newest first"
-                                        : "Oldest first"
+                                        ? t("healer.reflections.sort.newest")
+                                        : t("healer.reflections.sort.oldest")
                                     }
                                     title={
                                       trendPrintoutSort === "desc"
-                                        ? "Newest first"
-                                        : "Oldest first"
+                                        ? t("healer.reflections.sort.newest")
+                                        : t("healer.reflections.sort.oldest")
                                     }
                                   >
                                     <svg
@@ -1516,8 +1520,8 @@ export default function ReflectionCard({
                                   </svg>
                                   <span>
                                     {trendPrintoutSort === "desc"
-                                      ? "Newest first"
-                                      : "Oldest first"}
+                                      ? t("healer.reflections.sort.newest")
+                                      : t("healer.reflections.sort.oldest")}
                                   </span>
                                 </button>
                               </div>
@@ -1540,7 +1544,7 @@ export default function ReflectionCard({
                                   aria-hidden="true"
                                   className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
                                 />
-                                <span>Loading reflections...</span>
+                                <span>{t("healer.reflections.loadingReflections")}</span>
                               </div>
                             ) : sortedTrendReflections.length === 0 ? (
                               <p className={noticeTextClass}>
@@ -1584,7 +1588,7 @@ export default function ReflectionCard({
                                       className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={trendPrintoutPage <= 1}
                                     >
-                                      Last page
+                                      {t("pagination.lastPage")}
                                     </button>
                                     <button
                                       type="button"
@@ -1596,7 +1600,7 @@ export default function ReflectionCard({
                                       className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={trendPrintoutPage >= totalPages}
                                     >
-                                      Next page
+                                      {t("pagination.nextPage")}
                                     </button>
                                   </div>
                                 )}
@@ -1622,16 +1626,15 @@ export default function ReflectionCard({
                   <p className="text-sm text-red-600">{sentimentError}</p>
                 ) : isSentimentLoading && !sentimentData ? null : !hasNlpInsights ? (
                   <div className="space-y-1 text-left">
-                    <p>No reflections to read yet.</p>
+                    <p>{t("healer.sentiment.empty.title")}</p>
                     <p className="text-xs font-normal italic text-gray-500">
-                      Insights will bloom here once your clients share a few thoughts in
-                      their own words.
+                      {t("healer.sentiment.empty.subtitle")}
                     </p>
                   </div>
                 ) : (
                   <>
                     <p>
-                      <b>{"\u00a0\u00a0"}Through the lens of language:</b>
+                      <b>{t("healer.sentiment.languageLens")}</b>
                     </p>
                     <div className="text-left">
                       {primaryEmotion.label !== "\u2014" &&
@@ -1652,14 +1655,15 @@ export default function ReflectionCard({
                               {")"}
                             </>
                           ) : null}
-                          {"\u00a0"}feelings surfaced most.
+                          {"\u00a0"}
+                          {t("healer.sentiment.topFeelingsSuffix")}
                         </span>
                       ) : null}
                     </div>
                     <div className="text-left">
                       <span className="text-left">
-                        {"\u2013\u00a0"}The emotional warmth was measured at{"\u00a0"}
-                        <b>{formattedEmotionalWarmth}</b>.
+                        {"\u2013\u00a0"}
+                        {t("healer.sentiment.warmth", { value: formattedEmotionalWarmth })}
                       </span>
                     </div>
                     {showGentleSignals ? (
@@ -1670,12 +1674,15 @@ export default function ReflectionCard({
                         <div className="text-left">
                           {showGentleLine ? (
                             <span className="text-left">
-                              {"\u2013\u00a0"}Some reflections carried traces of{" "}
+                              {"\u2013\u00a0"}
+                              {t("healer.sentiment.gentleTraces")}{" "}
                               {renderEmotionButton(gentlePrimaryEmotion, false, true)}
                               {gentleSecondaryEmotion.label !== "\u2014" &&
                               gentleSecondaryUnheardCount > 0 ? (
                                 <>
-                                  {"\u00a0"}or{"\u00a0"}
+                                  {"\u00a0"}
+                                  {t("healer.sentiment.gentleOr")}
+                                  {"\u00a0"}
                                   {renderEmotionButton(
                                     gentleSecondaryEmotion,
                                     false,
@@ -1689,29 +1696,30 @@ export default function ReflectionCard({
                         </div>
                         <div className="text-left">
                           {showHarshLine ? (
-                            <span className="text-left">
-                              {"\u2013\u00a0"}
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleEmotionSelect(
-                                    harshPrimaryEmotion.label,
-                                    harshPrimaryEmotion.count,
-                                    true,
-                                    "Reflections that felt a bit heavier",
-                                  )
-                                }
-                                className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
-                                  selectedEmotion?.label.toLowerCase() ===
-                                  harshPrimaryEmotion.label.toLowerCase()
-                                    ? "text-pulse-bloom-deep"
-                                    : "text-gray-800 hover:text-pulse-bloom-deep"
-                                }`}
-                              >
-                                A few moments
-                              </button>
-                              {"\u00a0"}felt a bit heavier, perhaps asking for care.
-                            </span>
+                              <span className="text-left">
+                                {"\u2013\u00a0"}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleEmotionSelect(
+                                      harshPrimaryEmotion.label,
+                                      harshPrimaryEmotion.count,
+                                      true,
+                                      t("healer.sentiment.heavyReflections"),
+                                    )
+                                  }
+                                  className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
+                                    selectedEmotion?.label.toLowerCase() ===
+                                    harshPrimaryEmotion.label.toLowerCase()
+                                      ? "text-pulse-bloom-deep"
+                                      : "text-gray-800 hover:text-pulse-bloom-deep"
+                                  }`}
+                                >
+                                  {t("healer.sentiment.harshSignalButton")}
+                                </button>
+                                {"\u00a0"}
+                                {t("healer.sentiment.harshSignalText")}
+                              </span>
                           ) : null}
                         </div>
                       </div>
@@ -1720,7 +1728,7 @@ export default function ReflectionCard({
                     <div className="mb-3 text-xs text-gray-500 text-left">
                       <p>
                         <sub>
-                          ✨These insights were gently generated using two NLP models:{" "}
+                          {t("healer.sentiment.insightsCredit")}{" "}
                           <a
                             href="https://huggingface.co/SamLowe/roberta-base-go_emotions"
                             className="underline"
@@ -1729,14 +1737,14 @@ export default function ReflectionCard({
                           >
                             Sam Lowe&apos;s GoEmotions
                           </a>{" "}
-                          and{" "}
+                          {t("healer.sentiment.insightsAnd")}{" "}
                           <a
                             href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest"
                             className="underline"
                             target="_blank"
                             rel="noreferrer"
                           >
-                          CardiffNLP&apos;s sentiment model
+                            CardiffNLP&apos;s sentiment model
                           </a>
                           .{" "}
                         </sub>
@@ -1755,7 +1763,7 @@ export default function ReflectionCard({
                               aria-hidden="true"
                               className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500"
                             />
-                            <span>Loading reflections...</span>
+                            <span>{t("healer.reflections.loadingReflections")}</span>
                           </div>
                         ) : sortedEmotionPrintout.length === 0 ? (
                           <p className={noticeTextClass}>
@@ -1783,7 +1791,9 @@ export default function ReflectionCard({
                                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                         <p className={listTitleClass}>
                                           {emotionTitleOverride ??
-                                            `Reflections with ${selectedEmotion.label} tone`}
+                                            t("healer.reflections.emotionToneTitle", {
+                                              label: selectedEmotion.label,
+                                            })}
                                         </p>
                                         {shouldShowSort ? (
                                           <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-end">
@@ -1802,13 +1812,13 @@ export default function ReflectionCard({
                                               }
                                               aria-label={
                                                 emotionPrintoutSort === "desc"
-                                                  ? "Newest first"
-                                                  : "Oldest first"
+                                                  ? t("healer.reflections.sort.newest")
+                                                  : t("healer.reflections.sort.oldest")
                                               }
                                               title={
                                                 emotionPrintoutSort === "desc"
-                                                  ? "Newest first"
-                                                  : "Oldest first"
+                                                  ? t("healer.reflections.sort.newest")
+                                                  : t("healer.reflections.sort.oldest")
                                               }
                                             >
                                               <svg
@@ -1832,8 +1842,8 @@ export default function ReflectionCard({
                                               </svg>
                                               <span>
                                                 {emotionPrintoutSort === "desc"
-                                                  ? "Newest first"
-                                                  : "Oldest first"}
+                                                  ? t("healer.reflections.sort.newest")
+                                                  : t("healer.reflections.sort.oldest")}
                                               </span>
                                             </button>
                                           </div>
@@ -1922,7 +1932,9 @@ export default function ReflectionCard({
                     className={printoutButtonClass}
                     aria-pressed={printoutFreeTextOnly}
                   >
-                    {printoutFreeTextOnly ? "💬 Show all" : "💬 Comments only"}
+                    {printoutFreeTextOnly
+                      ? t("healer.reflections.printout.comments.showAll")
+                      : t("healer.reflections.printout.comments.only")}
                   </button>
                   <button
                     type="button"
@@ -1934,10 +1946,14 @@ export default function ReflectionCard({
                     className={printoutButtonClass}
                     aria-pressed={printoutSort === "asc"}
                     aria-label={
-                      printoutSort === "desc" ? "Newest first" : "Oldest first"
+                      printoutSort === "desc"
+                        ? t("healer.reflections.sort.newest")
+                        : t("healer.reflections.sort.oldest")
                     }
                     title={
-                      printoutSort === "desc" ? "Newest first" : "Oldest first"
+                      printoutSort === "desc"
+                        ? t("healer.reflections.sort.newest")
+                        : t("healer.reflections.sort.oldest")
                     }
                   >
                     <svg
@@ -1958,7 +1974,9 @@ export default function ReflectionCard({
                       <path d="M14 17l4 4 4-4" />
                     </svg>
                     <span>
-                      {printoutSort === "desc" ? "Newest first" : "Oldest first"}
+                      {printoutSort === "desc"
+                        ? t("healer.reflections.sort.newest")
+                        : t("healer.reflections.sort.oldest")}
                     </span>
                   </button>
                 </div>
@@ -1970,14 +1988,16 @@ export default function ReflectionCard({
                   className={printoutButtonClass}
                   aria-pressed={printoutIncludeHidden}
                 >
-                  {printoutIncludeHidden ? "🙈 Hide again" : "🙈 Show hidden"}
+                  {printoutIncludeHidden
+                    ? t("healer.printout.toggle.hidden.hide")
+                    : t("healer.printout.toggle.hidden.show")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsPrintoutTimeOpen(true)}
                   className={printoutButtonClass}
                 >
-                  📆 Choose dates
+                  {t("healer.printout.chooseDates")}
                 </button>
               </div>
             </div>
@@ -2024,7 +2044,7 @@ export default function ReflectionCard({
                           className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={printoutPage <= 1}
                         >
-                          Last page
+                          {t("pagination.lastPage")}
                         </button>
                         <button
                           type="button"
@@ -2034,7 +2054,7 @@ export default function ReflectionCard({
                           className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={printoutPage >= totalPages}
                         >
-                          Next page
+                          {t("pagination.nextPage")}
                         </button>
                       </div>
                     )}
@@ -2045,7 +2065,7 @@ export default function ReflectionCard({
             <Modal
               open={isPrintoutTimeOpen}
               setOpen={setIsPrintoutTimeOpen}
-              title="Change time range"
+              title={t("healer.printout.timeRange")}
               contentStyle={
                 isPrintoutKeyboardOpen && printoutViewportHeight
                   ? { height: printoutViewportHeight }
@@ -2060,23 +2080,22 @@ export default function ReflectionCard({
               <div className="w-full bg-white p-6">
                 <div className="space-y-1">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    🕰️ Choose a time range
+                    🕰️ {t("healer.printout.timeRange")}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    Pick the start and end dates you&apos;d like to explore. You can use
-                    the spinners or type the dates directly.
+                    {t("healer.printout.instructions")}
                   </p>
                 </div>
                 <div className="mt-5 grid gap-4">
                   {[
                     {
                       id: "start" as const,
-                      label: "Start date",
+                      label: t("healer.printout.startDate"),
                       value: printoutDraftStart,
                     },
                     {
                       id: "end" as const,
-                      label: "End date",
+                      label: t("healer.printout.endDate"),
                       value: printoutDraftEnd,
                     },
                   ].map(({ id, label, value }) => {
@@ -2241,14 +2260,14 @@ export default function ReflectionCard({
                     }}
                     className="rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
                   >
-                    Clear
+                    {t("button.clear")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsPrintoutTimeOpen(false)}
                     className="rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
                   >
-                    Cancel
+                    {t("button.cancel")}
                   </button>
                   <button
                     type="button"
@@ -2269,7 +2288,7 @@ export default function ReflectionCard({
                     }}
                     className="rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
                   >
-                    Apply
+                    {t("button.apply")}
                   </button>
                 </div>
               </div>

@@ -41,6 +41,8 @@ function TrendTooltip({
   selectedLabel?: string | null;
   isMobile?: boolean;
 }) {
+  const { t } = useLocale();
+
   if (!active || !payload?.length) {
     return null;
   }
@@ -52,8 +54,13 @@ function TrendTooltip({
     .filter(Boolean);
   const isClickable = Boolean(onSelectPoint);
   const isSelected = Boolean(selectedLabel && label && selectedLabel === label);
-  const ctaVerb = isSelected ? "hide" : "view";
-  const ctaLabel = isMobile ? `Tap to ${ctaVerb}` : `Click to ${ctaVerb}`;
+  const ctaLabel = isSelected
+    ? isMobile
+      ? t("healer.trend.tooltip.touch.hide")
+      : t("healer.trend.tooltip.click.hide")
+    : isMobile
+      ? t("healer.trend.tooltip.touch.view")
+      : t("healer.trend.tooltip.click.view");
   const allowContainerClick = isClickable && isMobile;
 
   return (
@@ -80,7 +87,7 @@ function TrendTooltip({
       tabIndex={allowContainerClick ? 0 : undefined}
       aria-label={
         allowContainerClick && displayLabel
-          ? `View reflections for ${displayLabel}`
+          ? t("healer.trend.tooltip.aria", { label: displayLabel })
           : undefined
       }
     >
