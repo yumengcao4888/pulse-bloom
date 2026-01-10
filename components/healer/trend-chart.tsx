@@ -48,7 +48,7 @@ function TrendTooltip({
   }
 
   const displayLabel = formatLabel ? formatLabel(label) : label;
-  const order = ["connected", "grounded", "supported"];
+  const order = ["grounded", "supported", "connected"];
   const items = order
     .map((key) => payload.find((entry) => entry.dataKey === key))
     .filter(Boolean);
@@ -167,6 +167,26 @@ export function TrendChart({
     tooltipLabelMode === "weekRange"
       ? (label?: string) => formatWeekRangeLabel(label, locale)
       : undefined;
+  const legendPayload = [
+    {
+      dataKey: "grounded",
+      color: "#F4C430",
+      value: t("reflection.grounded"),
+      type: "line",
+    },
+    {
+      dataKey: "supported",
+      color: "#BAA1DD",
+      value: t("reflection.supported"),
+      type: "line",
+    },
+    {
+      dataKey: "connected",
+      color: "#4FC3F7",
+      value: t("reflection.connected"),
+      type: "line",
+    },
+  ];
 
   return (
     <div className="h-64 w-full">
@@ -185,7 +205,7 @@ export function TrendChart({
               />
             }
           />
-          <Legend />
+          <Legend payload={legendPayload} />
 
           <Line
             type="monotone"
