@@ -156,7 +156,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
       };
     });
     if (!nextType && nextContact.trim()) {
-      setContactError("Just one more step. What type of contact is this?");
+      setContactError(t("form.healer.contact.missingType"));
       return;
     }
     const error = validateContact(nextType, nextContact);
@@ -174,7 +174,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
     const value = e.target.value;
     setForm((prev) => ({ ...prev, contact: value }));
     if (!form.contactType && value.trim()) {
-      setContactError("Just one more step. What type of contact is this?");
+      setContactError(t("form.healer.contact.missingType"));
       return;
     }
     const error = validateContact(form.contactType, value);
@@ -189,7 +189,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
   const handleSave = async () => {
     const normalizedContact = form.contactType ? form.contact ?? "" : "";
     if (!form.contactType && form.contact) {
-      setContactError("Just one more step. What type of contact is this?");
+      setContactError(t("form.healer.contact.missingType"));
       return;
     }
     const pronounsValidation = validatePronouns(form.pronouns ?? "");
@@ -256,7 +256,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
     } catch (err) {
       console.error("Failed to delete healer space:", err);
       setDeleteError(
-        "We could not confirm the code or delete your space. Please try again.",
+        t("editSpace.error.delete"),
       );
     } finally {
       setIsDeleting(false);
@@ -275,7 +275,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
       router.refresh();
     } catch (err) {
       console.error("Failed to clear reflections:", err);
-      setClearError("We could not clear reflections. Please try again.");
+      setClearError(t("editSpace.error.clear"));
     } finally {
       setIsClearing(false);
     }
@@ -289,9 +289,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
   const panelContent = (
     <div className="flex h-full min-h-0 flex-col bg-white">
       <div className="border-b px-6 py-4 dark:border-[rgb(var(--dark-border))]">
-        <Dialog.Title className="text-lg font-semibold">Edit your space</Dialog.Title>
+        <Dialog.Title className="text-lg font-semibold">{t("editSpace.panel.title")}</Dialog.Title>
         <p className="text-sm text-gray-500 dark:text-gray-300">
-          These details help others recognize and feel your space.
+          {t("editSpace.panel.description")}
         </p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-1 min-h-0 flex-col">
@@ -450,10 +450,10 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
           </div>
           <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-300/40 dark:bg-amber-500/15">
             <p className="text-sm font-semibold text-amber-700 dark:text-amber-200">
-              Clear all reflections
+              {t("editSpace.clear.title")}
             </p>
             <p className="mt-1 text-xs text-amber-700 dark:text-amber-200">
-              Remove all reflections and give your space a fresh start.
+              {t("editSpace.clear.bannerDescription")}
             </p>
             <div className="mt-3 flex justify-center">
               <button
@@ -461,14 +461,16 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                 onClick={() => setClearOpen(true)}
                 className="rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600"
               >
-                Clear all reflections
+                {t("editSpace.clear.button")}
               </button>
             </div>
           </div>
           <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/60 p-4 dark:border-red-300/40 dark:bg-red-500/15">
-            <p className="text-sm font-semibold text-red-700 dark:text-red-200">Delete your space</p>
+            <p className="text-sm font-semibold text-red-700 dark:text-red-200">
+              {t("editSpace.delete.title")}
+            </p>
             <p className="mt-1 text-xs text-red-700 dark:text-red-200">
-              This will permanently delete your space and all associated reflections.
+              {t("editSpace.delete.description")}
             </p>
             <div className="mt-3 flex justify-center">
               <button
@@ -476,7 +478,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                 onClick={() => setDeleteOpen(true)}
                 className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
               >
-                Delete your space
+                {t("editSpace.delete.button")}
               </button>
             </div>
           </div>
@@ -488,7 +490,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               onClick={() => setOpen(false)}
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:hover:border-[rgb(var(--dark-border))] dark:hover:bg-[rgb(var(--dark-card-hover))]"
             >
-              Cancel
+              {t("button.cancel")}
             </button>
             <button
               type="submit"
@@ -498,20 +500,20 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
                 isSaving && "opacity-70",
               )}
             >
-              Save changes
+              {t("editSpace.saveButton")}
             </button>
           </div>
         </div>
       </form>
-      <Modal open={deleteOpen} setOpen={setDeleteOpen} title="Delete your space">
+      <Modal open={deleteOpen} setOpen={setDeleteOpen} title={t("editSpace.delete.title")}>
         <div className="p-6 space-y-4">
           <div className="space-y-1">
             <h3 className="text-lg font-semibold text-gray-900">
-              Delete your space?
+              {t("editSpace.delete.prompt")}
             </h3>
             <p className="text-sm text-gray-600">
-              This will permanently delete your space and all associated reflections.
-              Your profile and data cannot be recovered.
+              {t("editSpace.delete.description")}{" "}
+              {t("editSpace.delete.warning")}
             </p>
           </div>
           {deleteError ? (
@@ -524,27 +526,26 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
               disabled={isDeleting}
             >
-              Delete your space
+              {t("editSpace.delete.button")}
             </button>
             <button
               type="button"
               onClick={() => setDeleteOpen(false)}
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
             >
-              Cancel
+              {t("button.cancel")}
             </button>
           </div>
         </div>
       </Modal>
-      <Modal open={clearOpen} setOpen={setClearOpen} title="Clear all reflections">
+      <Modal open={clearOpen} setOpen={setClearOpen} title={t("editSpace.clear.title")}>
         <div className="p-6 space-y-4">
           <div className="space-y-1">
             <h3 className="text-lg font-semibold text-gray-900">
-              Clear all reflections?
+              {t("editSpace.clear.prompt")}
             </h3>
             <p className="text-sm text-gray-600">
-              This will permanently remove all reflections from your space. Your
-              profile and space settings will remain unchanged.
+              {t("editSpace.clear.modalDescription")}
             </p>
           </div>
           {clearError ? (
@@ -557,14 +558,14 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
               className="rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600"
               disabled={isClearing}
             >
-              Clear all reflections
+              {t("editSpace.clear.button")}
             </button>
             <button
               type="button"
               onClick={() => setClearOpen(false)}
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
             >
-              Cancel
+              {t("button.cancel")}
             </button>
           </div>
         </div>
@@ -583,7 +584,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
             buttonClassName,
           )}
         >
-          Edit your space
+          {t("editSpace.button")}
         </button>
         <Drawer.Root open={open} onOpenChange={handleOpenChange}>
           <Drawer.Overlay className="fixed inset-0 z-40 bg-gray-100 bg-opacity-10 backdrop-blur" />
@@ -611,7 +612,7 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
           buttonClassName,
         )}
       >
-        Edit your space
+        {t("editSpace.button")}
       </button>
       <Dialog.Root open={open} onOpenChange={handleOpenChange}>
         <Dialog.Portal>
