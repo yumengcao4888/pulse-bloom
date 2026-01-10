@@ -1198,8 +1198,8 @@ export default function ReflectionCard({
           onClick={() => handleHiddenToggle(reflection.id, isHidden)}
           className={`absolute right-2 top-1.5 rounded-full border px-2 py-0.5 text-[9px] font-semibold leading-none tracking-wide shadow-sm transition ${
             isHidden
-              ? "border-gray-700 bg-gray-700 text-white"
-              : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
+              ? "border-gray-700 bg-gray-700 text-white dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white"
+              : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-200 dark:hover:bg-[rgb(var(--dark-card-hover))]"
           }`}
           disabled={isHiddenUpdating}
         >
