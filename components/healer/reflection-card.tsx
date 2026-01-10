@@ -1701,7 +1701,12 @@ export default function ReflectionCard({
                                     "Reflections that felt a bit heavier",
                                   )
                                 }
-                                className="font-semibold underline decoration-dotted underline-offset-2 transition text-gray-800 hover:text-pulse-bloom-deep"
+                                className={`font-semibold underline decoration-dotted underline-offset-2 transition ${
+                                  selectedEmotion?.label.toLowerCase() ===
+                                  harshPrimaryEmotion.label.toLowerCase()
+                                    ? "text-pulse-bloom-deep"
+                                    : "text-gray-800 hover:text-pulse-bloom-deep"
+                                }`}
                               >
                                 A few moments
                               </button>
