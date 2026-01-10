@@ -192,7 +192,7 @@ export default function SpaceCta({
             <SignedIn>
               <button
                 type="button"
-                className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white md:w-auto"
+                className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 md:w-auto"
                 onClick={handleClick}
                 disabled={loading}
                 aria-busy={loading}
