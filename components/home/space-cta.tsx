@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignUpButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
+import { useLocale } from "@/components/shared/locale-provider";
 
 type Props = {
   initialSlug?: string | null;
@@ -15,6 +16,7 @@ export default function SpaceCta({
 }: Props) {
   const router = useRouter();
   const { isLoaded, isSignedIn, userId } = useAuth();
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [slug, setSlug] = useState<string | null>(initialSlug);
   const [hasChecked, setHasChecked] = useState(initialChecked);
@@ -150,27 +152,29 @@ export default function SpaceCta({
           <>
             <SignedOut>
               <h2 className="text-base font-semibold text-gray-900">
-                Begin with a gentle pulse
+                {t("cta.gentlePulse.title")}
               </h2>
               <p className="text-sm text-gray-600">
-                Create a space and invite your first reflection.
+                {t("cta.gentlePulse.description")}
               </p>
             </SignedOut>
             <SignedIn>
               <h2 className="text-base font-semibold text-gray-900">
-                {showReturn ? "Return to your healing space" : "Begin with a gentle pulse"}
+                {showReturn ? t("cta.return.title") : t("cta.gentlePulse.title")}
               </h2>
               <p className="text-sm text-gray-600">
                 {showReturn
-                  ? "Gently hold space for your next reflection."
-                  : "Create a space and invite your first reflection."}
+                  ? t("cta.return.description")
+                  : t("cta.gentlePulse.description")}
               </p>
             </SignedIn>
           </>
         ) : (
           <>
-            <h2 className="text-base font-semibold text-gray-900">Begin with a gentle pulse</h2>
-            <p className="text-sm text-gray-600">Create a space and invite your first reflection.</p>
+            <h2 className="text-base font-semibold text-gray-900">
+              {t("cta.gentlePulse.title")}
+            </h2>
+            <p className="text-sm text-gray-600">{t("cta.gentlePulse.description")}</p>
           </>
         )}
       </div>
@@ -185,7 +189,7 @@ export default function SpaceCta({
                 appearance={signUpAppearance}
               >
                 <button className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white md:w-auto">
-                  Create a healing space
+                  {t("cta.button.create")}
                 </button>
               </SignUpButton>
             </SignedOut>
@@ -198,10 +202,10 @@ export default function SpaceCta({
                 aria-busy={loading}
               >
                 {loading
-                  ? "Loading..."
+                  ? t("cta.button.loading")
                   : showReturn
-                  ? "Enter your healing space"
-                  : "Create a healing space"}
+                  ? t("cta.button.enter")
+                  : t("cta.button.create")}
               </button>
             </SignedIn>
           </>
@@ -211,7 +215,7 @@ export default function SpaceCta({
             className="w-full rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white opacity-70 md:w-auto"
             disabled
           >
-            Loading...
+            {t("cta.button.loading")}
           </button>
         )}
       </div>
