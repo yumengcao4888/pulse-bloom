@@ -123,12 +123,13 @@ export default function ReflectionForm({ slug }: Props) {
       </div>
 
       <label className="block">
-        <span className="text-gray-700">
-          {t("reflection.form.optional")} <span className="text-gray-500">{t("form.optional")}</span>
+        <span className="text-gray-700 dark:text-gray-200">
+          {t("reflection.form.optional")}{" "}
+          <span className="text-gray-500 dark:text-gray-400">{t("form.optional")}</span>
         </span>
         <textarea
           name="feeling"
-          className="w-full border p-3 rounded mt-1"
+          className="mt-1 w-full rounded border border-gray-300 bg-white p-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pulse-bloom/30 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus:ring-pulse-bloom-soft/40"
           placeholder={t("reflection.form.placeholder")}
           onChange={(e) => {
             const nextValue = e.target.value;
@@ -142,7 +143,7 @@ export default function ReflectionForm({ slug }: Props) {
           value={feeling}
           rows={3}
         />
-        <p className="mt-0.5 text-right text-xs text-gray-500">
+        <p className="mt-0.5 text-right text-xs text-gray-500 dark:text-gray-400">
           {countWords(feeling)}/{WORD_LIMIT}
         </p>
       </label>
