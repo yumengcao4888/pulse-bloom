@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import Modal from "@/components/shared/modal";
+import { useLocale } from "@/components/shared/locale-provider";
 
 type ShareLinkButtonProps = {
   link: string;
@@ -23,6 +24,7 @@ export default function ShareLinkButton({
   const [copied, setCopied] = useState(false);
   const [qrExpanded, setQrExpanded] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { t } = useLocale();
 
   const handleCopyLink = async () => {
     try {
@@ -83,7 +85,7 @@ export default function ShareLinkButton({
                 <path d="M7.75 5A2.75 2.75 0 0 1 10.5 2.25h4.75A2.75 2.75 0 0 1 18 5v4.75A2.75 2.75 0 0 1 15.25 12.5H10.5A2.75 2.75 0 0 1 7.75 9.75V5Z" />
                 <path d="M2 8.75A2.75 2.75 0 0 1 4.75 6h1.5a.75.75 0 0 1 0 1.5h-1.5A1.25 1.25 0 0 0 3.5 8.75v6.5A1.25 1.25 0 0 0 4.75 16.5h6.5a1.25 1.25 0 0 0 1.25-1.25v-1.5a.75.75 0 0 1 1.5 0v1.5A2.75 2.75 0 0 1 11.25 18h-6.5A2.75 2.75 0 0 1 2 15.25v-6.5Z" />
               </svg>
-              {copied ? "Copied" : "Copy"}
+              {copied ? t("share.copy.copied") : t("share.copy")}
             </button>
           </div>
           <div className="border-t border-gray-200 dark:border-[rgb(var(--dark-border))]" />
@@ -94,7 +96,7 @@ export default function ShareLinkButton({
               className={`rounded-lg p-1 transition hover:bg-gray-100 dark:hover:bg-[rgb(var(--dark-card-hover))] ${
                 qrExpanded ? "cursor-zoom-out" : "cursor-zoom-in"
               }`}
-              aria-label={qrExpanded ? "Shrink QR code" : "Expand QR code"}
+              aria-label={qrExpanded ? t("share.qr.shrink") : t("share.qr.expand")}
               aria-pressed={qrExpanded}
             >
               <QRCodeCanvas value={link} size={qrExpanded ? 240 : 140} />
@@ -106,7 +108,7 @@ export default function ShareLinkButton({
             onClick={() => setOpen(false)}
             className="mx-auto block rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
           >
-            Done
+            {t("share.button.done")}
           </button>
         </div>
       </Modal>

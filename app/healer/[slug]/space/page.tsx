@@ -24,6 +24,16 @@ export default async function HealingSpacePage(props: PageProps) {
   }
   const locale = await getLocale();
   const t = getTranslations(locale);
+  const shareSpaceCopy = {
+    buttonLabel: t("share.space.buttonLabel"),
+    title: t("share.space.title"),
+    description: t("share.space.description"),
+  };
+  const shareReflectionCopy = {
+    buttonLabel: t("share.reflection.buttonLabel"),
+    title: t("share.reflection.title"),
+    description: t("share.reflection.description"),
+  };
   const contactTypeLabels = {
     email: t("form.healer.contact.type.email"),
     phone: t("form.healer.contact.type.phone"),
@@ -203,16 +213,16 @@ export default async function HealingSpacePage(props: PageProps) {
                   />
                   <ShareLinkButton
                     link={sharableLink}
-                    buttonLabel="Share your space"
-                    title="Share your space"
-                    description="Share this link or QR code to let others see your space."
+                    buttonLabel={shareSpaceCopy.buttonLabel}
+                    title={shareSpaceCopy.title}
+                    description={shareSpaceCopy.description}
                     buttonClassName="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50 sm:w-full sm:justify-center"
                   />
                   <ShareLinkButton
                     link={reflectionLink}
-                    buttonLabel="Invite reflection"
-                    title="Invite reflection"
-                    description="Share this link or QRcode with your clients."
+                    buttonLabel={shareReflectionCopy.buttonLabel}
+                    title={shareReflectionCopy.title}
+                    description={shareReflectionCopy.description}
                     buttonClassName="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800 sm:w-full sm:justify-center"
                   />
                 </div>
@@ -233,22 +243,22 @@ export default async function HealingSpacePage(props: PageProps) {
               />
               <ShareLinkButton
                 link={sharableLink}
-                buttonLabel="Share your space"
-                title="Share your space"
-                description="Share this link or QR code to let others see your space."
+                buttonLabel={shareSpaceCopy.buttonLabel}
+                title={shareSpaceCopy.title}
+                description={shareSpaceCopy.description}
                 buttonClassName="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm transition hover:bg-gray-50"
               />
               <ShareLinkButton
                 link={reflectionLink}
-                buttonLabel="Invite reflection"
-                title="Invite reflection"
-                description="Share this link or QRcode with your clients."
+                buttonLabel={shareReflectionCopy.buttonLabel}
+                title={shareReflectionCopy.title}
+                description={shareReflectionCopy.description}
               />
             </div>
             <div className="my-4 border-t border-gray-200" />
             <div className="text-gray-700">
               <p>
-                <b>{"Modality"}:</b> {healer.modality}
+                <b>{t("healer.dev.modality")}:</b> {healer.modality}
               </p>
               <div className="my-2 border-t border-dashed border-gray-200" />
               <p>
