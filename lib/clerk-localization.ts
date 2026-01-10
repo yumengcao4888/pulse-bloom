@@ -1,5 +1,9 @@
-import type { LocalizationResource } from "@clerk/shared";
 import type { Locale } from "@/lib/i18n";
+
+type LocalizationResource = {
+  locale: string;
+  [key: string]: unknown;
+};
 
 const spanishLocalization: LocalizationResource = {
   locale: "es",

@@ -167,27 +167,6 @@ export function TrendChart({
     tooltipLabelMode === "weekRange"
       ? (label?: string) => formatWeekRangeLabel(label, locale)
       : undefined;
-  const legendPayload = [
-    {
-      dataKey: "grounded",
-      color: "#F4C430",
-      value: t("reflection.grounded"),
-      type: "line",
-    },
-    {
-      dataKey: "supported",
-      color: "#BAA1DD",
-      value: t("reflection.supported"),
-      type: "line",
-    },
-    {
-      dataKey: "connected",
-      color: "#4FC3F7",
-      value: t("reflection.connected"),
-      type: "line",
-    },
-  ];
-
   return (
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -205,7 +184,7 @@ export function TrendChart({
               />
             }
           />
-          <Legend payload={legendPayload} />
+          <Legend />
 
           <Line
             type="monotone"
