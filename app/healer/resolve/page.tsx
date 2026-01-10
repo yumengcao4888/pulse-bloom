@@ -3,10 +3,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { useLocale } from "@/components/shared/locale-provider";
 
 export default function HealerResolvePage() {
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
+  const { t } = useLocale();
 
   useEffect(() => {
     if (!isLoaded) {
@@ -42,7 +44,7 @@ export default function HealerResolvePage() {
     <div className="relative z-10 w-full max-w-xl px-5 xl:px-0">
       <div className="my-10 mx-auto max-w-xl">
         <div className="rounded-2xl border bg-white/70 p-6 shadow-sm">
-          <p className="text-sm text-gray-600">Redirecting to your healing space...</p>
+          <p className="text-sm text-gray-600">{t("healer.resolve.redirecting")}</p>
         </div>
       </div>
     </div>
