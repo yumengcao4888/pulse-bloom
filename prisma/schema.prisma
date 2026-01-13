@@ -23,6 +23,7 @@ model Healer {
   contact     String?
   contactType ContactType?
   bio         String
+  locale      String?
 
   slug        String @unique
   reflections Reflection[]
@@ -53,6 +54,7 @@ model Reflection {
 
   healer   Healer @relation(fields: [healerId], references: [id])
   healerId Int
+  locale   String?
 
   createdAt DateTime @default(now())
 }

@@ -17,7 +17,7 @@ const countWords = (value: string) =>
 
 export default function ReflectionForm({ slug }: Props) {
   const router = useRouter();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const [grounded, setGrounded] = useState<TriState>(null);
   const [supported, setSupported] = useState<TriState>(null);
@@ -51,6 +51,7 @@ export default function ReflectionForm({ slug }: Props) {
           supported,
           connected,
           feeling,
+          locale,
           honeypot,
           startedAt,
         }),

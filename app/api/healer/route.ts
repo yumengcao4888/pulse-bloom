@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { isValidPronouns, normalizePronouns } from "@/lib/pronouns";
+import { locales } from "@/lib/i18n";
 
 const adjectives = [
   "gentle", "quiet", "soft", "warm", "glowing", "open", "steady",
@@ -77,8 +78,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: botError.error }, { status: botError.status });
     }
 
-    const { name, pronouns, modality, focus, location, contact, contactType, bio } = body;
+    const { name, pronouns, modality, focus, location, contact, contactType, bio, locale } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
+    const normalizedLocale =
+      typeof locale === "string" && locales.includes(locale as (typeof locales)[number])
+        ? locale
+        : null;
     const allowedContactTypes = ["email", "phone", "website", "social"] as const;
     const normalizedContactType =
       contactType && allowedContactTypes.includes(contactType) ? contactType : null;
@@ -131,6 +136,7 @@ export async function POST(req: NextRequest) {
         contact,
         contactType: normalizedContactType,
         bio,
+        locale: normalizedLocale,
         slug: generateSlugFromName(name),
       },
     });
@@ -180,8 +186,12 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: botError.error }, { status: botError.status });
     }
 
-    const { name, pronouns, modality, focus, location, contact, contactType, bio } = body;
+    const { name, pronouns, modality, focus, location, contact, contactType, bio, locale } = body;
     const normalizedPronouns = normalizePronouns(pronouns);
+    const normalizedLocale =
+      typeof locale === "string" && locales.includes(locale as (typeof locales)[number])
+        ? locale
+        : null;
     const allowedContactTypes = ["email", "phone", "website", "social"] as const;
     const normalizedContactType =
       contactType && allowedContactTypes.includes(contactType) ? contactType : null;
@@ -234,6 +244,7 @@ export async function PUT(req: NextRequest) {
         contact,
         contactType: normalizedContactType,
         bio,
+        ...(normalizedLocale ? { locale: normalizedLocale } : {}),
       },
     });
 

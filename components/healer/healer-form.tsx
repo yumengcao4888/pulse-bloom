@@ -50,7 +50,7 @@ export default function HealerForm() {
   const [startedAt] = useState(() => Date.now());
   const pronounsRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLTextAreaElement>(null);
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const router = useRouter();
 
   const handleChange =
@@ -173,6 +173,7 @@ export default function HealerForm() {
       ...form,
       contactType: normalizedContact.trim() ? form.contactType || null : null,
       contact: normalizedContact.trim() || null,
+      locale,
       honeypot,
       startedAt,
     };

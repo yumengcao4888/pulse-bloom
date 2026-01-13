@@ -3,6 +3,7 @@ import { EmotionalTone, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { classifyEmotion, classifyFeeling } from "@/lib/huggingface";
 import { calculateEmotionalWarmth } from "@/lib/utils";
+import { locales } from "@/lib/i18n";
 
 async function updateReflectionSentiment(reflectionId: number, feeling: string | null) {
   if (!feeling) {
@@ -36,7 +37,7 @@ async function updateReflectionSentiment(reflectionId: number, feeling: string |
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { slug, grounded, supported, connected, feeling, honeypot, startedAt } = body;
+    const { slug, grounded, supported, connected, feeling, honeypot, startedAt, locale } = body;
     const vercelEnv = process.env.VERCEL_ENV;
     const isLocalDev = !vercelEnv && process.env.NODE_ENV === "development";
     const bypassBotProtection =
@@ -82,6 +83,10 @@ export async function POST(req: NextRequest) {
 
     const trimmedFeeling =
       typeof feeling === "string" && feeling.trim() !== "" ? feeling.trim() : null;
+    const normalizedLocale =
+      typeof locale === "string" && locales.includes(locale as (typeof locales)[number])
+        ? locale
+        : null;
 
     const reflection = await prisma.reflection.create({
       data: {
@@ -90,6 +95,7 @@ export async function POST(req: NextRequest) {
         connected: connectedBool,
         feeling: trimmedFeeling,
         healerId: healer.id,
+        locale: normalizedLocale,
       },
     });
 
