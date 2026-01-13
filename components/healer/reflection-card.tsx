@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TrendChart } from "@/components/healer/trend-chart";
 import Modal from "@/components/shared/modal";
 import { useLocale } from "@/components/shared/locale-provider";
+import type { MessageKey } from "@/lib/i18n";
 import { delius, roboto } from "@/app/fonts";
 import {
   capitalize,
@@ -1096,7 +1097,10 @@ export default function ReflectionCard({
   const formatEmotionLabel = (label: string, capitalizeFirst: boolean) => {
     if (label === "\u2014") return label;
     const lowered = label.toLowerCase();
-    return capitalizeFirst ? capitalize(lowered) : lowered;
+    const key = `emotion.${lowered}` as MessageKey;
+    const translated = t(key);
+    const display = translated !== key ? translated : lowered;
+    return capitalizeFirst ? capitalize(display) : display;
   };
   const renderEmotionButton = (
     emotion: { label: string; count: number },
@@ -1795,7 +1799,10 @@ export default function ReflectionCard({
                                         <p className={listTitleClass}>
                                           {emotionTitleOverride ??
                                             t("healer.reflections.emotionToneTitle", {
-                                              label: selectedEmotion.label,
+                                              label: formatEmotionLabel(
+                                                selectedEmotion.label,
+                                                true,
+                                              ),
                                             })}
                                         </p>
                                         {shouldShowSort ? (

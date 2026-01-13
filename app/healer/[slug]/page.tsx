@@ -6,7 +6,7 @@ import {
   roundToTwo,
 } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
-import { getTranslations } from "@/lib/i18n";
+import { getTranslations, type MessageKey } from "@/lib/i18n";
 import AutoPrint from "@/components/healer/auto-print";
 import ProfileImage from "@/components/healer/profile-image";
 import FeltCard from "@/components/healer/felt-card";
@@ -97,10 +97,16 @@ export default async function HealerPage(props: PageProps) {
   };
   const formatWarmth = (value: number | null) =>
     value == null ? t("common.none") : `${Math.round(value)} / 100`;
+  const translateEmotionLabel = (label: string) => {
+    const key = `emotion.${label.toLowerCase()}` as MessageKey;
+    const translated = t(key);
+    return translated !== key ? translated : label;
+  };
+  const translateTopWords = (words: string[]) => words.map(translateEmotionLabel);
   const monthlySentiment = getAverageWarmth(monthlyReflections);
   const allTimeSentiment = getAverageWarmth(healer.reflections);
-  const monthlyTopWords = getTopEmotionWords(monthlyReflections);
-  const allTimeTopWords = getTopEmotionWords(healer.reflections);
+  const monthlyTopWords = translateTopWords(getTopEmotionWords(monthlyReflections));
+  const allTimeTopWords = translateTopWords(getTopEmotionWords(healer.reflections));
 
 
   const monthlyCount = monthlyReflections.length;
