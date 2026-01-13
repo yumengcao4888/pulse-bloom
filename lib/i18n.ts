@@ -484,7 +484,7 @@ const messages = {
     "healer.reflections.toggle.trends.view": "📈 Ver tendencias",
     "healer.reflections.toggle.trends.hide": "📈 Ocultar tendencias",
     "healer.reflections.toggle.printout.view": "🔍 Ver reflexión total",
-    "healer.reflections.toggle.printout.hide": "🔍 Ocultar reflexión total",
+    "healer.reflections.toggle.printout.hide": "🔍 Ocultar reflexión",
     "healer.reflections.printout.comments.showAll": "💬 Mostrar todo",
     "healer.reflections.printout.comments.only": "💬 Solo notas",
     "healer.reflections.sort.newest": "Más nuevas",
