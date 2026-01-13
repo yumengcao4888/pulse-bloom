@@ -280,7 +280,7 @@ const messages = {
   },
   es: {
     "nav.brand": "Pulse Bloom",
-    "nav.signIn": "Iniciar sesión",
+    "nav.signIn": "Entrar",
     "nav.dashboard": "Panel",
     "nav.healingSpace": "Mi espacio sanador",
     "nav.createHealingSpace": "Crear un espacio sanador",
