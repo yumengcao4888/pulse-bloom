@@ -6,10 +6,11 @@ import {
   roundToTwo,
 } from "@/lib/utils";
 import { getLocale } from "@/lib/i18n-server";
-import { getTranslations, type MessageKey } from "@/lib/i18n";
+import { getTranslations, locales, type Locale, type MessageKey } from "@/lib/i18n";
 import AutoPrint from "@/components/healer/auto-print";
 import ProfileImage from "@/components/healer/profile-image";
 import FeltCard from "@/components/healer/felt-card";
+import HealerProfileDetails from "@/components/healer/healer-profile-details";
 import { clerkClient } from "@clerk/nextjs/server";
 
 import 'tippy.js/dist/tippy.css';
@@ -107,6 +108,20 @@ export default async function HealerPage(props: PageProps) {
   const allTimeSentiment = getAverageWarmth(healer.reflections);
   const monthlyTopWords = translateTopWords(getTopEmotionWords(monthlyReflections));
   const allTimeTopWords = translateTopWords(getTopEmotionWords(healer.reflections));
+  const normalizedHealerLocale =
+    typeof healer.locale === "string" && locales.includes(healer.locale as Locale)
+      ? (healer.locale as Locale)
+      : locale;
+  const shouldShowTranslate = normalizedHealerLocale !== locale;
+  const languageDisplay = new Intl.DisplayNames([locale], { type: "language" });
+  const viewInLabel = shouldShowTranslate
+    ? t("healer.profile.seeIn", { language: languageDisplay.of(locale) ?? locale })
+    : "";
+  const revertLabel = shouldShowTranslate
+    ? t("healer.profile.seeIn", {
+        language: languageDisplay.of(normalizedHealerLocale) ?? normalizedHealerLocale,
+      })
+    : "";
 
 
   const monthlyCount = monthlyReflections.length;
@@ -205,25 +220,28 @@ export default async function HealerPage(props: PageProps) {
             ) : null}
           </div>
           <div className="w-full rounded-2xl border bg-white/70 p-6 shadow-sm">
-            <p className="text-gray-700">
-              <b>{t("healer.profile.approach")}</b> {healer.modality}
-            </p>
-            <div className="my-2 border-t border-dashed border-gray-200" />
-            <p className="text-gray-700">
-              <b>{t("healer.profile.workWith")}</b> {healer.focus}
-            </p>
-            <div className="my-2 border-t border-dashed border-gray-200" />
-            {healer.location ? (
-              <>
-                <p className="text-gray-700">
-                  <b>{t("healer.profile.location")}</b> {healer.location}
-                </p>
-                <div className="my-2 border-t border-dashed border-gray-200" />
-              </>
-            ) : null}
-            <p className="break-words hyphens-auto text-gray-700" lang={locale}>
-              <b>{t("healer.profile.about")}</b> {healer.bio}
-            </p>
+            <HealerProfileDetails
+              slug={slug}
+              labels={{
+                approach: t("healer.profile.approach"),
+                workWith: t("healer.profile.workWith"),
+                location: t("healer.profile.location"),
+                about: t("healer.profile.about"),
+                viewInLabel,
+                revertLabel,
+                translating: t("healer.profile.translating"),
+                translationError: t("healer.profile.translationError"),
+              }}
+              values={{
+                modality: healer.modality,
+                focus: healer.focus,
+                location: healer.location,
+                bio: healer.bio,
+              }}
+              locale={locale}
+              healerLocale={normalizedHealerLocale}
+              showTranslate={shouldShowTranslate && Boolean(viewInLabel) && Boolean(revertLabel)}
+            />
           </div>
           {healer.reflections.length > 0 ? (
             <FeltCard
