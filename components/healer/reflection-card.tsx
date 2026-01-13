@@ -1330,7 +1330,8 @@ export default function ReflectionCard({
               <div className="flex justify-start">
                 <div className="inline-grid place-items-center gap-0.5">
                   <span className="whitespace-nowrap">
-                    {"🌱 "}Grounded {countDisplay.grounded.count}
+                    {"🌱 "}
+                    {t("reflection.grounded")} {countDisplay.grounded.count}
                   </span>
                   <span className="text-xs font-normal text-gray-500">
                     {countDisplay.grounded.percent}
@@ -1340,7 +1341,8 @@ export default function ReflectionCard({
               <div className="flex justify-center">
                 <div className="inline-grid place-items-center gap-0.5">
                   <span className="whitespace-nowrap">
-                    {"💛 "}Supported {countDisplay.supported.count}
+                    {"💛 "}
+                    {t("reflection.supported")} {countDisplay.supported.count}
                   </span>
                   <span className="text-xs font-normal text-gray-500">
                     {countDisplay.supported.percent}
@@ -1350,7 +1352,8 @@ export default function ReflectionCard({
               <div className="flex justify-end">
                 <div className="inline-grid place-items-center gap-0.5">
                   <span className="whitespace-nowrap">
-                    {"🤝 "}Connected {countDisplay.connected.count}
+                    {"🤝 "}
+                    {t("reflection.connected")} {countDisplay.connected.count}
                   </span>
                   <span className="text-xs font-normal text-gray-500">
                     {countDisplay.connected.percent}
