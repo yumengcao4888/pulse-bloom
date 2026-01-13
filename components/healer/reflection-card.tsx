@@ -22,6 +22,7 @@ type ReflectionEntry = {
   supported: boolean | null;
   connected: boolean | null;
   feeling: string | null;
+  locale: string | null;
   createdAt: string;
   heardAt: string | null;
   hidden: boolean;
@@ -215,12 +216,24 @@ export default function ReflectionCard({
   const [hearingUpdates, setHearingUpdates] = useState<Record<string, boolean>>({});
   const [hiddenUpdates, setHiddenUpdates] = useState<Record<string, boolean>>({});
   const [hiddenOverrides, setHiddenOverrides] = useState<Record<string, boolean>>({});
+  const [translationUpdates, setTranslationUpdates] = useState<Record<string, boolean>>({});
+  const [translatedNotes, setTranslatedNotes] = useState<Record<string, string>>({});
+  const [cachedNotes, setCachedNotes] = useState<Record<string, string>>({});
+  const [translationErrors, setTranslationErrors] = useState<Record<string, string>>({});
   const pageSize = 5;
   const noticeTextClass = "text-sm text-center text-gray-500 font-normal";
   const listTitleClass =
     "text-sm font-semibold text-gray-700 w-full text-center sm:w-auto sm:text-left";
   const printoutButtonClass =
     "inline-flex min-w-[160px] items-center justify-center gap-2 rounded-full border border-pulse-bloom bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom/10";
+  const languageDisplay = useMemo(
+    () => new Intl.DisplayNames([locale], { type: "language" }),
+    [locale],
+  );
+  const getLanguageLabel = useCallback(
+    (value: string) => languageDisplay.of(value) ?? value,
+    [languageDisplay],
+  );
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
     [],
@@ -626,6 +639,75 @@ export default function ReflectionCard({
       setHiddenUpdates((prev) => ({ ...prev, [reflectionId]: false }));
     }
   }, [hiddenUpdates]);
+
+  const handleTranslateToggle = useCallback(
+    async (reflection: ReflectionEntry) => {
+      if (!reflection.feeling?.trim()) return;
+      if (!reflection.locale || reflection.locale === locale) return;
+      if (translationUpdates[reflection.id]) return;
+
+      setTranslationErrors((prev) => {
+        const next = { ...prev };
+        delete next[reflection.id];
+        return next;
+      });
+
+      if (translatedNotes[reflection.id]) {
+        setTranslatedNotes((prev) => {
+          const next = { ...prev };
+          delete next[reflection.id];
+          return next;
+        });
+        return;
+      }
+
+      const cached = cachedNotes[reflection.id];
+      if (cached) {
+        setTranslatedNotes((prev) => ({ ...prev, [reflection.id]: cached }));
+        return;
+      }
+
+      setTranslationUpdates((prev) => ({ ...prev, [reflection.id]: true }));
+      try {
+        const res = await fetch("/api/reflection/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sourceLocale: reflection.locale,
+            targetLocale: locale,
+            text: reflection.feeling,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to translate reflection");
+        }
+
+        const payload = await res.json();
+        if (!payload?.translated || typeof payload.translated !== "string") {
+          throw new Error("Missing translation payload");
+        }
+
+        setTranslatedNotes((prev) => ({ ...prev, [reflection.id]: payload.translated }));
+        setCachedNotes((prev) => ({ ...prev, [reflection.id]: payload.translated }));
+      } catch (err) {
+        console.error("Failed to translate reflection", err);
+        setTranslationErrors((prev) => ({
+          ...prev,
+          [reflection.id]: t("healer.profile.translationError"),
+        }));
+      } finally {
+        setTranslationUpdates((prev) => ({ ...prev, [reflection.id]: false }));
+      }
+    },
+    [
+      cachedNotes,
+      locale,
+      t,
+      translatedNotes,
+      translationUpdates,
+    ],
+  );
 
   const filteredPrintout = useMemo(() => {
     if (!data) return [];
@@ -1124,7 +1206,7 @@ export default function ReflectionCard({
     </button>
   );
 
-  const FeelingNote = ({ text }: { text: string }) => {
+  const FeelingNote = ({ text, lang }: { text: string; lang?: string }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);
     const textRef = useRef<HTMLSpanElement | null>(null);
@@ -1149,6 +1231,7 @@ export default function ReflectionCard({
         <span
           ref={textRef}
           className={`${delius.className} block font-normal tracking-wider not-italic`}
+          lang={lang}
           style={
             isExpanded
               ? undefined
@@ -1191,6 +1274,22 @@ export default function ReflectionCard({
     const isUpdating = hearingUpdates[reflection.id];
     const isHidden = hiddenOverrides[reflection.id] ?? Boolean(reflection.hidden);
     const isHiddenUpdating = hiddenUpdates[reflection.id];
+    const shouldShowTranslate =
+      Boolean(reflection.locale) && reflection.locale !== locale && hasFeeling;
+    const translatedFeeling = translatedNotes[reflection.id];
+    const isTranslated = Boolean(translatedFeeling);
+    const displayFeeling = translatedFeeling ?? reflection.feeling ?? "";
+    const translateLabel = t("healer.profile.seeIn", {
+      language: getLanguageLabel(locale),
+    });
+    const revertLabel = reflection.locale
+      ? t("healer.profile.seeIn", {
+          language: getLanguageLabel(reflection.locale),
+        })
+      : "";
+    const translateButtonLabel = translationUpdates[reflection.id]
+      ? t("healer.profile.translating")
+      : (isTranslated ? revertLabel : translateLabel);
 
     return (
       <div
@@ -1245,27 +1344,49 @@ export default function ReflectionCard({
         </p>
         {hasFeeling && (
           <>
-            <FeelingNote text={reflection.feeling ?? ""} />
-            {shouldShowHearButton ? (
-              <div className="mt-2 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleHearToggle(
-                      reflection.id,
-                      isHeard,
-                      options?.emotionLabel ?? "",
-                    )
-                  }
-                  className={`inline-flex items-center justify-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-3 py-1.5 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:hover:bg-[rgb(var(--dark-cta-hover))] ${
-                    isHeard
-                      ? "border-pulse-bloom/80 bg-pulse-bloom/80 text-white dark:border-purple-400/60 dark:bg-purple-500/40 dark:text-white"
-                      : ""
-                  }`}
-                  disabled={isUpdating}
-                >
-                  {isHeard ? t("reflection.heard") : t("reflection.hear")}
-                </button>
+            <FeelingNote
+              text={displayFeeling}
+              lang={isTranslated ? locale : reflection.locale ?? locale}
+            />
+            {shouldShowTranslate || shouldShowHearButton ? (
+              <div className="mt-2">
+                <div className="flex justify-center gap-3">
+                  {shouldShowTranslate ? (
+                    <button
+                      type="button"
+                      onClick={() => handleTranslateToggle(reflection)}
+                      className="inline-flex items-center justify-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-3 py-1.5 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:hover:bg-[rgb(var(--dark-cta-hover))]"
+                      disabled={translationUpdates[reflection.id]}
+                    >
+                      {translateButtonLabel}
+                    </button>
+                  ) : null}
+                  {shouldShowHearButton ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleHearToggle(
+                          reflection.id,
+                          isHeard,
+                          options?.emotionLabel ?? "",
+                        )
+                      }
+                      className={`inline-flex items-center justify-center rounded-full border border-pulse-bloom/30 bg-pulse-bloom-soft/20 px-3 py-1.5 text-xs font-semibold text-pulse-bloom-deep shadow-sm transition-colors hover:bg-pulse-bloom-soft-hover disabled:cursor-not-allowed disabled:opacity-60 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-cta))] dark:text-white dark:hover:bg-[rgb(var(--dark-cta-hover))] ${
+                        isHeard
+                          ? "border-pulse-bloom/80 bg-pulse-bloom/80 text-white dark:border-purple-400/60 dark:bg-purple-500/40 dark:text-white"
+                          : ""
+                      }`}
+                      disabled={isUpdating}
+                    >
+                      {isHeard ? t("reflection.heard") : t("reflection.hear")}
+                    </button>
+                  ) : null}
+                </div>
+                {translationErrors[reflection.id] ? (
+                  <p className="mt-1 text-center text-xs text-red-500">
+                    {translationErrors[reflection.id]}
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </>
@@ -1888,7 +2009,7 @@ export default function ReflectionCard({
                                       className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={emotionPrintoutPage <= 1}
                                     >
-                                      Last page
+                                      {t("pagination.lastPage")}
                                     </button>
                                     <button
                                       type="button"
@@ -1900,7 +2021,7 @@ export default function ReflectionCard({
                                       className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-pulse-bloom-soft/20 disabled:cursor-not-allowed disabled:opacity-60"
                                       disabled={emotionPrintoutPage >= totalPages}
                                     >
-                                      Next page
+                                      {t("pagination.nextPage")}
                                     </button>
                                   </div>
                                 )}
