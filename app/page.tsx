@@ -1,4 +1,5 @@
 import SpaceCta from "@/components/home/space-cta";
+import FeatureCards from "@/components/home/feature-cards";
 import { getLocale } from "@/lib/i18n-server";
 import { getTranslations } from "@/lib/i18n";
 import { auth } from "@clerk/nextjs/server";
@@ -28,26 +29,21 @@ export default async function HomePage() {
           <p className="mt-2 text-sm text-gray-500">{t("home.hero.subtext")}</p>
         </section>
 
-        <section className="flex gap-4 overflow-x-auto pb-2 md:grid md:overflow-visible md:pb-0 md:grid-cols-3">
-          <div className="min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm md:min-w-0">
-            <span className="block text-xs uppercase tracking-[0.2em] text-gray-400 dark:text-gray-300">
-              {t("home.feature.invite.title")}
-            </span>
-            {t("home.feature.invite.description")}
-          </div>
-          <div className="min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm md:min-w-0">
-            <span className="block text-xs uppercase tracking-[0.2em] text-gray-400 dark:text-gray-300">
-              {t("home.feature.sense.title")}
-            </span>
-            {t("home.feature.sense.description")}
-          </div>
-          <div className="min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-sm text-gray-700 shadow-sm md:min-w-0">
-            <span className="block text-xs uppercase tracking-[0.2em] text-gray-400 dark:text-gray-300">
-              {t("home.feature.share.title")}
-            </span>
-            {t("home.feature.share.description")}
-          </div>
-        </section>
+        <FeatureCards
+          locale={locale}
+          invite={{
+            title: t("home.feature.invite.title"),
+            description: t("home.feature.invite.description"),
+          }}
+          sense={{
+            title: t("home.feature.sense.title"),
+            description: t("home.feature.sense.description"),
+          }}
+          share={{
+            title: t("home.feature.share.title"),
+            description: t("home.feature.share.description"),
+          }}
+        />
 
         <SpaceCta initialSlug={healer?.slug ?? null} initialChecked={Boolean(userId)} />
 
