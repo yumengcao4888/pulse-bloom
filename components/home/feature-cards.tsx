@@ -24,8 +24,9 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
   const [active, setActive] = useState<FeatureKey | null>(null);
   const open = active !== null;
 
-  const setOpen = (nextOpen: boolean) => {
-    if (!nextOpen) {
+  const setOpen = (nextOpen: boolean | ((prevState: boolean) => boolean)) => {
+    const resolvedOpen = typeof nextOpen === "function" ? nextOpen(true) : nextOpen;
+    if (!resolvedOpen) {
       setActive(null);
     }
   };
