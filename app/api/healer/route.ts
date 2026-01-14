@@ -3,34 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { isValidPronouns, normalizePronouns } from "@/lib/pronouns";
 import { locales } from "@/lib/i18n";
-
-const adjectives = [
-  "gentle", "quiet", "soft", "warm", "glowing", "open", "steady",
-  "grounded", "calm", "kind", "bright", "held", "supported",
-];
-
-const nouns = [
-  "bloom", "river", "path", "horizon", "seed", "light",
-  "garden", "field", "harbor", "meadow", "pulse", "leaf",
-];
+import { generateUniqueSlug } from "@/lib/slug";
 
 type BotCheckPayload = {
   honeypot?: string;
   startedAt?: number | string;
 };
-
-function generateSlugFromName(name: string) {
-
-  const cleaned = name.toLowerCase().replace(/[^a-z]/g, "");
-  const prefix = cleaned.substring(0, 2) || "h";
-
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-
-  const num = Math.floor(Math.random() * 100);
-
-  return `${prefix}-${adj}-${noun}-${num}`;
-}
 
 function getBotProtectionError(body: BotCheckPayload) {
   const vercelEnv = process.env.VERCEL_ENV;
@@ -125,6 +103,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const slug = await generateUniqueSlug(name);
     const healer = await prisma.healer.create({
       data: {
         clerkId: userId,
@@ -137,7 +116,7 @@ export async function POST(req: NextRequest) {
         contactType: normalizedContactType,
         bio,
         locale: normalizedLocale,
-        slug: generateSlugFromName(name),
+        slug,
       },
     });
 

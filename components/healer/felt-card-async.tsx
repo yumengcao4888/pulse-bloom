@@ -67,15 +67,14 @@ function FeltCardAsyncInner({
   const [monthlyData, setMonthlyData] = useState<FeltCardData>(monthly);
   const [allTimeData, setAllTimeData] = useState<FeltCardData>(allTime);
   const [loaded, setLoaded] = useState({ monthly: false, allTime: false });
-  const translateEmotionLabel = (label: string) => {
-    const key = `emotion.${label.toLowerCase()}` as MessageKey;
-    const translated = t(key);
-    return translated !== key ? translated : label;
-  };
-  const translateTopWords = (words: string[]) => words.map(translateEmotionLabel);
-
   useEffect(() => {
     const controller = new AbortController();
+    const translateEmotionLabel = (label: string) => {
+      const key = `emotion.${label.toLowerCase()}` as MessageKey;
+      const translated = t(key);
+      return translated !== key ? translated : label;
+    };
+    const translateTopWords = (words: string[]) => words.map(translateEmotionLabel);
 
     const loadAnalysis = async () => {
       try {
