@@ -582,7 +582,7 @@ const messages = {
     "editSpace.error.clear": "No pudimos eliminar las reflexiones. Inténtalo de nuevo.",
     "editSpace.error.refresh": "No pudimos actualizar el URL. Inténtalo de nuevo.",
     "editSpace.button": "Edita tu espacio",
-    "editSpace.saveButton": "Guardar cambios",
+    "editSpace.saveButton": "Guardar",
     "editSpace.refresh.button": "Regenerar URL",
     "editSpace.refresh.title": "Regenerar URL",
     "editSpace.refresh.prompt": "¿Lista para renovar tu enlace y código QR?",
