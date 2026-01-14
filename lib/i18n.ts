@@ -331,7 +331,7 @@ const messages = {
       "PulseBloom invita a reflexionar con suavidad y compartir la sensación de tu espacio.",
     "home.hero.subtext": "Que el cuidado hable por si mismo.",
     "home.feature.invite.title": "Invita",
-    "home.feature.invite.description": "Reflexiones con toques suaves.",
+    "home.feature.invite.description": "Reflexiones con toques suaves y cuidado atento.",
     "home.feature.sense.title": "Percibe",
     "home.feature.sense.description": "Las emociones aparecen con el tiempo.",
     "home.feature.share.title": "Comparte",

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Modal from "@/components/shared/modal";
+import useMediaQuery from "@/lib/hooks/use-media-query";
 
 type FeatureKey = "invite" | "sense" | "share";
 
@@ -23,6 +24,25 @@ const featureOrder: FeatureKey[] = ["invite", "sense", "share"];
 export default function FeatureCards({ locale, invite, sense, share }: Props) {
   const [active, setActive] = useState<FeatureKey | null>(null);
   const open = active !== null;
+  const { isDesktop } = useMediaQuery();
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = (event: React.PointerEvent) => {
+    pointerStartRef.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handlePointerUp = (event: React.PointerEvent) => {
+    const start = pointerStartRef.current;
+    pointerStartRef.current = null;
+    if (!start) {
+      return;
+    }
+    const deltaX = Math.abs(event.clientX - start.x);
+    const deltaY = Math.abs(event.clientY - start.y);
+    if (deltaX < 5 && deltaY < 5) {
+      setActive(null);
+    }
+  };
 
   const setOpen = (nextOpen: boolean | ((prevState: boolean) => boolean)) => {
     const resolvedOpen = typeof nextOpen === "function" ? nextOpen(true) : nextOpen;
@@ -74,17 +94,49 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
         {featureOrder.map((key) => {
           const feature = config[key].copy;
           return (
-            <button
+            <div
               key={key}
-              type="button"
-              onClick={() => setActive(key)}
-              className="min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-left text-sm text-gray-700 shadow-sm transition hover:shadow-md md:min-w-0"
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                if (!isDesktop) {
+                  setActive(key);
+                }
+              }}
+              onKeyDown={(event) => {
+                if (!isDesktop && (event.key === "Enter" || event.key === " ")) {
+                  event.preventDefault();
+                  setActive(key);
+                }
+              }}
+              className="relative min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-left text-sm text-gray-700 shadow-sm transition hover:shadow-md md:min-w-0"
             >
+              <button
+                type="button"
+                aria-label="Open feature preview"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActive(key);
+                }}
+                className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600"
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  aria-hidden="true"
+                  className="h-3.5 w-3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <circle cx="9" cy="9" r="5.5" />
+                  <path d="M13 13l4 4" strokeLinecap="round" />
+                </svg>
+              </button>
               <span className="block text-xs uppercase tracking-[0.2em] text-gray-400 dark:text-gray-300">
                 {feature.title}
               </span>
               {feature.description}
-            </button>
+            </div>
           );
         })}
       </section>
@@ -117,6 +169,9 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
                   alt={image.alt}
                   width={1400}
                   height={900}
+                  draggable={false}
+                  onPointerDown={handlePointerDown}
+                  onPointerUp={handlePointerUp}
                   className={
                     isShare
                       ? "h-auto w-auto max-h-[80vh] max-w-[90vw] rounded-xl object-contain md:max-w-[44vw]"
