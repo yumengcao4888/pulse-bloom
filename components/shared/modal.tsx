@@ -13,6 +13,7 @@ export default function Modal({
   open,
   setOpen,
   title = "Modal",
+  hideHandle = false,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -20,6 +21,7 @@ export default function Modal({
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   title?: string;
+  hideHandle?: boolean;
 }) {
   const { isMobile } = useMediaQuery();
   if (isMobile) {
@@ -35,9 +37,11 @@ export default function Modal({
             style={contentStyle}
           >
             <Drawer.Title className="sr-only">{title}</Drawer.Title>
-            <div className="sticky top-0 z-20 flex w-full items-center justify-center rounded-t-[10px] bg-inherit">
-              <div className="my-3 h-1 w-12 rounded-full bg-gray-300" />
-            </div>
+            {!hideHandle ? (
+              <div className="sticky top-0 z-20 flex w-full items-center justify-center rounded-t-[10px] bg-inherit">
+                <div className="my-3 h-1 w-12 rounded-full bg-gray-300" />
+              </div>
+            ) : null}
             {children}
           </Drawer.Content>
           <Drawer.Overlay />

@@ -92,8 +92,9 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
       <Modal
         open={open}
         setOpen={setOpen}
-        className="w-fit max-w-none bg-transparent p-0"
+        className="w-fit max-w-none bg-transparent p-0 !left-1/2 !right-auto !-translate-x-1/2 !overflow-visible !max-h-[90dvh] !bg-transparent !border-0 md:!left-0 md:!right-0 md:!translate-x-0"
         title="Feature preview"
+        hideHandle
       >
         {activeConfig ? (
           <div className="inline-flex h-fit items-center justify-center">
