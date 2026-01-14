@@ -50,6 +50,9 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [refreshOpen, setRefreshOpen] = useState(false);
+  const [refreshError, setRefreshError] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [clearOpen, setClearOpen] = useState(false);
   const [clearError, setClearError] = useState("");
   const [isClearing, setIsClearing] = useState(false);
@@ -81,6 +84,13 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
       setIsClearing(false);
     }
   }, [clearOpen]);
+
+  useEffect(() => {
+    if (!refreshOpen) {
+      setRefreshError("");
+      setIsRefreshing(false);
+    }
+  }, [refreshOpen]);
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
       startedAtRef.current = Date.now();
@@ -278,6 +288,31 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
       setClearError(t("editSpace.error.clear"));
     } finally {
       setIsClearing(false);
+    }
+  };
+
+  const handleRefreshSlug = async () => {
+    setRefreshError("");
+    setIsRefreshing(true);
+
+    try {
+      const res = await fetch("/api/healer/slug", { method: "POST" });
+      if (!res.ok) {
+        throw new Error("Failed to refresh slug");
+      }
+      const data = await res.json();
+      if (!data?.slug) {
+        throw new Error("Missing slug");
+      }
+      setRefreshOpen(false);
+      setOpen(false);
+      router.push(`/healer/${data.slug}/space`);
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to refresh healer slug:", err);
+      setRefreshError(t("editSpace.error.refresh"));
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -484,24 +519,33 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
           </div>
         </div>
         <div className="border-t px-6 py-4">
-          <div className="flex items-center justify-end gap-3">
+          <div className="flex items-center justify-between gap-3">
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => setRefreshOpen(true)}
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:hover:border-[rgb(var(--dark-border))] dark:hover:bg-[rgb(var(--dark-card-hover))]"
             >
-              {t("button.cancel")}
+              {t("editSpace.refresh.button")}
             </button>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className={cn(
-                "rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800",
-                isSaving && "opacity-70",
-              )}
-            >
-              {t("editSpace.saveButton")}
-            </button>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 dark:border-[rgb(var(--dark-border))] dark:bg-[rgb(var(--dark-card))] dark:text-gray-100 dark:hover:border-[rgb(var(--dark-border))] dark:hover:bg-[rgb(var(--dark-card-hover))]"
+              >
+                {t("button.cancel")}
+              </button>
+              <button
+                type="submit"
+                disabled={isSaving}
+                className={cn(
+                  "rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800",
+                  isSaving && "opacity-70",
+                )}
+              >
+                {t("editSpace.saveButton")}
+              </button>
+            </div>
           </div>
         </div>
       </form>
@@ -563,6 +607,38 @@ export default function EditProfileSheet({ healer, buttonClassName }: EditProfil
             <button
               type="button"
               onClick={() => setClearOpen(false)}
+              className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
+            >
+              {t("button.cancel")}
+            </button>
+          </div>
+        </div>
+      </Modal>
+      <Modal open={refreshOpen} setOpen={setRefreshOpen} title={t("editSpace.refresh.title")}>
+        <div className="p-6 space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {t("editSpace.refresh.prompt")}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {t("editSpace.refresh.description")}
+            </p>
+          </div>
+          {refreshError ? (
+            <p className="text-sm text-red-600 dark:text-red-300">{refreshError}</p>
+          ) : null}
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              onClick={handleRefreshSlug}
+              className="rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+              disabled={isRefreshing}
+            >
+              {t("editSpace.refresh.confirm")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setRefreshOpen(false)}
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300"
             >
               {t("button.cancel")}
