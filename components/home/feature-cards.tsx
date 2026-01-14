@@ -95,7 +95,7 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
         className="h-fit w-fit max-w-none max-h-none bg-transparent p-0 overflow-visible border-0"
         mobileClassName={
           isShare
-            ? "w-fit max-w-[92vw] bg-transparent p-0 !left-1/2 !right-auto !-translate-x-1/2 !max-h-[55dvh] !overflow-y-auto !border-0"
+            ? "w-fit max-w-[92vw] bg-transparent p-0 !left-1/2 !right-auto !-translate-x-1/2 !max-h-[55dvh] !border-0 touch-pan-y"
             : "h-fit w-fit max-w-[92vw] bg-transparent p-0 !left-1/2 !right-auto !-translate-x-1/2 !overflow-visible !max-h-[90dvh] !border-0"
         }
         title="Feature preview"
@@ -106,7 +106,7 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
             <div
               className={
                 isShare
-                  ? "flex flex-col items-center justify-center gap-2 md:flex-row"
+                  ? "flex max-h-[55dvh] flex-col items-center gap-2 overflow-y-auto md:max-h-none md:flex-row md:overflow-visible"
                   : "flex items-center justify-center"
               }
             >
