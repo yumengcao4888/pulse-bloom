@@ -20,6 +20,14 @@ PulseBloom is a gentle reflection tool for healers and space-holders. It helps y
 - [Postgres](https://www.postgresql.org/)
 - [Clerk](https://clerk.com/)
 
+## Project Structure
+
+- `app/`: Next.js App Router routes and API handlers
+- `components/`: Shared UI organized by feature
+- `lib/`: Reusable hooks, helpers, and constants
+- `prisma/`: Schema, migrations, and seed scripts
+- `public/` + `app/fonts/`: Static assets and custom fonts
+
 ## Local Development
 
 1) Install dependencies
@@ -55,9 +63,47 @@ pnpm dev
 
 ## Deployment
 
-Deploy on Vercel and set the same environment variables as `.env.local`. If you use Clerk webhooks, add the webhook endpoint:
+### Prerequisites
+
+- Postgres database (e.g. Neon)
+- Clerk application keys
+
+### Environment Variables
+
+Set these in your hosting provider:
+
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+DATABASE_URL=
+```
+
+If you use Clerk webhooks, add:
+
+```
+CLERK_WEBHOOK_SECRET=
+```
+
+And configure the webhook endpoint:
 
 `https://<your-domain>/api/clerk/webhook`
+
+### Build and Run
+
+```bash
+pnpm install
+pnpm prisma generate
+pnpm build
+pnpm start
+```
+
+### Database Migrations
+
+When the schema changes, run:
+
+```bash
+pnpm prisma migrate deploy
+```
 
 ## Acknowledgements
 

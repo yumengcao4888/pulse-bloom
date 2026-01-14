@@ -109,7 +109,7 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
                   setActive(key);
                 }
               }}
-              className="relative min-w-[240px] flex-1 rounded-2xl border bg-white/80 p-5 text-left text-sm text-gray-700 shadow-sm transition hover:shadow-md md:min-w-0"
+              className="relative min-w-[240px] flex-1 cursor-default rounded-2xl border bg-white/80 p-5 text-left text-sm text-gray-700 shadow-sm transition hover:shadow-md md:min-w-0"
             >
               <button
                 type="button"
@@ -118,7 +118,7 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
                   event.stopPropagation();
                   setActive(key);
                 }}
-                className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600"
+                className="absolute right-3 top-3 inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:text-gray-600"
               >
                 <svg
                   viewBox="0 0 20 20"
