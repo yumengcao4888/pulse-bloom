@@ -9,6 +9,7 @@ import useMediaQuery from "@/lib/hooks/use-media-query";
 export default function Modal({
   children,
   className,
+  mobileClassName,
   contentStyle,
   open,
   setOpen,
@@ -17,6 +18,7 @@ export default function Modal({
 }: {
   children: React.ReactNode;
   className?: string;
+  mobileClassName?: string;
   contentStyle?: React.CSSProperties;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -32,7 +34,7 @@ export default function Modal({
           <Drawer.Content
             className={cn(
               "fixed bottom-0 left-0 right-0 z-[70] mt-24 max-h-[85dvh] overflow-y-auto rounded-t-[10px] border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]",
-              className,
+              mobileClassName ?? className,
             )}
             style={contentStyle}
           >

@@ -92,7 +92,12 @@ export default function FeatureCards({ locale, invite, sense, share }: Props) {
       <Modal
         open={open}
         setOpen={setOpen}
-        className="w-fit max-w-none bg-transparent p-0 !left-1/2 !right-auto !-translate-x-1/2 !overflow-visible !max-h-[90dvh] !bg-transparent !border-0 md:!left-0 md:!right-0 md:!translate-x-0"
+        className="h-fit w-fit max-w-none max-h-none bg-transparent p-0 overflow-visible border-0"
+        mobileClassName={
+          isShare
+            ? "w-fit max-w-[92vw] bg-transparent p-0 !left-1/2 !right-auto !-translate-x-1/2 !max-h-[55dvh] !overflow-y-auto !border-0"
+            : "h-fit w-fit max-w-[92vw] bg-transparent p-0 !left-1/2 !right-auto !-translate-x-1/2 !overflow-visible !max-h-[90dvh] !border-0"
+        }
         title="Feature preview"
         hideHandle
       >
