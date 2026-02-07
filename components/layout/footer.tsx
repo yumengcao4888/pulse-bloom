@@ -19,6 +19,28 @@ export default async function Footer() {
         </p>
         <p>
           <Link
+            href="/privacy"
+            className="text-gray-600 underline-offset-4 hover:underline dark:text-gray-300"
+          >
+            Privacy Policy
+          </Link>{" "}
+          •{" "}
+          <Link
+            href="/terms"
+            className="text-gray-600 underline-offset-4 hover:underline dark:text-gray-300"
+          >
+            Terms of Service
+          </Link>{" "}
+          •{" "}
+          <Link
+            href="/data-deletion"
+            className="text-gray-600 underline-offset-4 hover:underline dark:text-gray-300"
+          >
+            Data Deletion
+          </Link>
+        </p>
+        <p>
+          <Link
             href="https://github.com/yumengcao4888/pulse-bloom"
             className="text-gray-600 underline-offset-4 hover:underline dark:text-gray-300"
           >
