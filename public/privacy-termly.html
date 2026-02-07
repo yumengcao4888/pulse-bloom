@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Privacy Policy</title>
+    <script>
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var theme = params.get("theme");
+          if (theme === "dark" || theme === "light") {
+            document.documentElement.setAttribute("data-theme", theme);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <style>
       body {
         margin: 0;
@@ -11,6 +22,59 @@
         font-family: Arial, sans-serif;
         line-height: 1.6;
         color: #333;
+      }
+
+      :root {
+        color-scheme: light;
+      }
+
+      :root[data-theme='dark'] body {
+        background: rgb(46, 32, 72);
+        color: #e5e7eb;
+      }
+
+      :root[data-theme='dark'] [data-custom-class='title'],
+      :root[data-theme='dark'] [data-custom-class='title'] *,
+      :root[data-theme='dark'] [data-custom-class='heading_1'],
+      :root[data-theme='dark'] [data-custom-class='heading_1'] *,
+      :root[data-theme='dark'] [data-custom-class='heading_2'],
+      :root[data-theme='dark'] [data-custom-class='heading_2'] * {
+        color: #f9fafb !important;
+      }
+
+      :root[data-theme='dark'] [data-custom-class='subtitle'],
+      :root[data-theme='dark'] [data-custom-class='subtitle'] *,
+      :root[data-theme='dark'] [data-custom-class='body_text'],
+      :root[data-theme='dark'] [data-custom-class='body_text'] * {
+        color: #d1d5db !important;
+      }
+
+      :root[data-theme='dark'] [data-custom-class='link'],
+      :root[data-theme='dark'] [data-custom-class='link'] * {
+        color: #a5b4fc !important;
+      }
+
+      :root[data-theme='dark'] [style*='color: rgb(0, 0, 0)'] {
+        color: #f9fafb !important;
+      }
+      :root[data-theme='dark'] [style*='color: rgb(0,0,0)'] {
+        color: #f9fafb !important;
+      }
+
+      :root[data-theme='dark'] [style*='color: rgb(89, 89, 89)'],
+      :root[data-theme='dark'] [style*='color: rgb(127, 127, 127)'] {
+        color: #d1d5db !important;
+      }
+
+      :root[data-theme='dark'] [style*='color: rgb(0, 58, 250)'] {
+        color: #a5b4fc !important;
+      }
+      :root[data-theme='dark'] [style*='color: rgb(0,58,250)'] {
+        color: #a5b4fc !important;
+      }
+
+      :root[data-theme='dark'] {
+        color-scheme: dark;
       }
     </style>
   </head>
